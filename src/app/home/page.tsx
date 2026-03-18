@@ -1,5 +1,4 @@
-import { fetchTopCoins } from "@/application/useCases/fetchTopCoins";
-import { CoinGeckoRepository } from "@/infrastructure/db/coinGeckoRepository";
+import { getTopCoinsSnapshot } from "@/application/useCases/getTopCoinsSnapshot";
 import { AppHeader } from "@/presentation/components/AppHeader";
 import { RecentCoinsList } from "@/presentation/components/RecentCoinsList";
 import { RiskDisclaimer } from "@/presentation/components/RiskDisclaimer";
@@ -8,8 +7,7 @@ import { TopCoinsGrid } from "@/presentation/components/TopCoinsGrid";
 import { characters } from "@/shared/constants/characters";
 
 export default async function HomePage() {
-  const repository = new CoinGeckoRepository();
-  const topCoins = await fetchTopCoins(repository);
+  const topCoins = await getTopCoinsSnapshot();
   const bullCount = characters.filter((character) => character.team === "bull").length;
   const bearCount = characters.length - bullCount;
 

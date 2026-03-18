@@ -18,14 +18,23 @@ export function WinnerHighlight({ messages, winningTeam }: WinnerHighlightProps)
     return null;
   }
 
-  const winnerMessages = messages
-    .filter((message) => message.team === winningTeam)
-    .sort((left, right) => scoreMessage(right) - scoreMessage(left))
-    .filter(
-      (message, index, collection) =>
-        collection.findIndex((candidate) => candidate.characterId === message.characterId) === index,
-    )
-    .slice(0, 2);
+  const bestMessageByCharacterId = new Map<string, DebateMessage>();
+
+  for (const message of messages) {
+    if (message.team !== winningTeam) {
+      continue;
+    }
+
+    const currentBestMessage = bestMessageByCharacterId.get(message.characterId);
+
+    if (!currentBestMessage || scoreMessage(message) > scoreMessage(currentBestMessage)) {
+      bestMessageByCharacterId.set(message.characterId, message);
+    }
+  }
+
+  const winnerMessages = Array.from(bestMessageByCharacterId.values());
+  winnerMessages.sort((left, right) => scoreMessage(right) - scoreMessage(left));
+  winnerMessages.length = Math.min(winnerMessages.length, 2);
 
   return (
     <section className="rounded-[24px] border border-border bg-card p-5">

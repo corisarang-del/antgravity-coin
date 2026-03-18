@@ -12,7 +12,7 @@ export function TopCoinsGrid({ coins }: TopCoinsGridProps) {
       {coins.map((coin) => (
         <article
           key={coin.id}
-          className="rounded-[24px] border border-border bg-card p-5 shadow-[0_18px_40px_rgba(17,29,61,0.08)] transition-transform duration-200 hover:-translate-y-0.5"
+          className="rounded-[24px] border border-border bg-card p-5 shadow-[0_18px_40px_rgba(17,29,61,0.08)] transition-transform duration-200 hover:-translate-y-0.5 [content-visibility:auto]"
         >
           <div className="mb-4 flex items-start justify-between gap-3">
             <div>

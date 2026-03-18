@@ -2,7 +2,6 @@
 
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { AppHeader } from "@/presentation/components/AppHeader";
 import { IndicatorCard } from "@/presentation/components/IndicatorCard";
@@ -37,7 +36,7 @@ export function BattlePageClient({ coinId }: BattlePageClientProps) {
       coinId,
     });
 
-  const lastMessage = useMemo(() => messages[messages.length - 1] ?? null, [messages]);
+  const lastMessage = messages[messages.length - 1] ?? null;
   const indicators = summary?.indicators ?? [];
 
   return (

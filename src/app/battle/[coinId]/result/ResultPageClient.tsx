@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { startTransition, useEffect, useState } from "react";
 import { resolveBattle } from "@/application/useCases/resolveBattle";
 import { updateLevels } from "@/application/useCases/updateLevels";
 import { AppHeader } from "@/presentation/components/AppHeader";
@@ -27,6 +27,7 @@ export function ResultPageClient({ coinId }: ResultPageClientProps) {
     useUserLevelStore();
   const [battleReport, setBattleReport] = useState<string | null>(null);
   const [resultError, setResultError] = useState<string | null>(null);
+  const battleId = userBattle?.battleId;
 
   const battleResult =
     userBattle && snapshot?.marketData ? resolveBattle(userBattle, snapshot.marketData) : null;
@@ -38,7 +39,7 @@ export function ResultPageClient({ coinId }: ResultPageClientProps) {
   }, [hydrateUserLevel, hydrated, hydratedUserId, user?.userId]);
 
   useEffect(() => {
-    if (!battleResult || !userBattle || !hydrated || !user?.userId) {
+    if (!battleResult || !userBattle || !hydrated || !user?.userId || !battleId) {
       return;
     }
 
@@ -53,29 +54,32 @@ export function ResultPageClient({ coinId }: ResultPageClientProps) {
         return;
       }
 
-      const appliedResponse = await fetch(
-        `/api/battle/applications?battleId=${encodeURIComponent(currentBattle.battleId)}`,
-        {
+      const battleIdQuery = encodeURIComponent(currentBattle.battleId);
+      const [appliedResponse, existingOutcomeResponse] = await Promise.all([
+        fetch(`/api/battle/applications?battleId=${battleIdQuery}`, {
           credentials: "include",
-        },
-      );
+        }),
+        fetch(`/api/battle/outcome?battleId=${battleIdQuery}`, {
+          credentials: "include",
+        }),
+      ]);
+
       const appliedData = (await appliedResponse.json()) as { applied: boolean };
+      const existingOutcomeData = existingOutcomeResponse.ok
+        ? ((await existingOutcomeResponse.json()) as { report?: { report: string } })
+        : null;
 
-      if (cancelled || appliedData.applied) {
-        const existingOutcomeResponse = await fetch(
-          `/api/battle/outcome?battleId=${encodeURIComponent(currentBattle.battleId)}`,
-          {
-            credentials: "include",
-          },
-        );
+      if (cancelled) {
+        return;
+      }
 
-        if (existingOutcomeResponse.ok) {
-          const outcomeData = (await existingOutcomeResponse.json()) as { report?: { report: string } };
-          if (!cancelled) {
-            setBattleReport(outcomeData.report?.report ?? null);
-          }
-        }
+      if (existingOutcomeData?.report?.report) {
+        startTransition(() => {
+          setBattleReport(existingOutcomeData.report?.report ?? null);
+        });
+      }
 
+      if (appliedData.applied) {
         return;
       }
 
@@ -95,7 +99,9 @@ export function ResultPageClient({ coinId }: ResultPageClientProps) {
       if (outcomeResponse.ok) {
         const outcomeData = (await outcomeResponse.json()) as { report?: { report: string } };
         if (!cancelled) {
-          setBattleReport(outcomeData.report?.report ?? null);
+          startTransition(() => {
+            setBattleReport(outcomeData.report?.report ?? null);
+          });
         }
       } else {
         if (!cancelled) {
@@ -131,7 +137,7 @@ export function ResultPageClient({ coinId }: ResultPageClientProps) {
     return () => {
       cancelled = true;
     };
-  }, [battleResult, hydrated, setUserLevel, snapshot, user?.userId, userBattle, userLevel]);
+  }, [battleId, battleResult, hydrated, setUserLevel, snapshot, user?.userId, userBattle, userLevel]);
 
   if (!battleResult || !snapshot?.messages || !userBattle || userBattle.coinId !== coinId) {
     return (

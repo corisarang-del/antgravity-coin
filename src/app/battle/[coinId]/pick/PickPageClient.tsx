@@ -21,23 +21,30 @@ export function PickPageClient({ coinId }: PickPageClientProps) {
   const [timeframe, setTimeframe] = useState<"24h" | "7d">("24h");
   const snapshot = useBattleSnapshot();
 
-  const bullPoints = useMemo(
-    () =>
-      (snapshot?.messages ?? [])
-        .filter((message) => message.team === "bull")
-        .slice(0, 3)
-        .map((message) => message.summary),
-    [snapshot],
-  );
+  const { bullPoints, bearPoints } = useMemo(() => {
+    const snapshotMessages = snapshot?.messages ?? [];
+    const nextBullPoints: string[] = [];
+    const nextBearPoints: string[] = [];
 
-  const bearPoints = useMemo(
-    () =>
-      (snapshot?.messages ?? [])
-        .filter((message) => message.team === "bear")
-        .slice(0, 3)
-        .map((message) => message.summary),
-    [snapshot],
-  );
+    for (const message of snapshotMessages) {
+      if (message.team === "bull" && nextBullPoints.length < 3) {
+        nextBullPoints.push(message.summary);
+      }
+
+      if (message.team === "bear" && nextBearPoints.length < 3) {
+        nextBearPoints.push(message.summary);
+      }
+
+      if (nextBullPoints.length === 3 && nextBearPoints.length === 3) {
+        break;
+      }
+    }
+
+    return {
+      bullPoints: nextBullPoints,
+      bearPoints: nextBearPoints,
+    };
+  }, [snapshot?.messages]);
 
   const handleConfirm = () => {
     saveUserBattle({

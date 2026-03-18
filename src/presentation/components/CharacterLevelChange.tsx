@@ -4,12 +4,17 @@ interface CharacterLevelChangeProps {
   winningTeam: "bull" | "bear" | "draw";
 }
 
+const winnersByTeam = {
+  bull: characters.filter((character) => character.team === "bull"),
+  bear: characters.filter((character) => character.team === "bear"),
+} as const;
+
 export function CharacterLevelChange({ winningTeam }: CharacterLevelChangeProps) {
   if (winningTeam === "draw") {
     return null;
   }
 
-  const winners = characters.filter((character) => character.team === winningTeam);
+  const winners = winnersByTeam[winningTeam];
 
   return (
     <section className="rounded-[24px] border border-border bg-card p-5">

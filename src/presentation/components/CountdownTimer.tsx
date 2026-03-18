@@ -10,6 +10,14 @@ export function CountdownTimer({ seconds }: CountdownTimerProps) {
   const [remainingSeconds, setRemainingSeconds] = useState(seconds);
 
   useEffect(() => {
+    setRemainingSeconds(seconds);
+  }, [seconds]);
+
+  useEffect(() => {
+    if (remainingSeconds === 0) {
+      return;
+    }
+
     const timer = window.setInterval(() => {
       setRemainingSeconds((currentSeconds) => (currentSeconds > 0 ? currentSeconds - 1 : 0));
     }, 1000);
@@ -17,7 +25,7 @@ export function CountdownTimer({ seconds }: CountdownTimerProps) {
     return () => {
       window.clearInterval(timer);
     };
-  }, []);
+  }, [remainingSeconds]);
 
   return (
     <div className="rounded-[24px] border border-border bg-card p-5">

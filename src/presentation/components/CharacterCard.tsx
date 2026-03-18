@@ -4,9 +4,16 @@ import type { Character } from "@/shared/constants/characters";
 interface CharacterCardProps {
   character: Character;
   onClick: () => void;
+  imagePriority?: boolean;
+  imageSizes?: string;
 }
 
-export function CharacterCard({ character, onClick }: CharacterCardProps) {
+export function CharacterCard({
+  character,
+  onClick,
+  imagePriority = false,
+  imageSizes = "(max-width: 639px) calc(100vw - 2rem), (max-width: 1023px) calc(50vw - 1.625rem), 31.5rem",
+}: CharacterCardProps) {
   return (
     <button
       className="overflow-hidden rounded-[24px] border border-border bg-card text-left shadow-[0_18px_40px_rgba(17,29,61,0.08)] transition-transform duration-200 hover:-translate-y-1 hover:border-primary/20 focus-visible:ring-2 focus-visible:ring-primary/30"
@@ -14,24 +21,16 @@ export function CharacterCard({ character, onClick }: CharacterCardProps) {
       type="button"
     >
       <div className="relative aspect-[4/3] overflow-hidden bg-[linear-gradient(180deg,hsl(var(--surface-2)),hsl(var(--surface-3)))]">
-        <div className="absolute inset-0 flex items-center justify-between px-1">
-          <CharacterImage
-            alt=""
-            aria-hidden="true"
-            className="h-full w-[43%] object-contain object-right opacity-55"
-            src={character.imageSrc}
-          />
-          <CharacterImage
-            alt=""
-            aria-hidden="true"
-            className="h-full w-[43%] -scale-x-100 object-contain object-right opacity-55"
-            src={character.imageSrc}
-          />
+        <div className="absolute inset-0">
+          <div className="absolute left-[-12%] top-[10%] h-[72%] w-[40%] rounded-full bg-primary/10 blur-3xl" />
+          <div className="absolute right-[-12%] top-[16%] h-[68%] w-[38%] rounded-full bg-primary/10 blur-3xl" />
         </div>
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(12,18,36,0.08)_42%,rgba(12,18,36,0.22)_100%)]" />
         <CharacterImage
           alt={character.name}
           className="relative z-10 h-full w-full scale-[1.02] object-contain object-center p-2"
+          priority={imagePriority}
+          sizes={imageSizes}
           src={character.imageSrc}
         />
       </div>

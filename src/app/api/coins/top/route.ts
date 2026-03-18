@@ -1,10 +1,8 @@
 import { NextResponse } from "next/server";
-import { fetchTopCoins } from "@/application/useCases/fetchTopCoins";
-import { CoinGeckoRepository } from "@/infrastructure/db/coinGeckoRepository";
+import { getTopCoinsSnapshot } from "@/application/useCases/getTopCoinsSnapshot";
 
 export async function GET() {
-  const repository = new CoinGeckoRepository();
-  const coins = await fetchTopCoins(repository);
+  const coins = await getTopCoinsSnapshot();
 
   return NextResponse.json({ coins });
 }

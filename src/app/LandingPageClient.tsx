@@ -1,17 +1,23 @@
 ﻿"use client";
 
+import dynamic from "next/dynamic";
 import Link from "next/link";
-import {
-  useEffect,
-  useRef,
-  useState,
-  type MutableRefObject,
-} from "react";
+import { useEffect, useRef, useState, useTransition, type MutableRefObject } from "react";
 import { useRouter } from "next/navigation";
 import { CharacterImage } from "@/presentation/components/CharacterImage";
 import { characters } from "@/shared/constants/characters";
 import { cn } from "@/shared/lib/cn";
 import { PreviewVideoCache, type PreviewVideoStatus } from "@/app/previewVideoCache";
+
+const LandingCharacterPreviewModal = dynamic(
+  () =>
+    import("@/app/LandingCharacterPreviewModal").then(
+      (module) => module.LandingCharacterPreviewModal,
+    ),
+  {
+    loading: () => null,
+  },
+);
 
 const landingRows = [
   {
@@ -227,56 +233,6 @@ function CharacterHoverPreview({
   );
 }
 
-function CharacterPreviewModal({
-  character,
-  onClose,
-}: {
-  character: PreviewCharacter;
-  onClose: () => void;
-}) {
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/65 p-4 backdrop-blur-sm">
-      <div className="relative w-full max-w-[84rem] overflow-hidden rounded-[32px] border border-white/20 bg-[hsl(var(--landing-hero-ink))] text-white shadow-[0_40px_100px_rgba(0,0,0,0.45)]">
-        <button
-          aria-label="닫기"
-          className="absolute right-4 top-4 z-20 inline-flex h-11 w-11 items-center justify-center rounded-full bg-white/15 text-sm font-semibold text-white"
-          onClick={onClose}
-          type="button"
-        >
-          닫기
-        </button>
-        <div className="grid min-h-[34rem] md:grid-cols-[1.25fr_0.75fr]">
-          <div className="relative min-h-[24rem] bg-black/10 p-6">
-            <CharacterPreviewMedia key={character.id} character={character} />
-          </div>
-          <div className="flex flex-col justify-end gap-4 p-6 md:p-8">
-            <span className="inline-flex w-fit rounded-full border border-white/20 bg-white/10 px-3 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-white/72">
-              Character Preview
-            </span>
-            <h3 className="font-display text-5xl font-bold tracking-[-0.06em]">{character.name}</h3>
-            <p className="text-sm font-semibold text-white/78">{character.role}</p>
-            <p className="text-sm leading-7 text-white/74">{character.specialty}</p>
-            <div className="flex flex-wrap gap-3 pt-2">
-              <Link
-                className="inline-flex min-h-12 items-center rounded-full bg-white px-5 py-3 text-sm font-semibold text-[hsl(var(--landing-hero-ink))]"
-                href="/home"
-              >
-                홈으로 이동
-              </Link>
-              <Link
-                className="inline-flex min-h-12 items-center rounded-full border border-white/20 bg-white/10 px-5 py-3 text-sm font-semibold text-white"
-                href="/characters"
-              >
-                도감 전체 보기
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function CharacterPosterCard({
   character,
   onOpen,
@@ -410,6 +366,7 @@ function CharacterSlider({
 
 export function LandingPageClient() {
   const router = useRouter();
+  const [, startNavigationTransition] = useTransition();
   const hoverTimeoutRef = useRef<number | null>(null);
   const activeAudioVideoRef = useRef<HTMLVideoElement | null>(null);
   const unlockVideoRef = useRef<HTMLVideoElement | null>(null);
@@ -454,7 +411,9 @@ export function LandingPageClient() {
   const navigateToHome = () => {
     setIsTransitioning(true);
     window.setTimeout(() => {
-      router.push("/home");
+      startNavigationTransition(() => {
+        router.push("/home");
+      });
     }, 650);
   };
 
@@ -714,7 +673,7 @@ export function LandingPageClient() {
       ) : null}
 
       {selectedCharacter ? (
-        <CharacterPreviewModal
+        <LandingCharacterPreviewModal
           character={selectedCharacter}
           onClose={() => setSelectedCharacter(null)}
         />

@@ -76,10 +76,12 @@ export function CharactersPageClient() {
         ) : null}
       </section>
       <section className="grid gap-5 sm:grid-cols-2">
-        {characters.map((character) => (
+        {characters.map((character, index) => (
           <CharacterCard
             key={character.id}
             character={character}
+            imagePriority={index < 2}
+            imageSizes="(max-width: 639px) calc(100vw - 2rem), (max-width: 1023px) calc(50vw - 1.625rem), 31.5rem"
             onClick={() => setSelectedCharacter(character)}
           />
         ))}

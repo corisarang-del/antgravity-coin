@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useMemo, useState } from "react";
+import { startTransition, useDeferredValue, useEffect, useId, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { SearchCoinResult } from "@/application/ports/CoinRepository";
 import { useRecentCoins } from "@/presentation/hooks/useRecentCoins";
@@ -19,6 +19,7 @@ export function SearchBar({ initialCoins, debounceMs = 300 }: SearchBarProps) {
   const [results, setResults] = useState<SearchCoinResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
+  const deferredQuery = useDeferredValue(query);
 
   const fallbackResults = useMemo(
     () =>
@@ -34,8 +35,13 @@ export function SearchBar({ initialCoins, debounceMs = 300 }: SearchBarProps) {
   useEffect(() => {
     setActiveIndex(0);
 
-    if (!query.trim()) {
-      setResults(fallbackResults);
+    const normalizedQuery = deferredQuery.trim();
+
+    if (!normalizedQuery) {
+      startTransition(() => {
+        setResults(fallbackResults);
+      });
+      setIsLoading(false);
       return;
     }
 
@@ -44,14 +50,18 @@ export function SearchBar({ initialCoins, debounceMs = 300 }: SearchBarProps) {
       setIsLoading(true);
 
       try {
-        const response = await fetch(`/api/coins/search?q=${encodeURIComponent(query)}`, {
+        const response = await fetch(`/api/coins/search?q=${encodeURIComponent(normalizedQuery)}`, {
           signal: controller.signal,
         });
         const data = (await response.json()) as { coins: SearchCoinResult[] };
-        setResults(data.coins);
+        startTransition(() => {
+          setResults(data.coins);
+        });
       } catch (error) {
         if (!(error instanceof DOMException && error.name === "AbortError")) {
-          setResults([]);
+          startTransition(() => {
+            setResults([]);
+          });
         }
       } finally {
         setIsLoading(false);
@@ -62,7 +72,7 @@ export function SearchBar({ initialCoins, debounceMs = 300 }: SearchBarProps) {
       controller.abort();
       window.clearTimeout(timeoutId);
     };
-  }, [debounceMs, fallbackResults, query]);
+  }, [debounceMs, deferredQuery, fallbackResults]);
 
   useEffect(() => {
     if (!results.length) {

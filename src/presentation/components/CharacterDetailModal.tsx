@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef } from "react";
+import { useEffect, useEffectEvent, useId, useRef } from "react";
 import { CharacterImage } from "@/presentation/components/CharacterImage";
 import type { Character } from "@/shared/constants/characters";
 
@@ -11,6 +11,9 @@ export function CharacterDetailModal({ character, onClose }: CharacterDetailModa
   const titleId = useId();
   const descriptionId = useId();
   const closeButtonRef = useRef<HTMLButtonElement | null>(null);
+  const handleEscapeClose = useEffectEvent(() => {
+    onClose();
+  });
 
   useEffect(() => {
     if (!character) {
@@ -23,7 +26,7 @@ export function CharacterDetailModal({ character, onClose }: CharacterDetailModa
 
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
-        onClose();
+        handleEscapeClose();
       }
     };
 
@@ -33,7 +36,7 @@ export function CharacterDetailModal({ character, onClose }: CharacterDetailModa
       document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", onKeyDown);
     };
-  }, [character, onClose]);
+  }, [character]);
 
   if (!character) {
     return null;

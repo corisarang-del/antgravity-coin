@@ -9,6 +9,11 @@ interface TeamBoardProps {
   messages: DebateMessage[];
 }
 
+const charactersByTeam = {
+  bull: characters.filter((character) => character.team === "bull"),
+  bear: characters.filter((character) => character.team === "bear"),
+} as const;
+
 export function TeamBoard({ activeCharacterId, messages }: TeamBoardProps) {
   const messageCountByTeam = useMemo(() => {
     const counts = { bull: 0, bear: 0 };
@@ -38,9 +43,7 @@ export function TeamBoard({ activeCharacterId, messages }: TeamBoardProps) {
             </span>
           </div>
           <div className="grid grid-cols-2 gap-3">
-            {characters
-              .filter((character) => character.team === team)
-              .map((character) => (
+            {charactersByTeam[team].map((character) => (
                 <div
                   key={character.id}
                   className={cn(
@@ -68,7 +71,7 @@ export function TeamBoard({ activeCharacterId, messages }: TeamBoardProps) {
                   </div>
                   <p className="mt-3 text-xs text-muted-foreground">{character.specialty}</p>
                 </div>
-              ))}
+            ))}
           </div>
         </div>
       ))}
