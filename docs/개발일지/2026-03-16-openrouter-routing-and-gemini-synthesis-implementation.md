@@ -1,0 +1,24 @@
+# 개발일지 - OpenRouter 라우팅과 Gemini 최종 취합 구현
+
+- 작성시각: 2026-03-16 23:45:00 +09:00
+- 해결하고자 한 문제:
+  - planning 문서 기준으로는 캐릭터 모델 호출을 `OpenRouter` 단일 키 경로로, 최종 결과 취합은 `Gemini` 직결 API로 분리해야 했지만 실제 코드가 그 기준을 따라오지 못하고 있었음.
+  - 캐릭터별 역할 evidence 분기와 시스템 프롬프트, 공통 fallback, 최종 취합 report 구조도 문서 기준으로 정렬이 필요했음.
+- 진행 내용:
+  - `.env.local`을 만들고 OpenRouter 키를 반영함.
+  - `.gitignore`를 추가해 `.env.local`과 `.env`를 Git 제외 대상으로 설정함.
+  - `envConfig`를 `OPENROUTER_API_KEY`, `OPENROUTER_BASE_URL`, `GEMINI_API_KEY`, `GEMINI_API_URL` 중심으로 정리함.
+  - `characterModelRoutes`를 문서 기준 최종 배정표와 `Qwen` 공통 fallback 기준으로 수정함.
+  - `openRouterProvider`를 추가하고 `llmRouter`를 OpenRouter 단일 경로 기준으로 재구성함.
+  - 캐릭터별 시스템 프롬프트와 user prompt, 역할별 evidence 분기 로직을 추가함.
+  - `Gemini` 직결 기반 `synthesizeBattleReportWithGemini`를 추가하고, `generateBattleReport`가 요약 + 승부 근거 재정리 책임을 맡도록 보강함.
+  - `BattleReport` 생성은 `Gemini` 실패 시 기존 fallback report를 쓰도록 함.
+  - 관련 테스트를 수정/보강하고 전체 검증을 통과함.
+- 해결된 것:
+  - 캐릭터 모델 호출과 최종 취합 모델이 문서 기준으로 분리됨.
+  - 팀별 모델 배정과 공통 fallback이 코드에 반영됨.
+  - 역할별 조사 입력이 공통 스냅샷에서 분기되도록 구현됨.
+  - `pnpm test`, `pnpm typecheck`, `pnpm lint` 모두 통과함.
+- 해결되지 않은 것:
+  - `Gemini` 키는 아직 비어 있으므로 최종 취합은 현재 fallback report로 동작할 수 있음.
+  - OpenRouter 경유 실제 응답 품질은 실환경에서 추가 검증이 필요함.

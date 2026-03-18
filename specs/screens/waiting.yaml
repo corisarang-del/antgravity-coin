@@ -1,0 +1,47 @@
+version: "2.0"
+
+screen:
+  name: 결과 대기
+  route: /battle/[coinId]/waiting
+  layout: single-column
+  description: 데모용 짧은 카운트다운과 내 선택 요약을 보여주는 화면
+
+params:
+  coinId: string
+
+data_requirements:
+  - resource: userBattle
+    needs: [coinId, coinSymbol, selectedTeam, timeframe]
+    source: localstorage
+    key: ant_gravity_user_battle
+    label: myPick
+
+components:
+  - id: waiting_intro
+    type: summary_card
+    position: top
+    function: 결과 대기 안내
+
+  - id: countdown_timer
+    type: countdown
+    position: main_top
+    function: 데모용 초 단위 카운트다운
+
+  - id: my_pick_summary
+    type: info_card
+    position: main_mid
+    function: 선택한 팀과 기간 요약
+
+  - id: result_link
+    type: cta_button
+    position: main_bottom
+    function: 결과 화면으로 이동
+
+events:
+  - trigger: no_pick_in_localstorage
+    action: show_pick_link
+
+tests:
+  - name: 대기 화면 로드
+    when: 팀 선택 완료 후 접속
+    then: [카운트다운 표시, 내 선택 요약 표시]

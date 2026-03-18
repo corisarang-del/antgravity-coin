@@ -1,0 +1,22 @@
+# 프롬프트 기록 - S4~S7 구현
+
+- 작성시각: 2026-03-16 21:30:00 +09:00
+- 해결하고자 한 문제:
+  - planning 문서에 있는 S4~S7 미구현 범위를 현재 앱 코드에 실제로 반영할 필요가 있었음.
+- 사용자 요청 요약:
+  - `$ralph-loop` 기준으로 planning 문서를 이해한 뒤, S1~S3 이후 남은 미구현 항목도 계속 구현해달라는 요청.
+- 이번 작업에서 구현한 핵심:
+  - seed / outcome / report / event log 도메인 모델과 파일 저장소
+  - `/api/battle/outcome` 저장 라우트
+  - 결과 화면의 회고 보고서 연결
+  - `ruleVersion` 포함 결과 계산 구조
+  - 멀티 provider 인터페이스, 라우팅표, runtime route 관리
+  - LLM 응답 캐시
+  - timing metrics, provider route optimization, shadow evaluation 초안
+- 검증 결과:
+  - `pnpm test -- --run` 통과
+  - `pnpm typecheck` 통과
+  - `src` 대상 eslint 통과
+- 해결되지 않은 것:
+  - Anthropic 외 provider는 아직 실제 호출 구현이 아님
+  - 전체 `pnpm lint`는 `pptx` 하위 기존 파일 때문에 실패

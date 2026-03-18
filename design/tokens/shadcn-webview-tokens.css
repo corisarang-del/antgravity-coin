@@ -1,0 +1,55 @@
+/*
+  Ant Gravity - Landing + App synced tokens
+*/
+
+:root {
+  --background: 36 44% 97%;
+  --foreground: 224 34% 14%;
+  --card: 0 0% 100%;
+  --card-foreground: 224 34% 14%;
+  --primary: 224 40% 20%;
+  --primary-foreground: 36 44% 97%;
+  --secondary: 347 60% 94%;
+  --secondary-foreground: 224 34% 18%;
+  --accent: 8 84% 58%;
+  --accent-foreground: 0 0% 100%;
+  --border: 220 18% 84%;
+  --bull: 152 57% 41%;
+  --bear: 8 84% 58%;
+  --xp: 47 96% 58%;
+  --surface-2: 30 33% 94%;
+  --surface-3: 347 44% 96%;
+  --landing-hero-ink: 224 40% 18%;
+  --landing-hero-deep: 213 56% 63%;
+  --landing-hero-blush: 345 78% 90%;
+  --landing-card-rose: 336 88% 92%;
+  --landing-card-cream: 40 100% 96%;
+  --landing-card-butter: 49 97% 79%;
+  --landing-line: 8 70% 66%;
+}
+
+.dark {
+  --background: 228 27% 10%;
+  --foreground: 34 38% 94%;
+  --card: 226 24% 13%;
+  --card-foreground: 34 38% 94%;
+  --primary: 34 38% 94%;
+  --primary-foreground: 228 27% 10%;
+  --secondary: 226 18% 19%;
+  --secondary-foreground: 34 38% 94%;
+  --accent: 8 88% 64%;
+  --accent-foreground: 228 27% 10%;
+  --border: 224 14% 24%;
+  --bull: 152 52% 53%;
+  --bear: 8 88% 64%;
+  --xp: 47 90% 61%;
+  --surface-2: 226 18% 16%;
+  --surface-3: 226 18% 20%;
+  --landing-hero-ink: 228 27% 10%;
+  --landing-hero-deep: 226 24% 18%;
+  --landing-hero-blush: 342 42% 32%;
+  --landing-card-rose: 341 32% 28%;
+  --landing-card-cream: 230 18% 19%;
+  --landing-card-butter: 40 42% 30%;
+  --landing-line: 347 50% 66%;
+}

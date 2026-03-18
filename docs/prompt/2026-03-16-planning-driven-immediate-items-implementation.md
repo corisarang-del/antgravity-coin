@@ -1,0 +1,21 @@
+# 프롬프트 기록 - planning 기반 즉시 구현 항목 보강
+
+- 작성시각: 2026-03-16 22:12:00 +09:00
+- 해결하고자 한 문제:
+  - planning 문서에서 "바로 구현해야 할 미구현"으로 정리한 항목을 실제 코드에 반영할 필요가 있었음.
+- 사용자 요청 요약:
+  - `docs/planning`을 기준으로 구현하되, 남은 즉시 구현 항목을 실제 코드로 이어서 반영해달라는 요청.
+- 이번 작업에서 구현한 핵심:
+  - Gemini provider와 OpenAI-compatible provider 추가
+  - Qwen/Kimi/GLM/DeepSeek 실호출 가능 구조 연결
+  - `/api/battle/outcome` GET 조회 + idempotent POST 보강
+  - `/api/battle/events` 조회 API 추가
+  - `/api/characters` fallback 상태 헤더와 캐릭터 도감 안내 UI 추가
+  - 배틀 SSE error UX의 재시도/홈 이동/부분 결과 안내 추가
+  - 결과 화면의 outcome 저장 실패/조회 복구 흐름 보강
+- 검증 결과:
+  - `pnpm test -- --run` 통과
+  - `pnpm typecheck` 통과
+  - `src` 대상 eslint 통과
+- 해결되지 않은 것:
+  - 실제 provider 키/엔드포인트가 없으면 비-Anthropic provider는 여전히 fallback 경로를 탄다.

@@ -1,0 +1,66 @@
+{
+  "version": 1,
+  "marketSeeds": [
+    {
+      "key": "bitcoin",
+      "value": {
+        "coinId": "bitcoin",
+        "symbol": "BTC",
+        "currentPrice": 84000,
+        "priceChange24h": 2.4,
+        "priceChange7d": 6.8,
+        "volume24h": 31000000000,
+        "prices": [
+          82000,
+          82100,
+          82200,
+          82300,
+          82400,
+          82500,
+          82600,
+          82700,
+          82800,
+          82900,
+          83000,
+          83100,
+          83200,
+          83300,
+          83400,
+          83500,
+          83600,
+          83700,
+          83800,
+          83900,
+          84000,
+          84100,
+          84200,
+          84300,
+          84400,
+          84500,
+          84600,
+          84700,
+          84800,
+          84900
+        ]
+      },
+      "fetchedAt": "2026-03-18T10:48:39.946Z",
+      "softExpiresAt": "2026-03-18T10:50:39.946Z",
+      "hardExpiresAt": "2026-03-18T10:58:39.946Z"
+    }
+  ],
+  "newsSentiments": [
+    {
+      "key": "BTC",
+      "value": {
+        "sentimentScore": 0.34,
+        "summary": "Alpha Vantage 기사 흐름은 대체로 긍정적이야.",
+        "source": "alpha-vantage"
+      },
+      "fetchedAt": "2026-03-18T10:48:39.950Z",
+      "softExpiresAt": "2026-03-18T11:03:39.950Z",
+      "hardExpiresAt": "2026-03-18T12:48:39.950Z"
+    }
+  ],
+  "derivatives": [],
+  "fearGreed": null
+}

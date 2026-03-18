@@ -1,0 +1,7 @@
+{
+  "enabledMcpjsonServers": [
+    "gemini",
+    "context7",
+    "playwright"
+  ]
+}

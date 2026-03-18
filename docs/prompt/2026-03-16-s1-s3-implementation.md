@@ -1,0 +1,21 @@
+# 프롬프트 기록 - S1~S3 구현
+
+- 작성시각: 2026-03-16 21:15:00 +09:00
+- 해결하고자 한 문제:
+  - planning 문서의 S1~S3 미구현 항목을 실제 코드에 반영할 필요가 있었음.
+- 사용자 요청 요약:
+  - `$ralph-loop` 기준으로 `docs/planning`을 이해한 뒤, 전체 구현 대신 먼저 S1~S3를 구현해달라는 요청.
+- 이번 작업에서 구현한 핵심:
+  - 선택 화면 카피/설명 강화와 `RiskDisclaimer` 추가
+  - `WinnerHighlight` 선정 규칙 개선
+  - `fetchMarketData`의 CoinGecko 실데이터 우선화와 fallback 유지
+  - `/api/battle`의 `coinId` 누락 처리와 SSE `error` 이벤트 추가
+  - `battleSnapshot` 버전 필드 추가
+  - `/api/characters` local/external 계약 정리와 external 실패 시 local fallback
+  - 관련 테스트 추가 및 보강
+- 검증 결과:
+  - `pnpm test -- --run` 통과
+  - `pnpm typecheck` 통과
+  - 변경 파일 대상 개별 eslint 통과
+- 해결되지 않은 것:
+  - 전체 `pnpm lint`는 `pptx` 하위 기존 파일의 CommonJS import 경고/에러 때문에 여전히 실패

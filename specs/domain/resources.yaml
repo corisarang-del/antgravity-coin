@@ -1,0 +1,96 @@
+version: "2.0"
+
+resources:
+
+  coin:
+    description: 코인 기본 정보
+    fields:
+      id: string
+      symbol: string
+      name: string
+      currentPrice?: number
+      priceChange24h?: number
+      marketCap?: number
+      volume24h?: number
+      thumb: string
+
+  marketData:
+    description: 코인 분석용 시장 데이터
+    fields:
+      coinId: string
+      symbol: string
+      currentPrice: number
+      priceChange24h: number
+      priceChange7d: number
+      rsi: number
+      macd: number
+      bollingerUpper: number
+      bollingerLower: number
+      fearGreedIndex: number
+      fearGreedLabel: string
+      sentimentScore: number
+      longShortRatio: number
+      liquidation24h: number
+      whaleScore: number
+      volume24h: number
+
+  character:
+    description: 캐릭터 정적 카탈로그
+    fields:
+      id: string
+      name: string
+      role: string
+      team: string          # "bull" | "bear"
+      specialty: string
+      emoji: string
+      imageSrc: string
+      posterSrc: string
+      imageFileName: string
+      sourceImageName: string
+      personality: string
+      selectionReason: string
+      accentTone: string    # "rose" | "cream" | "butter"
+
+  debateMessage:
+    description: 캐릭터 배틀 발언
+    fields:
+      id: string
+      characterId: string
+      characterName: string
+      team: string          # "bull" | "bear"
+      stance: string        # "bullish" | "bearish" | "neutral"
+      summary: string
+      detail: string
+      indicatorLabel: string
+      indicatorValue: string
+      createdAt: string
+
+  userBattle:
+    description: 사용자 배틀 참여 기록 (localstorage)
+    fields:
+      battleId: string
+      coinId: string
+      coinSymbol: string
+      selectedTeam: string  # "bull" | "bear"
+      timeframe: string     # "24h" | "7d"
+      selectedPrice: number
+      selectedAt: string
+
+  battleResult:
+    description: 결과 계산 산출물
+    fields:
+      coinId: string
+      timeframe: string     # "24h" | "7d"
+      winningTeam: string   # "bull" | "bear" | "draw"
+      priceChangePercent: number
+      userWon: boolean
+      xpDelta: number
+
+  userLevel:
+    description: 사용자 등급 정보 (localstorage)
+    fields:
+      level: number
+      title: string
+      xp: number
+      wins: number
+      losses: number

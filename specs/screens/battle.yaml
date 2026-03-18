@@ -1,0 +1,95 @@
+version: "2.0"
+
+screen:
+  name: 배틀
+  route: /battle/[coinId]
+  layout: single-column
+  description: 8명 캐릭터의 순차 토론을 보여주는 배틀 화면
+
+params:
+  coinId: string
+
+data_requirements:
+  - resource: marketData
+    needs:
+      - coinId
+      - symbol
+      - currentPrice
+      - priceChange24h
+      - priceChange7d
+      - rsi
+      - macd
+      - bollingerUpper
+      - bollingerLower
+      - fearGreedIndex
+      - fearGreedLabel
+      - sentimentScore
+      - longShortRatio
+      - liquidation24h
+      - whaleScore
+      - volume24h
+    source: sse_event
+    label: marketData
+
+  - resource: debateMessage
+    needs:
+      - id
+      - characterId
+      - characterName
+      - team
+      - stance
+      - summary
+      - detail
+      - indicatorLabel
+      - indicatorValue
+      - createdAt
+    source: sse_stream
+    endpoint: POST /api/battle
+    label: debateMessages
+
+components:
+  - id: battle_header
+    type: summary_card
+    position: top
+    function: 코인 심볼과 배틀 요약 노출
+
+  - id: team_board
+    type: team_status_board
+    position: below_header
+    function: 현재 화자 강조와 팀 상태 표시
+
+  - id: battle_feed
+    type: chat_feed
+    position: main
+    function: 발언 목록 표시
+
+  - id: speaker_spotlight
+    type: spotlight_card
+    position: side
+    function: 마지막 발언 캐릭터 강조
+
+  - id: indicators
+    type: metric_cards
+    position: side_bottom
+    function: summary 지표 카드
+
+  - id: risk_disclaimer
+    type: alert_box
+    position: side_bottom
+    function: 투자 조언 아님 고지
+
+events:
+  - trigger: page_mount
+    action: start_sse_stream
+
+  - trigger: battle_complete
+    action: show_pick_cta_button
+
+tests:
+  - name: 배틀 시작
+    when: /battle/bitcoin 접속
+    then: [SSE 스트림 시작, 팀보드 표시]
+
+  - name: 8발언 완료
+    when: 마지막 캐릭터 발언 완료
+    then: [팀 선택 CTA 버튼 표시]

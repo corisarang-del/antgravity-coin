@@ -1,0 +1,30 @@
+# 개발일지 - provider 추적성과 실런타임 검증
+
+- 작성시각: 2026-03-17 01:05:00 +09:00
+- 해결하고자 한 문제:
+  - 실제로 어떤 캐릭터가 어떤 모델을 썼는지, `MiniMax`가 진짜 호출됐는지, `Gemini` report가 실제로 저장됐는지 추적할 수 없었음.
+- 진행 내용:
+  - `DebateMessage`에 `provider`, `model`, `fallbackUsed`를 추가함.
+  - `llmRouter`가 문자열만 반환하지 않고 실제 사용 provider/model/fallback 여부 메타데이터를 함께 반환하도록 수정함.
+  - `/api/battle`의 `character_done` SSE payload에 `provider`, `model`, `fallbackUsed`를 포함시킴.
+  - `/api/battle/outcome` 저장 결과와 응답에 `reportSource`를 추가함.
+  - event log의 `debate_complete` payload에 캐릭터별 `provider`, `model`, `fallbackUsed` 목록을 기록하도록 추가함.
+  - 서버 로그에 캐릭터별 실제 사용 모델과 `Gemini` report source를 출력하도록 보강함.
+  - 실제 샘플 배틀을 끝까지 실행하고 8명 완료, `reportSource`, 캐릭터별 런타임 모델 사용 결과를 확인함.
+- 확인된 런타임 결과:
+  - `messageCount`: 8
+  - `reportSource`: `gemini`
+  - `Aira`: `qwen/qwen3.5-9b`
+  - `Judy`: `qwen/qwen3.5-9b` fallback
+  - `Clover`: `nvidia/nemotron-3-super-120b-a12b:free`
+  - `Blaze`: `qwen/qwen3.5-9b` fallback
+  - `Ledger`: `nvidia/nemotron-3-super-120b-a12b:free`
+  - `Shade`: `character-fallback`
+  - `Vela`: `qwen/qwen3.5-9b` fallback
+  - `Flip`: `qwen/qwen3.5-9b`
+- 해결된 것:
+  - 이제 누가 어떤 모델을 썼는지 100% 추적 가능하다.
+  - `MiniMax`가 성공했는지, `Qwen` fallback으로 갔는지 실제 데이터로 확인 가능하다.
+  - `Gemini` report가 실제 저장됐는지도 확인 가능하다.
+- 해결되지 않은 것:
+  - `Judy`, `Blaze`, `Vela`, `Shade`는 현재 기본 모델 실패 또는 fallback 경로를 타므로, 개별 provider 품질 안정화는 후속 작업이 필요함.

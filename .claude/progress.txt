@@ -1,0 +1,14 @@
+# RALPH Progress Log
+
+## 2026-03-14 14:56 - 초기 상태 확인
+- Phase 2까지 구현 완료
+- Next.js 앱, 홈 화면, 코인 검색 API, 최근 검색 훅, 기본 라우트 존재
+- 남은 작업은 Phase 3~6 전체
+- 구현 전략: 외부 API는 우선 시도 후 실패 시 mock/fallback으로 전체 플로우 유지
+
+## 2026-03-14 15:12 - 전체 플로우 구현 완료
+- Phase 3: 기술지표, 공포탐욕, 감성/선물 fallback, MarketData 통합, SSE 배틀 API 구현
+- Phase 4: 배틀 스트림 UI, 팀 선택 UI, userBattle 저장 훅 구현
+- Phase 5: 대기/결과/캐릭터 도감, 레벨 계산, Zustand 스토어 구현
+- 런타임 버그: 배틀 스트림 중복 실행 문제를 useBattleStream 의존성 수정으로 해결
+- 최종 검증: lint, typecheck, test, build 모두 통과

@@ -1,0 +1,22 @@
+# 개발일지 - 운영 품질 마감과 운영자 대시보드 추가
+
+- 작성시각: 2026-03-16 22:22:00 +09:00
+- 해결하고자 한 문제:
+  - `docs/planning` 기준으로 남아 있던 운영 품질 마감 항목과 운영자용 결과 조회 UI가 실제 코드에는 부족했음.
+  - 특히 비-Anthropic provider의 실제 호출 구조, outcome 조회/복구, event 조회, 캐릭터 fallback 안내, admin 대시보드, 전체 lint 통과가 남아 있었음.
+- 진행 내용:
+  - `GEMINI`, `QWEN`, `KIMI`, `GLM`, `DEEPSEEK` 관련 env 설정을 확장함.
+  - Gemini 전용 provider와 OpenAI-compatible provider를 추가해 비-Anthropic provider 실호출 구조를 마련함.
+  - `/api/battle/outcome`에 GET 조회와 recovered 기반 복구 흐름을 보강함.
+  - `/api/battle/events` 조회 API를 유지하고, `/api/admin/battles`, `/api/admin/battles/[battleId]` 운영자 API를 추가함.
+  - `app/admin/battles` 운영자 대시보드 페이지와 클라이언트 컴포넌트를 추가해 최근 battle 목록, 상세 결과, report, event log를 조회 가능하게 함.
+  - `/api/characters` 헤더 상태와 `/characters` fallback 안내 UI를 유지하고, 배틀 화면의 error UX와 결과 화면 복구 흐름을 보강함.
+  - eslint에서 `pptx/**`를 ignore 처리해 전체 `pnpm lint`가 통과하도록 정리함.
+- 해결된 것:
+  - `pnpm test`, `pnpm typecheck`, `pnpm lint` 모두 통과함.
+  - 운영자용 결과 대시보드가 추가됨.
+  - 비-Anthropic provider 중심 구조에서 실제 호출 가능한 클라이언트 계층이 생김.
+  - outcome/event/admin 조회 API가 추가되어 운영 조회 루트가 확보됨.
+- 해결되지 않은 것:
+  - 실제 provider API 품질은 키/엔드포인트를 넣고 실환경에서 추가 검증이 필요함.
+  - optimization, shadow evaluation, timing metrics 활용은 여전히 초안 수준임.

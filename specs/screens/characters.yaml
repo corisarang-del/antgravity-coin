@@ -1,0 +1,45 @@
+version: "2.0"
+
+screen:
+  name: 캐릭터 도감
+  route: /characters
+  layout: single-column
+  description: 8명 캐릭터의 카드와 상세 설명을 확인하는 화면
+
+data_requirements:
+  - resource: character
+    needs:
+      - id
+      - name
+      - role
+      - team
+      - specialty
+      - emoji
+      - imageSrc
+      - personality
+      - selectionReason
+    source: static
+    label: characters
+
+components:
+  - id: page_intro
+    type: summary_card
+    position: top
+    function: 캐릭터 도감 소개
+
+  - id: character_grid
+    type: grid
+    position: main
+    function: 8명 캐릭터 카드 2열 그리드
+    actions:
+      - on: card_click
+        action: open_character_detail_modal
+
+  - id: character_detail_modal
+    type: modal
+    function: 역할, 성격, 선정 이유 표시
+
+tests:
+  - name: 캐릭터 도감 로드
+    when: /characters 접속
+    then: [8명 캐릭터 카드 표시]

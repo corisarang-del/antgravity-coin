@@ -1,0 +1,31 @@
+version: "2.0"
+
+shared_components:
+
+  - id: app_header
+    type: header
+    used_in: [home, battle, pick, waiting, result, characters]
+    function: Ant Gravity 로고, 사용자 레벨 요약, 캐릭터 도감 링크
+    props:
+      brandText: "Ant Gravity"
+      catalogLink: /characters
+
+  - id: risk_disclaimer
+    type: alert_box
+    used_in: [home, battle, result]
+    function: 투자 조언 아님 고지 문구
+    props:
+      text: "이 분석은 참고 정보이며 투자 조언이 아니다. 모든 판단 책임은 사용자 본인에게 있다."
+      style: warning
+
+  - id: loading_skeleton
+    type: skeleton
+    used_in: [battle]
+    function: 배틀 피드 동적 로딩 중 스켈레톤 UI
+
+  - id: coin_price_badge
+    type: badge
+    used_in: [home]
+    function: 코인 가격 + 24h 변동률 표시
+    props:
+      fields: [price, change24h]

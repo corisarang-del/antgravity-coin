@@ -1,0 +1,24 @@
+{
+  "items": [
+    {
+      "battleId": "24b87a52-9f33-4b4a-a9d5-0b85b4fd4387",
+      "userId": "d5f2fe99-51ff-4b46-a0ca-75d72f81d1db",
+      "appliedAt": "2026-03-15T04:42:47.803Z"
+    },
+    {
+      "battleId": "2e088ba8-fa12-4b82-9a05-6c70e0764a81",
+      "userId": "d5f2fe99-51ff-4b46-a0ca-75d72f81d1db",
+      "appliedAt": "2026-03-15T12:05:20.330Z"
+    },
+    {
+      "battleId": "48f65986-7d5a-4962-89c6-7da7de2bf873",
+      "userId": "d5f2fe99-51ff-4b46-a0ca-75d72f81d1db",
+      "appliedAt": "2026-03-15T13:32:12.851Z"
+    },
+    {
+      "battleId": "b9033941-0ed5-4e67-a465-a5e860298b09",
+      "userId": "d5f2fe99-51ff-4b46-a0ca-75d72f81d1db",
+      "appliedAt": "2026-03-16T12:11:13.797Z"
+    }
+  ]
+}
