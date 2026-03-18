@@ -1,5 +1,6 @@
 import dynamic from "next/dynamic";
 import Link from "next/link";
+import { AdminSectionNav } from "@/app/admin/AdminSectionNav";
 import { AdminBattleSearchForm } from "@/app/admin/battles/AdminBattleSearchForm";
 import type { BattleListItem } from "@/app/admin/battles/adminBattles.types";
 import { FileReportRepository } from "@/infrastructure/db/fileReportRepository";
@@ -104,6 +105,9 @@ export default async function AdminBattlesPage({ searchParams }: AdminBattlesPag
             <p className="mt-3 text-sm leading-6 text-muted-foreground">
               운영 배틀 결과와 리포트, 이벤트 로그를 조회하는 내부 페이지야.
             </p>
+            <div className="mt-5">
+              <AdminSectionNav active="battles" />
+            </div>
           </section>
 
           <AdminBattleSearchForm initialBattleId={battleId} />
