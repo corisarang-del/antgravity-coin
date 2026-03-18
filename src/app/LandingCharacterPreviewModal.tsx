@@ -34,7 +34,7 @@ export function LandingCharacterPreviewModal({
           </div>
           <div className="flex flex-col justify-end gap-4 p-6 md:p-8">
             <span className="inline-flex w-fit rounded-full border border-white/20 bg-white/10 px-3 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-[hsl(var(--background)/0.72)]">
-              Character Preview
+              캐릭터 미리보기
             </span>
             <h3 className="font-display text-5xl font-bold tracking-[-0.06em]">{character.name}</h3>
             <p className="text-sm font-semibold text-[hsl(var(--background)/0.78)]">{character.role}</p>

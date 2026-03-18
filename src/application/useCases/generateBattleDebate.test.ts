@@ -54,7 +54,7 @@ describe("generateBattleDebate", () => {
   it("fenced json 응답도 파싱해서 실제 메시지로 쓴다", async () => {
     vi.mocked(generateCharacterDebateChunk).mockResolvedValueOnce({
       content:
-        '```json\n{"summary":"한글 응답 성공","detail":"세부 근거도 한글로 유지한다.","indicatorLabel":"RSI","indicatorValue":"62","stance":"bullish"}\n```',
+        '```json\n{"summary":"첫 응답 성공","detail":"역할에 맞는 근거로 정리한다.","indicatorLabel":"RSI","indicatorValue":"62","stance":"bullish"}\n```',
       provider: "openrouter",
       model: "stepfun/step-3.5-flash:free",
       fallbackUsed: false,
@@ -62,7 +62,7 @@ describe("generateBattleDebate", () => {
 
     const messages = await generateBattleDebate(marketData);
 
-    expect(messages[0]?.summary).toBe("한글 응답 성공");
+    expect(messages[0]?.summary).toBe("첫 응답 성공");
     expect(messages[0]?.provider).toBe("openrouter");
     expect(messages[0]?.model).toBe("stepfun/step-3.5-flash:free");
   });
@@ -141,8 +141,8 @@ describe("generateBattleDebate", () => {
     const message = await generateCharacterMessage(partialMarketData, vela, []);
 
     expect(message.fallbackUsed).toBe(true);
-    expect(message.summary).toContain("지금 의견을 제시하지 못해서 죄송합니다.");
-    expect(message.detail).toContain("다음번에 하겠습니다.");
+    expect(message.summary).toContain("근거가 부족해서");
+    expect(message.detail).toContain("다음 턴에서는");
     expect(message.model).toBe("live-evidence-unavailable");
   });
 });

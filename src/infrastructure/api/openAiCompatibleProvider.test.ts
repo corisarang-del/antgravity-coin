@@ -29,8 +29,11 @@ describe("createOpenAiCompatibleProvider", () => {
       {
         characterId: "aira",
         characterName: "Aira",
+        role: "기술분석가",
         team: "bull",
         specialty: "RSI",
+        personality: "차트를 차분하게 읽어.",
+        selectionReason: "기술형 캐릭터 테스트용이야.",
         coinSymbol: "BTC",
         focusSummary: "summary",
         evidence: [],
@@ -54,8 +57,11 @@ describe("createOpenAiCompatibleProvider", () => {
       {
         characterId: "aira",
         characterName: "Aira",
+        role: "기술분석가",
         team: "bull",
         specialty: "RSI",
+        personality: "차트를 차분하게 읽어.",
+        selectionReason: "기술형 캐릭터 테스트용이야.",
         coinSymbol: "BTC",
         focusSummary: "summary",
         evidence: [],

@@ -31,8 +31,11 @@ describe("geminiProvider", () => {
       {
         characterId: "judy",
         characterName: "Judy",
+        role: "뉴스 스카우터",
         team: "bull",
         specialty: "뉴스",
+        personality: "재료를 먼저 보는 타입이야.",
+        selectionReason: "뉴스형 캐릭터 테스트용이야.",
         coinSymbol: "BTC",
         focusSummary: "summary",
         evidence: [],

@@ -222,7 +222,7 @@ function CharacterHoverPreview({
       </div>
       <div className="p-5">
         <div className="flex flex-wrap items-center gap-2 text-sm text-white/88">
-          <span className="rounded border border-white/20 px-2 py-1 text-xs">character preview</span>
+          <span className="rounded border border-white/20 px-2 py-1 text-xs">캐릭터 미리보기</span>
           <span>{preview.character.team === "bull" ? "불리시" : "베어리시"}</span>
           <span>·</span>
           <span>{preview.character.role}</span>
@@ -536,7 +536,7 @@ export function LandingPageClient() {
           <div className="absolute inset-y-0 right-[-8%] hidden w-[46%] rotate-[-6deg] rounded-[40px] border border-white/20 bg-[linear-gradient(180deg,hsla(var(--landing-card-rose),0.95),hsla(var(--landing-card-butter),0.95))] p-6 shadow-[0_40px_80px_rgba(10,16,38,0.32)] lg:block">
             <div className="grid gap-4">
               <div className="rounded-[26px] border border-[hsl(var(--landing-line))] bg-[hsl(var(--landing-card-cream))] p-5 text-[hsl(var(--primary))]">
-                <p className="text-xs font-semibold uppercase tracking-[0.18em]">LIVE PANEL</p>
+                <p className="text-xs font-semibold uppercase tracking-[0.18em]">실시간 배틀</p>
                 <p className="mt-3 font-display text-3xl font-bold tracking-[-0.05em]">Bull vs Bear</p>
                 <p className="mt-2 text-sm text-[hsl(var(--muted-foreground))]">
                   8명의 캐릭터가 같은 코인을 각자 다른 관점으로 분석해.
@@ -544,12 +544,12 @@ export function LandingPageClient() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="rounded-[24px] bg-[hsl(var(--landing-card-cream))] p-4 text-[hsl(var(--primary))]">
-                  <p className="text-xs font-semibold">SIGNAL</p>
-                  <p className="mt-2 font-display text-2xl font-bold">Fear & Greed</p>
+                  <p className="text-xs font-semibold">지금 보는 신호</p>
+                  <p className="mt-2 font-display text-2xl font-bold">공포탐욕</p>
                 </div>
                 <div className="rounded-[24px] bg-[hsl(var(--landing-card-butter))] p-4 text-[hsl(var(--primary))]">
-                  <p className="text-xs font-semibold">XP LOOP</p>
-                  <p className="mt-2 font-display text-2xl font-bold">Level Up</p>
+                  <p className="text-xs font-semibold">성장 루프</p>
+                  <p className="mt-2 font-display text-2xl font-bold">레벨 업</p>
                 </div>
               </div>
             </div>
@@ -566,7 +566,7 @@ export function LandingPageClient() {
               </span>
             </h1>
             <p className="mt-5 max-w-xl text-sm leading-7 text-white/90 md:text-base">
-              AI 에이전트 트레이더끼리의 분석배틀 시작
+              AI 트레이더들이 같은 코인을 두고 정면승부를 펼쳐.
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
               <button
@@ -619,12 +619,12 @@ export function LandingPageClient() {
                   key={item}
                   className={`group min-h-48 rounded-[28px] border border-[hsl(var(--landing-line))] p-5 shadow-[0_24px_50px_rgba(20,32,68,0.08)] transition-transform duration-300 hover:-translate-y-2 hover:scale-[1.02] ${index % 3 === 0 ? "bg-[hsl(var(--landing-card-rose))]" : index % 3 === 1 ? "bg-[hsl(var(--landing-card-cream))]" : "bg-[hsl(var(--landing-card-butter))]"}`}
                 >
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary/70">Featured</p>
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary/70">지금 보는 카드</p>
                   <p className="mt-4 font-display text-3xl font-bold tracking-[-0.05em] text-primary">
                     {item}
                   </p>
                   <p className="mt-3 text-sm leading-6 text-muted-foreground">
-                    캐릭터와 지표 카드가 같이 들어와 메인 진입 전에 톤을 보여줘.
+                    들어오자마자 지금 분위기를 바로 읽을 수 있게 묶어뒀어.
                   </p>
                 </article>
               ))}
@@ -636,7 +636,7 @@ export function LandingPageClient() {
           <div className="grid gap-6 md:grid-cols-[1.2fr_0.8fr] md:items-end">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                Ready to Play
+                바로 시작해도 좋아
               </p>
               <h2 className="mt-3 font-display text-4xl font-bold tracking-[-0.06em] text-primary">
                 첫인상은 강하게

@@ -35,7 +35,9 @@ describe("generateCharacterDebateChunk", () => {
   it("같은 openrouter provider여도 fallback model이 다르면 fallback을 시도한다", async () => {
     generateDebateChunkMock
       .mockResolvedValueOnce(null)
-      .mockResolvedValueOnce('{"summary":"fallback ok","detail":"ok","indicatorLabel":"RSI","indicatorValue":"61","stance":"bullish"}');
+      .mockResolvedValueOnce(
+        '{"summary":"fallback ok","detail":"ok","indicatorLabel":"RSI","indicatorValue":"61","stance":"bullish"}',
+      );
 
     const { generateCharacterDebateChunk } = await import("@/infrastructure/api/llmRouter");
 
@@ -45,8 +47,11 @@ describe("generateCharacterDebateChunk", () => {
       llmInput: {
         characterId: "judy",
         characterName: "Judy",
+        role: "뉴스 스카우터",
         team: "bull",
         specialty: "뉴스",
+        personality: "재료를 먼저 보는 타입이야.",
+        selectionReason: "뉴스형 캐릭터 테스트용이야.",
         coinSymbol: "BTC",
         focusSummary: "summary",
         evidence: ["뉴스 감성 0.3"],

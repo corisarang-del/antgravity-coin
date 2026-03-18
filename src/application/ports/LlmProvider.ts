@@ -15,8 +15,11 @@ export type LlmProviderName =
 export interface GenerateDebateChunkInput {
   characterId: string;
   characterName: string;
+  role: string;
   team: "bull" | "bear";
   specialty: string;
+  personality: string;
+  selectionReason: string;
   coinSymbol: string;
   focusSummary: string;
   evidence: string[];
