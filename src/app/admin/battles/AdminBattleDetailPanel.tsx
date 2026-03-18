@@ -20,8 +20,7 @@ export function AdminBattleDetailPanel({
         <div className="mt-4 space-y-5">
           <div className="rounded-[18px] bg-[hsl(var(--surface-2))] p-4 text-sm">
             <p className="font-semibold">
-              {initialDetail.battleOutcomeSeed.coinSymbol} ·{" "}
-              {initialDetail.battleOutcomeSeed.battleId}
+              {initialDetail.battleOutcomeSeed.coinSymbol} · {initialDetail.battleOutcomeSeed.battleId}
             </p>
             <p className="mt-2 text-muted-foreground">
               선택 {initialDetail.battleOutcomeSeed.userSelectedTeam} · 승리{" "}

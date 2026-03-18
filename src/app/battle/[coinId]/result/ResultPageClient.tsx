@@ -105,7 +105,7 @@ export function ResultPageClient({ coinId }: ResultPageClientProps) {
         }
       } else {
         if (!cancelled) {
-          setResultError("결과 저장이 아직 끝나지 않았어. 잠시 후 다시 시도해줘.");
+          setResultError("결과 데이터가 아직 준비되지 않았어. 잠시 뒤 다시 시도해줘.");
         }
         return;
       }
@@ -145,9 +145,11 @@ export function ResultPageClient({ coinId }: ResultPageClientProps) {
         <AppHeader />
         <main className="mx-auto max-w-4xl px-4 py-6">
           <section className="rounded-[28px] border border-border bg-card p-5 shadow-[0_18px_40px_rgba(17,29,61,0.08)]">
-            <h1 className="font-display text-3xl font-bold tracking-[-0.05em]">결과를 계산할 수 없어</h1>
+            <h1 className="font-display text-3xl font-bold tracking-[-0.05em]">
+              결과를 계산할 수 없어
+            </h1>
             <p className="mt-3 text-sm leading-6 text-muted-foreground">
-              결과를 계산할 데이터가 부족하다.
+              결과를 계산하는 데 필요한 데이터가 부족해.
             </p>
             <Link
               className="mt-5 inline-flex min-h-12 items-center justify-center rounded-[18px] bg-primary px-4 py-3 font-semibold text-primary-foreground shadow-[0_12px_24px_rgba(17,29,61,0.16)] transition hover:opacity-95 focus-visible:ring-2 focus-visible:ring-primary/30"
@@ -183,7 +185,7 @@ export function ResultPageClient({ coinId }: ResultPageClientProps) {
         <WinnerHighlight messages={snapshot.messages} winningTeam={battleResult.winningTeam} />
         {battleReport ? (
           <section className="rounded-[24px] border border-border bg-card p-5">
-            <h2 className="font-display text-2xl font-bold tracking-[-0.04em]">배틀 회고</h2>
+            <h2 className="font-display text-2xl font-bold tracking-[-0.04em]">배틀 리포트</h2>
             <pre className="mt-4 whitespace-pre-wrap text-sm leading-6 text-muted-foreground">
               {battleReport}
             </pre>

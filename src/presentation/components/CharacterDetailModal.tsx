@@ -43,7 +43,7 @@ export function CharacterDetailModal({ character, onClose }: CharacterDetailModa
   }
 
   return (
-    <div className="fixed inset-0 z-30 flex items-end bg-black/35 p-4 md:items-center md:justify-center">
+    <div className="fixed inset-0 z-30 flex items-end bg-[hsl(var(--foreground)/0.35)] p-4 md:items-center md:justify-center">
       <div
         aria-describedby={descriptionId}
         aria-labelledby={titleId}
@@ -69,7 +69,7 @@ export function CharacterDetailModal({ character, onClose }: CharacterDetailModa
             </div>
             <button
               aria-label="닫기"
-              className="rounded-full bg-[hsl(var(--surface-2))] px-3 py-2 text-sm font-semibold"
+              className="min-h-11 rounded-full bg-[hsl(var(--surface-2))] px-3 py-2 text-sm font-semibold"
               onClick={onClose}
               ref={closeButtonRef}
               type="button"

@@ -221,13 +221,13 @@ function CharacterHoverPreview({
         </div>
       </div>
       <div className="p-5">
-        <div className="flex flex-wrap items-center gap-2 text-sm text-white/75">
+        <div className="flex flex-wrap items-center gap-2 text-sm text-white/88">
           <span className="rounded border border-white/20 px-2 py-1 text-xs">character preview</span>
           <span>{preview.character.team === "bull" ? "불리시" : "베어리시"}</span>
           <span>·</span>
           <span>{preview.character.role}</span>
         </div>
-        <p className="mt-4 text-sm leading-6 text-white/78">{preview.character.specialty}</p>
+        <p className="mt-4 text-sm leading-6 text-white/88">{preview.character.specialty}</p>
       </div>
     </div>
   );
@@ -278,9 +278,9 @@ function CharacterPosterCard({
               src={character.posterSrc}
             />
           </div>
-          <div className="absolute inset-x-0 bottom-0 z-20 bg-[linear-gradient(180deg,transparent,rgba(6,10,24,0.88))] p-4 text-white">
+          <div className="absolute inset-x-0 bottom-0 z-20 bg-[linear-gradient(180deg,transparent,rgba(6,10,24,0.94))] p-4 text-white">
             <p className="font-display text-2xl font-bold tracking-[-0.05em]">{character.name}</p>
-            <p className="mt-1 text-xs text-white/70">{character.role}</p>
+            <p className="mt-1 text-xs text-white/82">{character.role}</p>
           </div>
         </div>
       </div>
@@ -565,7 +565,7 @@ export function LandingPageClient() {
                 캐릭터토론으로
               </span>
             </h1>
-            <p className="mt-5 max-w-xl text-sm leading-7 text-white/76 md:text-base">
+            <p className="mt-5 max-w-xl text-sm leading-7 text-white/90 md:text-base">
               AI 에이전트 트레이더끼리의 분석배틀 시작
             </p>
             <div className="mt-7 flex flex-wrap gap-3">

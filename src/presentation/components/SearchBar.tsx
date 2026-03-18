@@ -113,6 +113,8 @@ export function SearchBar({ initialCoins, debounceMs = 300 }: SearchBarProps) {
     }
   };
 
+  const showEmptyState = deferredQuery.trim().length > 0 && !isLoading && results.length === 0;
+
   return (
     <section className="rounded-[28px] border border-border bg-[linear-gradient(180deg,hsl(var(--card))_0%,hsl(var(--surface-3))_100%)] p-5 shadow-[0_18px_44px_rgba(17,29,61,0.08)]">
       <div className="mb-4 flex flex-col gap-2">
@@ -120,7 +122,7 @@ export function SearchBar({ initialCoins, debounceMs = 300 }: SearchBarProps) {
           어떤 코인으로 붙어볼지 골라줘
         </p>
         <p className="text-sm leading-6 text-muted-foreground">
-          코인을 찾으면 불리시와 베어리시의 8인 토론이 바로 시작돼.
+          코인을 찾으면 불리시와 베어리시 8명 토론을 바로 시작할 수 있어.
         </p>
       </div>
 
@@ -132,10 +134,10 @@ export function SearchBar({ initialCoins, debounceMs = 300 }: SearchBarProps) {
           results[activeIndex] ? `${listboxId}-${results[activeIndex].id}` : undefined
         }
         aria-autocomplete="list"
+        aria-busy={isLoading}
         aria-controls={listboxId}
         aria-expanded={results.length > 0}
-        autoFocus
-        className="h-13 w-full rounded-[18px] border border-input bg-background px-4 text-sm outline-none shadow-[inset_0_1px_0_rgba(255,255,255,0.35)] transition focus:border-primary focus-visible:ring-2 focus-visible:ring-primary/30"
+        className="min-h-12 w-full rounded-[18px] border border-input bg-background px-4 text-sm shadow-[inset_0_1px_0_rgba(255,255,255,0.35)] transition focus:border-primary focus-visible:ring-2 focus-visible:ring-primary/30"
         id="coin-search"
         onChange={(event) => setQuery(event.target.value)}
         onKeyDown={handleKeyDown}
@@ -143,6 +145,9 @@ export function SearchBar({ initialCoins, debounceMs = 300 }: SearchBarProps) {
         role="combobox"
         value={query}
       />
+      <p className="mt-2 text-xs text-muted-foreground">
+        모바일에서는 키보드가 갑자기 열리지 않게 자동 포커스를 제거했어.
+      </p>
 
       <ul
         aria-label="코인 자동완성"
@@ -154,7 +159,7 @@ export function SearchBar({ initialCoins, debounceMs = 300 }: SearchBarProps) {
           <li key={coin.id} role="presentation">
             <button
               aria-selected={activeIndex === index}
-              className={`flex w-full items-center justify-between rounded-[18px] border px-4 py-3 text-left transition focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/30 ${
+              className={`flex min-h-12 w-full items-center justify-between rounded-[18px] border px-4 py-3 text-left transition focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/30 ${
                 activeIndex === index
                   ? "border-primary/25 bg-card shadow-[0_12px_24px_rgba(17,29,61,0.08)]"
                   : "border-transparent bg-[hsl(var(--surface-2))] hover:border-primary/20 hover:bg-card"
@@ -165,21 +170,26 @@ export function SearchBar({ initialCoins, debounceMs = 300 }: SearchBarProps) {
               role="option"
               type="button"
             >
-              <div className="flex items-center gap-3">
-                <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-card text-sm font-bold text-muted-foreground">
+              <div className="flex min-w-0 items-center gap-3">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-card text-sm font-bold text-muted-foreground">
                   {coin.thumb.slice(0, 1)}
                 </span>
-                <span>
+                <span className="min-w-0">
                   <span className="block font-semibold">{coin.symbol}</span>
-                  <span className="block text-xs text-muted-foreground">{coin.name}</span>
+                  <span className="block truncate text-xs text-muted-foreground">{coin.name}</span>
                 </span>
               </div>
-              <span className="text-xs font-semibold text-muted-foreground">
+              <span className="shrink-0 text-xs font-semibold text-muted-foreground">
                 {isLoading ? "검색 중" : "선택"}
               </span>
             </button>
           </li>
         ))}
+        {showEmptyState ? (
+          <li className="rounded-[18px] bg-card px-4 py-4 text-sm text-muted-foreground" role="status">
+            검색 결과가 없어. 다른 심볼이나 이름으로 다시 찾아줘.
+          </li>
+        ) : null}
       </ul>
     </section>
   );

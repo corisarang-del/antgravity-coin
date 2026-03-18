@@ -20,33 +20,43 @@ export async function AdminBattleEventLog({ battleId, page }: AdminBattleEventLo
 
   return (
     <div>
-      <div className="flex items-center justify-between gap-3">
-        <h3 className="text-sm font-semibold">Event Log</h3>
-        <p className="text-xs text-muted-foreground">
-          {events.length}개 중 {visibleStart}-{visibleEnd}
-        </p>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h3 className="text-sm font-semibold">Event Log</h3>
+          <p className="mt-1 text-xs text-muted-foreground">
+            {events.length}개 중 {visibleStart}-{visibleEnd} 표시 중
+          </p>
+        </div>
       </div>
-      <div className="mt-3 grid gap-2">
-        {visibleEvents.map((event) => (
-          <div
-            key={event.id}
-            className="rounded-[16px] bg-[hsl(var(--surface-2))] px-4 py-3 text-sm"
-          >
-            <p className="font-semibold">{event.type}</p>
-            <p className="text-muted-foreground">{event.createdAt}</p>
-            {event.payload ? (
-              <pre className="mt-2 whitespace-pre-wrap text-xs text-muted-foreground">
-                {JSON.stringify(event.payload, null, 2)}
-              </pre>
-            ) : null}
-          </div>
-        ))}
-      </div>
+
+      {visibleEvents.length > 0 ? (
+        <div className="mt-3 grid gap-2">
+          {visibleEvents.map((event) => (
+            <div
+              key={event.id}
+              className="rounded-[16px] bg-[hsl(var(--surface-2))] px-4 py-3 text-sm"
+            >
+              <p className="font-semibold">{event.type}</p>
+              <p className="text-muted-foreground">{event.createdAt}</p>
+              {event.payload ? (
+                <pre className="mt-2 whitespace-pre-wrap text-xs leading-6 text-muted-foreground">
+                  {JSON.stringify(event.payload, null, 2)}
+                </pre>
+              ) : null}
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="mt-3 rounded-[16px] bg-[hsl(var(--surface-2))] px-4 py-4 text-sm text-muted-foreground">
+          아직 기록된 이벤트가 없어.
+        </div>
+      )}
+
       {totalPages > 1 ? (
         <div className="mt-4 flex items-center justify-between gap-3">
           <Link
             aria-disabled={currentPage === 1}
-            className={`inline-flex min-h-10 items-center rounded-[14px] px-4 py-2 text-sm font-semibold ${
+            className={`inline-flex min-h-11 items-center rounded-[14px] px-4 py-2 text-sm font-semibold ${
               currentPage === 1
                 ? "pointer-events-none border border-border/60 bg-[hsl(var(--surface-2))] text-muted-foreground"
                 : "bg-primary text-primary-foreground"
@@ -60,7 +70,7 @@ export async function AdminBattleEventLog({ battleId, page }: AdminBattleEventLo
           </p>
           <Link
             aria-disabled={currentPage === totalPages}
-            className={`inline-flex min-h-10 items-center rounded-[14px] px-4 py-2 text-sm font-semibold ${
+            className={`inline-flex min-h-11 items-center rounded-[14px] px-4 py-2 text-sm font-semibold ${
               currentPage === totalPages
                 ? "pointer-events-none border border-border/60 bg-[hsl(var(--surface-2))] text-muted-foreground"
                 : "bg-primary text-primary-foreground"

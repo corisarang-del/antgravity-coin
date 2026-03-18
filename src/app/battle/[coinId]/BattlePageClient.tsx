@@ -73,14 +73,14 @@ export function BattlePageClient({ coinId }: BattlePageClientProps) {
               </div>
               {messages.length > 0 ? (
                 <p className="mt-3 text-xs text-bear/80">
-                  이미 받은 발언은 유지하고 있어. 다시 시도해서 이어갈 수 있어.
+                  이미 받은 발언은 유지하고 있어. 다시 시도해서 이어가 볼 수 있어.
                 </p>
               ) : null}
             </div>
           ) : null}
           {timingMetrics?.firstMessageDisplayedAt ? (
             <p className="mt-3 text-xs text-muted-foreground">
-              첫 발언 도달 시간:{" "}
+              첫 발언 도착 시간:{" "}
               {Math.max(
                 0,
                 Math.round(

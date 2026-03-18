@@ -6,12 +6,13 @@ import type { SearchCoinResult } from "@/application/ports/CoinRepository";
 const STORAGE_KEY = "ant_gravity_recent_coins";
 const MAX_RECENT_COINS = 5;
 const RECENT_COINS_EVENT = "recent-coins-change";
+const EMPTY_RECENT_COINS: SearchCoinResult[] = [];
 let cachedRawValue: string | null = null;
-let cachedRecentCoins: SearchCoinResult[] = [];
+let cachedRecentCoins: SearchCoinResult[] = EMPTY_RECENT_COINS;
 
 function readRecentCoins(): SearchCoinResult[] {
   if (typeof window === "undefined") {
-    return [];
+    return EMPTY_RECENT_COINS;
   }
 
   const rawValue = window.localStorage.getItem(STORAGE_KEY);
@@ -21,8 +22,8 @@ function readRecentCoins(): SearchCoinResult[] {
 
   if (!rawValue) {
     cachedRawValue = null;
-    cachedRecentCoins = [];
-    return [];
+    cachedRecentCoins = EMPTY_RECENT_COINS;
+    return EMPTY_RECENT_COINS;
   }
 
   try {
@@ -33,8 +34,8 @@ function readRecentCoins(): SearchCoinResult[] {
   } catch {
     window.localStorage.removeItem(STORAGE_KEY);
     cachedRawValue = null;
-    cachedRecentCoins = [];
-    return [];
+    cachedRecentCoins = EMPTY_RECENT_COINS;
+    return EMPTY_RECENT_COINS;
   }
 }
 
@@ -55,7 +56,7 @@ function subscribe(onStoreChange: () => void) {
 }
 
 export function useRecentCoins() {
-  const recentCoins = useSyncExternalStore(subscribe, readRecentCoins, () => []);
+  const recentCoins = useSyncExternalStore(subscribe, readRecentCoins, () => EMPTY_RECENT_COINS);
 
   const saveRecentCoin = (coin: SearchCoinResult) => {
     const currentCoins = readRecentCoins();

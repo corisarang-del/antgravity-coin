@@ -117,7 +117,7 @@ export default async function AdminBattlesPage({ searchParams }: AdminBattlesPag
                     <p className="font-semibold">
                       {battle.coinSymbol} · {battle.timeframe}
                     </p>
-                    <p className="mt-1 text-muted-foreground">{battle.battleId}</p>
+                    <p className="mt-1 break-all text-muted-foreground">{battle.battleId}</p>
                     <p className="mt-2 text-xs text-muted-foreground">
                       승리 팀 {battle.winningTeam} · 변동률 {battle.priceChangePercent.toFixed(2)}%
                       · rule {battle.ruleVersion} · report {battle.reportSource}
