@@ -10,6 +10,8 @@ export function buildLlmResponseCacheKey(input: {
   characterId: string;
   focusSummary: string;
   evidence: string[];
+  recentBattleLessons: string[];
+  characterLessons: string[];
   previousMessagesSummary: string[];
 }) {
   return JSON.stringify(input);

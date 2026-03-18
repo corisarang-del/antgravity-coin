@@ -35,6 +35,8 @@ export async function generateCharacterDebateChunk(input: {
     characterId: input.characterId,
     focusSummary: input.llmInput.focusSummary,
     evidence: input.llmInput.evidence,
+    recentBattleLessons: input.llmInput.recentBattleLessons,
+    characterLessons: input.llmInput.characterLessons,
     previousMessagesSummary: input.llmInput.previousMessages.map((message) => message.summary),
   });
 

@@ -2,9 +2,11 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import type { ReportRepository } from "@/application/ports/ReportRepository";
 import type { BattleReport } from "@/domain/models/BattleReport";
+import type { ReusableBattleMemo } from "@/domain/models/ReusableBattleMemo";
 
 interface ReportStore {
   reports: BattleReport[];
+  reusableMemos: ReusableBattleMemo[];
 }
 
 const DATA_DIR = path.join(process.cwd(), "database", "data");
@@ -15,9 +17,14 @@ async function ensureStore(): Promise<ReportStore> {
 
   try {
     const rawValue = await readFile(DATA_FILE, "utf8");
-    return JSON.parse(rawValue) as ReportStore;
+    const parsed = JSON.parse(rawValue) as Partial<ReportStore>;
+
+    return {
+      reports: parsed.reports ?? [],
+      reusableMemos: parsed.reusableMemos ?? [],
+    };
   } catch {
-    const initialValue: ReportStore = { reports: [] };
+    const initialValue: ReportStore = { reports: [], reusableMemos: [] };
     await writeFile(DATA_FILE, JSON.stringify(initialValue, null, 2), "utf8");
     return initialValue;
   }
@@ -38,5 +45,32 @@ export class FileReportRepository implements ReportRepository {
   async getByBattleId(battleId: string) {
     const store = await ensureStore();
     return store.reports.find((report) => report.battleId === battleId) ?? null;
+  }
+
+  async saveReusableMemo(memo: ReusableBattleMemo) {
+    const store = await ensureStore();
+    store.reusableMemos = store.reusableMemos.filter((item) => item.id !== memo.id);
+    store.reusableMemos.push(memo);
+    await saveStore(store);
+  }
+
+  async getReusableMemoByBattleId(battleId: string) {
+    const store = await ensureStore();
+    return store.reusableMemos.find((memo) => memo.battleId === battleId) ?? null;
+  }
+
+  async listReusableMemosByCoin(coinId: string, limit = 3) {
+    const store = await ensureStore();
+    return [...store.reusableMemos]
+      .filter((memo) => memo.coinId === coinId)
+      .sort((left, right) => right.createdAt.localeCompare(left.createdAt))
+      .slice(0, limit);
+  }
+
+  async listRecentReusableMemos(limit = 3) {
+    const store = await ensureStore();
+    return [...store.reusableMemos]
+      .sort((left, right) => right.createdAt.localeCompare(left.createdAt))
+      .slice(0, limit);
   }
 }

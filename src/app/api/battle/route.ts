@@ -1,5 +1,7 @@
 import { getBattleMarketSnapshot } from "@/application/useCases/getBattleMarketSnapshot";
+import { getReusableDebateContext } from "@/application/useCases/getReusableDebateContext";
 import { generateCharacterMessage } from "@/application/useCases/generateBattleDebate";
+import { FileReportRepository } from "@/infrastructure/db/fileReportRepository";
 import { NextResponse } from "next/server";
 import { characters } from "@/shared/constants/characters";
 
@@ -22,14 +24,22 @@ export async function POST(request: Request) {
     async start(controller) {
       const encoder = new TextEncoder();
       try {
-        const snapshotPromise = getBattleMarketSnapshot(coinId);
-        const { marketData, summary } = await snapshotPromise;
+        const { marketData, summary } = await getBattleMarketSnapshot(coinId);
+        const reusableDebateContext = await getReusableDebateContext(
+          new FileReportRepository(),
+          coinId,
+        );
 
         controller.enqueue(encoder.encode(toSseEvent("battle_start", { marketData, summary })));
 
         const messages = [];
         for (const character of characters) {
-          const message = await generateCharacterMessage(marketData, character, messages);
+          const message = await generateCharacterMessage(
+            marketData,
+            character,
+            messages,
+            reusableDebateContext,
+          );
           messages.push(message);
           controller.enqueue(
             encoder.encode(

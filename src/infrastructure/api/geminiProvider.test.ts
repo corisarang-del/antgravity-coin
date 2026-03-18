@@ -39,6 +39,8 @@ describe("geminiProvider", () => {
         coinSymbol: "BTC",
         focusSummary: "summary",
         evidence: [],
+        recentBattleLessons: [],
+        characterLessons: [],
         previousMessages: [],
       },
       "gemini-2.5-flash-lite",

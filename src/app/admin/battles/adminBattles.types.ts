@@ -47,6 +47,16 @@ export interface AdminBattleDetail {
     report: string;
   } | null;
   reportSource: "gemini" | "fallback";
+  reusableMemo: {
+    reportSummary: string;
+    globalLessons: string[];
+    characterLessons: Array<{
+      characterId: string;
+      characterName: string;
+      lesson: string;
+      wasCorrect: boolean;
+    }>;
+  } | null;
 }
 
 export interface AdminBattleEventLogEntry {

@@ -45,6 +45,41 @@ export function AdminBattleDetailPanel({
             </pre>
           </div>
 
+          {initialDetail.reusableMemo ? (
+            <div>
+              <h3 className="text-sm font-semibold">재사용 메모</h3>
+              <div className="mt-3 rounded-[18px] bg-[hsl(var(--surface-2))] p-4 text-sm">
+                <p className="font-semibold">요약</p>
+                <p className="mt-2 text-muted-foreground">
+                  {initialDetail.reusableMemo.reportSummary}
+                </p>
+                <div className="mt-4">
+                  <p className="font-semibold">공용 lesson</p>
+                  <ul className="mt-2 grid gap-2 text-muted-foreground">
+                    {initialDetail.reusableMemo.globalLessons.map((lesson) => (
+                      <li key={lesson} className="rounded-[14px] bg-background px-3 py-2">
+                        {lesson}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+              <div className="mt-3 grid gap-3">
+                {initialDetail.reusableMemo.characterLessons.map((lesson) => (
+                  <div
+                    key={`${lesson.characterId}:${lesson.lesson}`}
+                    className="rounded-[18px] bg-[hsl(var(--surface-2))] p-4 text-sm"
+                  >
+                    <p className="font-semibold">
+                      {lesson.characterName} · {lesson.wasCorrect ? "맞은 관점" : "빗나간 관점"}
+                    </p>
+                    <p className="mt-2 text-muted-foreground">{lesson.lesson}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : null}
+
           <div>
             <h3 className="text-sm font-semibold">Character Memory Seeds</h3>
             <div className="mt-3 grid gap-3">

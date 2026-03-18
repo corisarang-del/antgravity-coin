@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { POST } from "@/app/api/battle/route";
+import { getReusableDebateContext } from "@/application/useCases/getReusableDebateContext";
 import { generateCharacterDebateChunk } from "@/infrastructure/api/llmRouter";
 import { getBattleMarketSnapshot } from "@/application/useCases/getBattleMarketSnapshot";
 
@@ -9,6 +10,13 @@ vi.mock("@/infrastructure/api/llmRouter", () => ({
 
 vi.mock("@/application/useCases/getBattleMarketSnapshot", () => ({
   getBattleMarketSnapshot: vi.fn(),
+}));
+
+vi.mock("@/application/useCases/getReusableDebateContext", () => ({
+  getReusableDebateContext: vi.fn().mockResolvedValue({
+    recentBattleLessons: [],
+    characterLessonsById: {},
+  }),
 }));
 
 describe("POST /api/battle", () => {
@@ -42,6 +50,10 @@ describe("POST /api/battle", () => {
           { label: "RSI", value: "61.2" },
         ],
       },
+    });
+    vi.mocked(getReusableDebateContext).mockResolvedValue({
+      recentBattleLessons: [],
+      characterLessonsById: {},
     });
   });
 

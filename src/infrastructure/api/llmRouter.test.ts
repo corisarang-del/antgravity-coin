@@ -55,6 +55,8 @@ describe("generateCharacterDebateChunk", () => {
         coinSymbol: "BTC",
         focusSummary: "summary",
         evidence: ["뉴스 감성 0.3"],
+        recentBattleLessons: [],
+        characterLessons: [],
         previousMessages: [],
       },
     });

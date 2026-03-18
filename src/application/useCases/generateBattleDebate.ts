@@ -296,6 +296,13 @@ export async function generateCharacterMessage(
   marketData: MarketData,
   character: (typeof characters)[number],
   previousMessages: DebateMessage[],
+  reusableDebateContext: {
+    recentBattleLessons: string[];
+    characterLessonsById: Record<string, string[]>;
+  } = {
+    recentBattleLessons: [],
+    characterLessonsById: {},
+  },
 ) {
   const marketSummary = `${marketData.symbol} 24h ${marketData.priceChange24h}% / 7d ${marketData.priceChange7d}% / RSI ${marketData.rsi}`;
   const roleEvidence = buildRoleEvidence(marketData, character.id, previousMessages);
@@ -319,6 +326,8 @@ export async function generateCharacterMessage(
         coinSymbol: marketData.symbol,
         focusSummary: marketSummary,
         evidence: roleEvidence.items,
+        recentBattleLessons: reusableDebateContext.recentBattleLessons,
+        characterLessons: reusableDebateContext.characterLessonsById[character.id] ?? [],
         previousMessages,
       },
     });

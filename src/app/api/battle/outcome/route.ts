@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { appendSeedEvents } from "@/application/useCases/appendSeedEvents";
 import { buildBattleOutcomeSeed } from "@/application/useCases/buildBattleOutcomeSeed";
 import { buildMemorySeeds } from "@/application/useCases/buildMemorySeeds";
+import { buildReusableBattleMemo } from "@/application/useCases/buildReusableBattleMemo";
 import { generateBattleReport } from "@/application/useCases/generateBattleReport";
 import type { DebateMessage } from "@/domain/models/DebateMessage";
 import type { MarketData } from "@/domain/models/MarketData";
@@ -10,6 +11,7 @@ import type { UserBattle } from "@/domain/models/UserBattle";
 import { FileEventLog } from "@/infrastructure/db/fileEventLog";
 import { FileReportRepository } from "@/infrastructure/db/fileReportRepository";
 import { FileSeedRepository } from "@/infrastructure/db/fileSeedRepository";
+import { synthesizeBattleLessonsWithGemini } from "@/infrastructure/api/geminiSynthesisClient";
 
 const SESSION_COOKIE_NAME = "ant_gravity_user_id";
 
@@ -49,6 +51,19 @@ export async function POST(request: Request) {
     characterMemorySeeds,
     playerDecisionSeed,
   });
+  const synthesizedLessons = await synthesizeBattleLessonsWithGemini({
+    battleOutcomeSeed,
+    characterMemorySeeds,
+    playerDecisionSeed,
+    report: report.report,
+  });
+
+  const reusableMemo = buildReusableBattleMemo({
+    battleOutcomeSeed,
+    characterMemorySeeds,
+    report,
+    synthesizedLessons,
+  });
 
   const seedRepository = new FileSeedRepository();
   const reportRepository = new FileReportRepository();
@@ -76,6 +91,7 @@ export async function POST(request: Request) {
     await seedRepository.saveCharacterMemorySeeds(characterMemorySeeds);
     await seedRepository.savePlayerDecisionSeed(playerDecisionSeed);
     await reportRepository.saveReport(report);
+    await reportRepository.saveReusableMemo(reusableMemo);
 
     await eventLog.append({
       id: `event:battle_start:${battleOutcomeSeed.battleId}`,

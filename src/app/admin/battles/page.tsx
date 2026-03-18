@@ -66,10 +66,11 @@ export default async function AdminBattlesPage({ searchParams }: AdminBattlesPag
           return null;
         }
 
-        const [characterMemorySeeds, playerDecisionSeed, report] = await Promise.all([
+        const [characterMemorySeeds, playerDecisionSeed, report, reusableMemo] = await Promise.all([
           seedRepository.getCharacterMemorySeeds(battleId),
           seedRepository.getPlayerDecisionSeed(battleId),
           reportRepository.getByBattleId(battleId),
+          reportRepository.getReusableMemoByBattleId(battleId),
         ]);
 
         return {
@@ -78,6 +79,13 @@ export default async function AdminBattlesPage({ searchParams }: AdminBattlesPag
           playerDecisionSeed,
           report,
           reportSource: report?.reportSource ?? "fallback",
+          reusableMemo: reusableMemo
+            ? {
+                reportSummary: reusableMemo.reportSummary,
+                globalLessons: reusableMemo.globalLessons,
+                characterLessons: reusableMemo.characterLessons,
+              }
+            : null,
         };
       })()
     : null;

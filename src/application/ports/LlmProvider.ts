@@ -23,6 +23,8 @@ export interface GenerateDebateChunkInput {
   coinSymbol: string;
   focusSummary: string;
   evidence: string[];
+  recentBattleLessons: string[];
+  characterLessons: string[];
   previousMessages: DebateMessage[];
 }
 

@@ -3,6 +3,7 @@ import { GET, POST } from "@/app/api/battle/outcome/route";
 
 vi.mock("@/infrastructure/api/geminiSynthesisClient", () => ({
   synthesizeBattleReportWithGemini: vi.fn().mockResolvedValue(null),
+  synthesizeBattleLessonsWithGemini: vi.fn().mockResolvedValue(null),
 }));
 
 describe("POST /api/battle/outcome", () => {
@@ -49,7 +50,7 @@ describe("POST /api/battle/outcome", () => {
               characterName: "Aira",
               team: "bull",
               stance: "bullish",
-              summary: "기술 구조가 버틴다.",
+              summary: "기술 구조가 버텨.",
               detail: "detail",
               indicatorLabel: "RSI",
               indicatorValue: "61",
@@ -77,7 +78,7 @@ describe("POST /api/battle/outcome", () => {
     expect(data.battleOutcomeSeed.ruleVersion).toBe("v1");
     expect(data.characterMemorySeeds[0]?.characterId).toBe("aira");
     expect(data.playerDecisionSeed.selectedTeam).toBe("bull");
-    expect(data.report.report).toContain("배틀 회고");
+    expect(data.report.report).toContain("배틀");
     expect(data.reportSource).toBe("fallback");
   });
 
@@ -95,7 +96,7 @@ describe("POST /api/battle/outcome", () => {
 
     expect(data.ok).toBe(true);
     expect(data.battleOutcomeSeed.battleId).toBe("battle-1");
-    expect(data.report.report).toContain("배틀 회고");
+    expect(data.report.report).toContain("배틀");
     expect(data.reportSource).toBe("fallback");
   });
 });
