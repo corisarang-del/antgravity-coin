@@ -1,0 +1,23 @@
+{
+  "durationMs": 4953,
+  "segments": [
+    {
+      "index": 0,
+      "text": "한 코인.",
+      "startMs": 0,
+      "endMs": 1291
+    },
+    {
+      "index": 1,
+      "text": "AI 여덟 명.",
+      "startMs": 1511,
+      "endMs": 2602
+    },
+    {
+      "index": 2,
+      "text": "마지막 선택은 네가 한다.",
+      "startMs": 2822,
+      "endMs": 4953
+    }
+  ]
+}

@@ -10,15 +10,25 @@
     "lint": "eslint .",
     "typecheck": "tsc -p tsconfig.typecheck.json --noEmit",
     "test": "vitest run",
-    "test:live-apis": "vitest run src/infrastructure/api/liveApiSources.live.test.ts"
+    "test:live-apis": "vitest run src/infrastructure/api/liveApiSources.live.test.ts",
+    "video:studio": "remotion studio src/remotion/index.ts",
+    "video:render": "remotion render src/remotion/index.ts AntGravityPromo out/ant-gravity-promo.mp4",
+    "video:render:shorts": "remotion render src/remotion/index.ts AntGravityPromoShorts out/ant-gravity-promo-shorts.mp4",
+    "video:render:extended": "remotion render src/remotion/index.ts AntGravityPromoExtended out/ant-gravity-promo-extended.mp4",
+    "tts:gemini:wide": "python scripts/generate_gemini_tts.py --split-lines --input-file scripts/tts/wide.txt --out public/audio/ant-gravity-narration-wide.wav --timings-out src/remotion/generated/wide-narration.json",
+    "tts:gemini:shorts": "python scripts/generate_gemini_tts.py --split-lines --input-file scripts/tts/shorts.txt --out public/audio/ant-gravity-narration-shorts.wav --timings-out src/remotion/generated/shorts-narration.json",
+    "tts:gemini:extended": "python scripts/generate_gemini_tts.py --split-lines --input-file scripts/tts/extended.txt --out public/audio/ant-gravity-narration-extended.wav --timings-out src/remotion/generated/extended-narration.json"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.78.0",
+    "@remotion/cli": "^4.0.436",
+    "@remotion/media": "^4.0.436",
     "clsx": "^2.1.1",
     "next": "16.1.6",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "recharts": "^3.8.0",
+    "remotion": "^4.0.436",
     "tailwind-merge": "^3.5.0",
     "zod": "^4.3.6",
     "zustand": "^5.0.11"

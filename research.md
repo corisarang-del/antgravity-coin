@@ -413,3 +413,150 @@
   - 실제 서비스용 포스터/프리뷰 미디어
 
 여기서 `backup-worktree/`와 `bootstrap-app/`은 루트와 매우 비슷한 파일 구성을 갖고 있어서, 구조 파악이나 수정 범위를 잡을 때 “활성 소스 오브 트루스는 루트인가, 보조 사본인가”를 항상 구분해야 한다. 현재 관찰상 실제 실행 대상은 루트 워크스페이스다.
+---
+
+## 19. 2026-03-18 추가 구조 이해 메모
+
+이번 점검에서는 문서뿐 아니라 실제 파일 구조를 기준으로 현재 프로젝트를 다시 확인했다. 결론부터 말하면 이 저장소는 단순한 Next.js 화면 모음이 아니라, `src/app` 바깥에 `domain / application / infrastructure / presentation` 레이어를 분리한 구조 위에 App Router를 얹은 형태다.
+
+### 기준 문서 위치
+
+- 작업 지침에는 `docs/PRD.md`가 기준이라고 적혀 있지만, 현재 저장소의 실제 기준 문서 묶음은 `docs/planning/01-prd.md`부터 `09-cache-strategy.md`까지의 연속 문서다.
+- 즉 현재 실무 기준으로는 `docs/planning/*`가 제품/기능/데이터/API/화면/태스크의 기준 문서 역할을 하고 있다.
+
+### 실제 소스 레이어 구조
+
+- `src/app`
+  - Next.js App Router 진입점이다.
+  - 사용자 페이지(`page.tsx`, `home`, `characters`, `battle/*`)와 API 라우트(`api/*`), 운영 페이지(`admin/*`)가 함께 있다.
+  - `LandingPageClient.tsx`, `LandingCharacterPreviewModal.tsx`, `BattlePageClient.tsx`처럼 서버 페이지와 클라이언트 UI 래퍼를 나눠 두는 패턴이 보인다.
+- `src/domain`
+  - 순수 모델 계층이다.
+  - `Coin`, `MarketData`, `BattleResult`, `BattleReport`, `BattleOutcomeSeed`, `CharacterMemorySeed`, `PlayerDecisionSeed`, `UserBattle`, `UserLevel` 같은 핵심 타입이 여기 있다.
+- `src/application`
+  - 유스케이스 계층이다.
+  - `fetchMarketData`, `getBattleMarketSnapshot`, `generateBattleDebate`, `generateBattleReport`, `resolveBattle`, `updateLevels`, `optimizeProviderRoutes`처럼 실제 동작 흐름이 모여 있다.
+  - `ports`에는 저장소와 외부 연동 인터페이스가 있고, `prompts`에는 캐릭터 발화 및 synthesis 프롬프트가 분리돼 있다.
+- `src/infrastructure`
+  - 외부 API, 파일 저장소, 캐시, 설정, 매퍼 구현이 들어 있다.
+  - `api`, `db`, `cache`, `config`, `mappers`로 나뉘며 application port의 실제 구현체가 위치한다.
+- `src/presentation`
+  - 재사용 UI, 훅, 상태 저장소가 모여 있다.
+  - 화면 조립에 가까운 컴포넌트와 클라이언트 훅이 이 계층에 집중돼 있다.
+- `src/features/characters`
+  - 캐릭터 카탈로그 관련 로직을 feature 단위로 따로 묶어 둔 예외적인 모듈이다.
+- `src/shared`
+  - 상수, 유틸, 공용 설정이 있다.
+  - 특히 `characterModelRoutes.ts`, `characterDebateProfiles.ts`, `envConfig.ts`, `storageKeys.ts`가 전역 규칙 역할을 한다.
+- `src/styles`
+  - 토큰과 전역 스타일 보조 CSS가 있다.
+
+### 사용자 흐름 기준 실제 페이지 구조
+
+- 랜딩: `/`
+- 홈: `/home`
+- 캐릭터 소개: `/characters`
+- 배틀 메인: `/battle/[coinId]`
+- 포지션 선택: `/battle/[coinId]/pick`
+- 대기: `/battle/[coinId]/waiting`
+- 결과: `/battle/[coinId]/result`
+- 운영 확인용: `/admin/battles`
+
+즉 문서에 있던 핵심 소비자 흐름은 유지되고 있지만, 실제 구현에는 운영자 관찰용 `admin` 화면이 이미 포함돼 있다.
+
+### API 경계는 문서보다 더 확장돼 있다
+
+현재 `src/app/api` 기준 실제 API는 아래 묶음으로 이해하는 게 맞다.
+
+- 인증/세션: `auth/session`
+- 코인 조회: `coins/search`, `coins/top`
+- 배틀 실행: `battle`
+- 결과 적용 조회: `battle/applications`
+- 이벤트 로그 조회: `battle/events`
+- outcome/report 생성 및 조회: `battle/outcome`
+- 캐릭터 목록: `characters`
+- provider 라우팅 조회/조정: `providers/routes`
+- 운영용 조회: `admin/battles`, `admin/battles/[battleId]`
+- 운영용 캐시 예열: `admin/cache/prewarm`
+
+특히 문서상 초기 API보다 실제 구현이 더 나아간 지점은 다음이다.
+
+- `/api/battle`는 SSE 스트림으로 `battle_start`, `character_start`, `message`, `character_done`, `battle_complete`를 순차 전송한다.
+- 구현상 실패 시 `error` 이벤트도 내려보낸다.
+- `/api/battle/outcome`와 `/api/admin/battles*`가 추가되면서 배틀 이후 결과 자산과 운영 조회 기능이 독립 경계로 분리됐다.
+- `/api/providers/routes`로 캐릭터별 모델 라우팅을 조회/조정할 수 있다.
+
+### 저장소는 DB보다 파일 기반 운영에 가깝다
+
+현재 지속 데이터는 `database/data` 아래 JSON 파일에 분리 저장된다.
+
+- `battle_result_applications.json`: 결과 중복 반영 방지
+- `seed_store.json`: `battleOutcomeSeeds`, `characterMemorySeeds`, `playerDecisionSeeds`
+- `report_store.json`: 최종 배틀 리포트
+- `event_log.json`: 배틀 이벤트 로그
+- `source_cache.json`: 외부 소스 캐시
+
+실제 구현도 이를 그대로 반영한다.
+
+- `FileSeedRepository`
+- `FileReportRepository`
+- `FileEventLog`
+- `FileBattleResultApplicationRepository`
+- `FileDataCacheRepository`
+
+즉 현재 단계의 운영 저장소는 RDB 중심이 아니라 “JSON 파일 저장소 + Next API” 형태의 로컬 MVP 운영 구조라고 보는 게 정확하다.
+
+### 외부 연동 구조
+
+- 마켓/코인 데이터: `coinGeckoClient`, `bybitClient`, `hyperliquidClient`, `fearGreedClient`
+- 뉴스/감성 데이터: `newsApiClient`, `gdeltNewsClient`, `alphaVantageNewsClient`, `newsSentimentClient`
+- LLM/합성: `openRouterProvider`, `geminiProvider`, `anthropicProvider`, `claudeClient`, `geminiSynthesisClient`, `llmRouter`
+
+중요한 점은 provider 라우팅이 상수 테이블로 끝나지 않는다는 점이다.
+
+- 기본 라우팅 상수: `src/shared/constants/characterModelRoutes.ts`
+- 런타임 override 저장/로드: `src/infrastructure/config/providerRuntimeConfig.ts`
+- 실제 호출 및 fallback 제어: `src/infrastructure/api/llmRouter.ts`
+
+즉 이 프로젝트는 “캐릭터 발화 생성” 자체보다 “어떤 provider/model 조합으로 안정적으로 발화를 만들지”까지 운영 대상으로 보는 구조다.
+
+### 테스트와 실행 구조
+
+`package.json` 기준 실행 스크립트는 아래와 같다.
+
+- `pnpm dev`
+- `pnpm build`
+- `pnpm start`
+- `pnpm lint`
+- `pnpm typecheck`
+- `pnpm test`
+- `pnpm test:live-apis`
+- `pnpm dev:clean`
+
+테스트는 별도 폴더 하나에 몰아넣지 않고 구현 근처에 붙여 두는 colocated 방식이다. 현재 테스트 범위는 `application/useCases`, `infrastructure/api`, `infrastructure/db`, `app/api`, `presentation/components`, `features/characters`, `shared`, `domain`까지 퍼져 있어서, 구조를 이해할 때 테스트 파일도 실제 설계 단서로 봐야 한다.
+
+### 루트 보조 디렉터리의 성격
+
+루트 기준 주 실행 대상은 현재 `src`, `public`, `database`, `docs/planning`, `specs`다. 그 외 폴더는 보조 성격이 강하다.
+
+- `design/`: 원본 디자인 자산, 토큰, 레퍼런스
+- `public/characters`, `public/characters/previews`: 서비스용 캐릭터 이미지/프리뷰 비디오
+- `tools/ffmpeg`: 로컬 미디어 변환 도구 번들
+- `pptx/`: 보고서 산출물
+- `backup-worktree`, `bootstrap-app`, `skill-staging`: 보조 작업 흔적 또는 별도 실험 공간
+
+그래서 구조를 읽을 때는 루트 전체를 동일 가중치로 보지 말고, 실제 앱 실행 경로와 보조 산출물 경로를 구분해야 한다.
+
+### 현재 시점 최종 이해
+
+현재 프로젝트는 “AI 캐릭터 8명이 코인 방향성을 토론하고, 사용자가 bull/bear를 선택한 뒤 결과와 XP를 확인하는 Next.js 앱”이라는 제품 골격 위에,
+
+- 파일 기반 seed/report/event 저장소
+- provider/model 라우팅 운영 도구
+- admin 관찰 화면
+- hover preview용 미디어 자산 체계
+- 문서/스펙/테스트가 함께 유지되는 구조
+
+까지 이미 포함한 상태다.
+
+즉 이 저장소의 핵심은 단순 화면 구현이 아니라, 배틀 생성 → 토론 스트리밍 → 결과 저장 → 운영 관찰까지 이어지는 작은 애플리케이션 플랫폼 구조를 이미 갖췄다는 점이다.
