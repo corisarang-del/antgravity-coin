@@ -1,252 +1,177 @@
-# PRD: 앤트배틀로그 (AntBattleLog)
+# PRD: Ant Gravity Coin
 
-## 제품 개요
+- 작성시각: 2026-03-21 03:01 KST
+- 기준:
+  - `memory.md`
+  - 현재 `src/`, `database/`, `supabase/` 구현
+  - `docs/PRD.md`는 현재 저장소에 없어서 이 문서를 작업 기준 PRD로 사용
 
-**제품명:** 앤트배틀로그  
-**버전:** v1.1.0  
-**최종 갱신일:** 2026-03-16
+## 한 줄 설명
 
-### 한 줄 설명
-8명의 AI 캐릭터가 같은 코인을 서로 다른 관점으로 토론하고, 사용자가 불리시팀 또는 베어리시팀을 고른 뒤 결과 시점 가격 변화로 승패와 XP를 확인하는 모바일 우선 코인 배틀 앱.
+8명의 AI 캐릭터가 하나의 코인을 서로 다른 관점으로 토론하고, 사용자가 bull 또는 bear를 선택한 뒤 실제 Bybit 캔들 정산 결과로 승패와 XP를 확인하는 모바일 우선 코인 배틀 앱.
 
-### 현재 구현 기준
-- 진입점은 랜딩 페이지 `/`다.
-- 실제 배틀 탐색과 검색은 `/home`에서 시작한다.
-- 결과 판정 기간은 현재 `24h`, `7d` 두 가지다.
-- 장기 대기나 푸시 알림은 아직 없고, 로컬 상태 기반 데모 흐름으로 결과를 확인한다.
+## 현재 구현 범위
 
----
+- 공개 라우트
+  - `/`
+  - `/home`
+  - `/battle/[coinId]`
+  - `/battle/[coinId]/pick`
+  - `/battle/[coinId]/waiting`
+  - `/battle/[coinId]/result`
+  - `/characters`
+  - `/login`
+- 로그인 사용자 라우트
+  - `/me`
+- 운영 라우트
+  - `/admin/battles`
+  - `/admin/memos`
 
-## 해결하는 문제
+## 해결하려는 문제
 
-코인 투자자는 보통 아래 문제를 겪는다.
-1. 지표가 많아서 어디를 먼저 봐야 할지 어렵다.
-2. 서로 다른 관점을 한 번에 비교하기 어렵다.
-3. 분석을 읽고 끝나서 자기 판단을 학습하기 어렵다.
-4. 재방문 동기를 만드는 구조가 약하다.
+1. 투자자는 차트, 뉴스, 심리, 파생 지표를 한 번에 비교하기 어렵다.
+2. 분석을 읽고 끝나는 경우가 많아서 자기 판단을 복기하기 어렵다.
+3. 재방문 동기를 만드는 게임형 구조가 약하다.
 
-이 제품은 배틀 형식과 XP 보상 구조로 분석 소비를 쉽게 만들고, 결과 확인을 통해 사용자가 자기 판단을 되돌아보게 한다.
+이 제품은 역할이 분리된 8명의 캐릭터 토론과 결과 복기 구조로 이 문제를 줄인다.
 
----
-
-## 핵심 게임 루프
+## 핵심 루프
 
 ```text
 랜딩 진입
-  -> 홈에서 코인 검색 또는 Top 코인 선택
-  -> 배틀 화면에서 8명 캐릭터 토론 시청
-  -> 팀 선택 화면에서 bull / bear와 기간(24h / 7d) 선택
-  -> 대기 화면 확인
-  -> 결과 화면에서 승패, XP 변화, 하이라이트 확인
+  -> 홈에서 검색 또는 Top 코인 선택
+  -> 배틀 화면에서 시장 요약과 토론 시청
+  -> 핵심 논거가 모이면 pick 화면으로 이동
+  -> bull / bear + 시간프레임 선택
+  -> waiting 화면에서 정산 시각 대기
+  -> result 화면에서 실제 Bybit 캔들 기준 승패와 XP 확인
+  -> 로그인 사용자는 /me 에서 배틀 아카이브 재확인
 ```
 
-### 결과 계산 기준
-- `24h` 선택 시 `priceChange24h` 기준으로 결과를 계산한다.
-- `7d` 선택 시 `priceChange7d` 기준으로 결과를 계산한다.
-- 현재 `priceChange7d`는 배틀용 시장 데이터에서 계산된 파생값을 사용한다.
+## 현재 배틀 구조
 
----
+- 캐릭터는 8명이고 4라운드 병렬 구조로 발언한다.
+  - `Aira + Ledger`
+  - `Judy + Shade`
+  - `Clover + Vela`
+  - `Blaze + Flip`
+- `battle_pick_ready`는 bull 2명, bear 2명이 발언하면 열린다.
+- 사용자는 8명 발언을 모두 기다리지 않고도 pick 단계로 이동할 수 있다.
+- `battle_complete` 후에는 전체 토론 snapshot을 서버에도 저장한다.
 
-## 캐릭터 구성
+## 시간프레임과 결과 판정
 
-### 불리시팀
+- 지원 시간프레임
+  - `5m`
+  - `30m`
+  - `1h`
+  - `4h`
+  - `24h`
+  - `7d`
+- 정산 기준
+  - 진입가: 선택 시점 Bybit entry candle close
+  - 정산가: timeframe 종료 시점 Bybit settlement candle close
+  - 상승이면 bull 승, 하락이면 bear 승, 0이면 draw
+- 데모용 가짜 결과가 아니라 `fetchBattleSettlement()` 기반 실정산 흐름이다.
 
-| 이름 | 역할 | 핵심 해석 축 |
-|------|------|-------------|
-| Aira | 기술분석가 | RSI, MACD, 볼린저, 추세 |
-| Judy | 뉴스 스카우터 | 뉴스 수, 대표 헤드라인, 감성 |
-| Clover | 심리 센티먼트 분석가 | 공포탐욕지수, 커뮤니티 온도 |
-| Blaze | 모멘텀 트레이더 | 24h/7d 변동률, 거래량 |
+## 데이터 소스
 
-### 베어리시팀
+- CoinGecko
+  - 검색
+  - Top 코인
+  - 가격, 거래량, 시총, 24h/7d 변화
+  - RSI, MACD, 볼린저 계산용 가격 히스토리
+- Alternative.me
+  - Fear & Greed
+- Alpha Vantage -> GDELT -> NewsAPI
+  - 뉴스 감성
+  - 헤드라인 요약
+- Bybit
+  - long/short ratio
+  - 실제 정산 캔들
+- Hyperliquid
+  - open interest
+  - funding rate
+  - whaleScore 계산용 입력
+- OpenRouter
+  - 8명 캐릭터 발언 생성
+- Gemini
+  - 최종 리포트와 lesson synthesis
+- Supabase Auth / Postgres
+  - 로그인
+  - 인증 사용자 battle 자산 미러 저장
 
-| 이름 | 역할 | 핵심 해석 축 |
-|------|------|-------------|
-| Ledger | 온체인 분석가 | 거래량/시총, 시총 순위 |
-| Shade | 리스크 매니저 | 롱숏 비율, 펀딩비, 청산 규모 |
-| Vela | 고래 추적자 | whaleScore, 미결제약정 |
-| Flip | 역발상 전략가 | RSI, 공포탐욕, 감성의 역지표 해석 |
+## 캐릭터와 현재 모델 배치
 
----
+### 불리시 팀
 
-## 데이터 소스와 원칙
+| 캐릭터 | 역할 | primary | fallback |
+| --- | --- | --- | --- |
+| Aira | 기술분석가 | `stepfun/step-3.5-flash:free` | `qwen/qwen3.5-9b` |
+| Judy | 뉴스 스카우터 | `arcee-ai/trinity-large-preview:free` | `qwen/qwen3.5-9b` |
+| Clover | 심리 센티먼트 분석가 | `nvidia/nemotron-3-super-120b-a12b:free` | `qwen/qwen3.5-9b` |
+| Blaze | 모멘텀 트레이더 | `minimax/minimax-m2.5:free` | `qwen/qwen3.5-9b` |
 
-### 현재 우선 사용 소스
-- CoinGecko: 검색, Top 코인, 가격, 시총, 기본 배틀 스냅샷
-- Alternative.me: 공포탐욕지수
-- Alpha Vantage -> GDELT -> NewsAPI: 뉴스 감성 파이프라인
-- Bybit: 롱숏 비율
-- Hyperliquid: 미결제약정, 펀딩비, 고래 점수 계산용 원데이터
+### 베어리시 팀
 
-### 현재 구현 원칙
-- 실데이터를 우선 사용한다.
-- 외부 API가 실패하면 fallback 데이터나 계산값으로 흐름을 유지한다.
-- 민감정보는 저장하지 않는다.
-- 사용자 상태는 세션 쿠키와 로컬스토리지 중심으로 다룬다.
+| 캐릭터 | 역할 | primary | fallback |
+| --- | --- | --- | --- |
+| Ledger | 거래 구조 분석가 | `stepfun/step-3.5-flash:free` | `qwen/qwen3.5-9b` |
+| Shade | 리스크 매니저 | `arcee-ai/trinity-large-preview:free` | `qwen/qwen3.5-9b` |
+| Vela | 고래 추적자 | `arcee-ai/trinity-large-preview:free` | `qwen/qwen3.5-9b` |
+| Flip | 역발상 전략가 | `nvidia/nemotron-3-super-120b-a12b:free` | `qwen/qwen3.5-9b` |
 
----
+### 최종 합성
 
-## 보상 구조
+- 최종 리포트 생성 route는 `gemini-2.5-pro`
+- Gemini는 승패를 다시 판정하지 않고, 이미 정해진 결과를 설명하고 lesson을 합성한다.
 
-### 사용자 XP
-- 승리 시 `+24 XP`
-- 패배 시 `-12 XP`
-- 무승부 시 `0 XP`
+## 저장 원칙
 
-### 저장 위치
-- 사용자 레벨: 사용자 세션 id 기준 로컬스토리지
-- 결과 중복 적용 방지: `database/data/battle_result_applications.json`
+- 민감 정보와 GPS는 저장하지 않는다.
+- 요청 owner는 `auth user id -> guest cookie id` 우선순위로 계산한다.
+- 로컬 저장
+  - 최근 본 코인
+  - 현재 battle snapshot
+  - 현재 userBattle
+  - 사용자 레벨
+  - 결과 적용 여부
+  - timing metrics
+- 서버 파일 저장
+  - snapshot
+  - prep cache
+  - outcome seed
+  - player decision seed
+  - character memory seed
+  - report
+  - reusable memo
+  - event log
+- 로그인 사용자는 주요 battle 자산을 Supabase에도 미러 저장한다.
 
----
+## 현재 제품 강점
 
-## 비기능 요구사항
+- battle 진입부터 결과 정산까지 실제 흐름이 이어진다.
+- `/me`에서 로그인 사용자 battle archive를 확인할 수 있다.
+- `/admin/battles`, `/admin/memos`에서 운영자가 결과와 lesson을 조회할 수 있다.
+- opening round prewarm과 `battle_pick_ready` 도입으로 체감 대기 시간이 많이 줄었다.
 
-- 모바일 우선 레이아웃
-- GPS 같은 민감정보 저장 금지
-- 모든 주요 화면에 리스크 고지 문구 유지
-- API 실패 시 완전 중단보다 fallback 우선
-- `pnpm lint`, `pnpm typecheck`, `pnpm test` 통과 기준 유지
+## 현재 핵심 리스크
 
----
+1. OpenRouter 무료 모델의 가용성과 응답 품질 편차가 크다.
+2. warm battle은 빨라졌지만 prewarm wall-clock은 아직 더 줄일 여지가 있다.
+3. 일부 화면/소스 문자열 인코딩 깨짐이 남아 있다.
+4. `docs/PRD.md` 경로가 실제 저장소와 어긋나 있다.
 
-## 현재 단계 성공 기준
+## 현재 우선순위
 
-- 홈 -> 배틀 -> 선택 -> 결과 흐름이 끊기지 않을 것
-- 외부 API 키가 없어도 기본 데모 흐름이 유지될 것
-- 같은 배틀 결과가 중복 적용되지 않을 것
-- 사용자 입장에서 첫 발언까지 대기 시간이 과도하지 않을 것
+1. `/battle/bitcoin` 반복 실측으로 첫 발언, pick-ready, 완료 시점 분포를 다시 집계
+2. 캐릭터별 primary/fallback 조합 실패율 재조정
+3. `pickReadyAt` 메트릭 추가와 관측성 강화
+4. prewarm 추가 경량화
+5. 남은 UTF-8 깨짐 정리
 
----
+## 품질 게이트
 
-## 현재 우선 개발 원칙
-
-- 현재 단계는 기능 확장보다 신뢰도 회복을 우선한다.
-- 문구 정상화, 데이터 품질, API 계약 정합성을 1순위로 둔다.
-- 멀티에이전트 구조 확장은 MVP 안정화 이후 단계로 본다.
-
----
-
-## 운영 안정성 원칙
-
-- 실데이터를 우선 사용하되, 일부 외부 의존성이 실패해도 partial fallback으로 흐름을 유지한다.
-- 실패가 나더라도 사용자가 다음 행동을 선택할 수 있게 재시도 또는 홈 이동 경로를 남긴다.
-- 결과 규칙 변경은 항상 버전 관리 전제를 둔다.
-- 외부 연동 확장은 응답 계약 단일화 후 진행한다.
-- 멀티 provider는 팀 내 4명이 서로 다른 모델을 쓰는 방향으로 배정한다.
-- 캐릭터 기본 모델 실패 시 공통 fallback은 `Qwen: Qwen3.5-9B`를 사용한다.
-- 캐릭터 모델 호출은 `OpenRouter` 하나로 먼저 시작하고, 최종 결과 취합 에이전트 `Gemini`만 직결 API를 사용한다.
-
-### OpenRouter 경로 분리 원칙
-- 캐릭터 모델 호출은 `OPENROUTER_API_KEY` 기반 단일 경로를 기본으로 둔다.
-- provider별 개별 `API_KEY`, `API_URL` 구조는 직결 API 전환 전까지 필수가 아니다.
-- 즉시 구현 단계에서는 OpenRouter 단일 키 경로를 우선하고, provider 직결 env는 후속 운영 전환 항목으로 분리한다.
-
----
-
-## 캐릭터 모델 배정 원칙
-
-### 불리시팀
-
-| 캐릭터 | 역할 | 기본 모델 |
-|------|------|-----------|
-| Aira | 기술분석가 | `Qwen: Qwen3.5-9B` |
-| Judy | 뉴스 스카우터 | `MiniMax: MiniMax M2.5 (free)` |
-| Clover | 심리 센티먼트 분석가 | `NVIDIA: Nemotron 3 Super (free)` |
-| Blaze | 모멘텀 트레이더 | `StepFun: Step 3.5 Flash (free)` |
-
-### 베어리시팀
-
-| 캐릭터 | 역할 | 기본 모델 |
-|------|------|-----------|
-| Ledger | 온체인 분석가 | `NVIDIA: Nemotron 3 Super (free)` |
-| Shade | 리스크 매니저 | `StepFun: Step 3.5 Flash (free)` |
-| Vela | 고래 추적자 | `MiniMax: MiniMax M2.5 (free)` |
-| Flip | 역발상 전략가 | `Qwen: Qwen3.5-9B` |
-
-### 결과 취합
-
-- 최종 결과 취합 에이전트는 `Gemini`를 사용한다.
-- 개별 캐릭터 모델 실패 시 공통 fallback은 `Qwen: Qwen3.5-9B`로 통일한다.
-- `Gemini`는 최종 승패를 새로 판정하지 않고, 이미 계산된 결과를 바탕으로 승부 근거를 다시 정리하고 report를 생성한다.
-
----
-
-## 캐릭터 조사 방식 원칙
-
-모든 캐릭터는 같은 검색을 반복하지 않고, 공통 스냅샷 위에 각자 다른 조사 축을 맡는다.
-
-### 공통 입력
-- CoinGecko: 가격, 거래량, 시총, `24h`, `7d`
-- Alternative.me: 공포탐욕지수
-- Alpha Vantage -> GDELT -> NewsAPI: 뉴스 감성 파이프라인
-- Bybit: 롱숏 비율
-- Hyperliquid: 미결제약정, 펀딩비
-
-### 공통 스냅샷과 역할 전용 evidence 경계
-
-- 공통 스냅샷:
-  - `coinId`, `symbol`
-  - `currentPrice`
-  - `priceChange24h`
-  - `priceChange7d`
-  - `volume24h`
-  - `rsi`, `macd`, `bollingerUpper`, `bollingerLower`
-  - `fearGreedIndex`, `fearGreedLabel`
-  - `sentimentScore`
-  - `longShortRatio`
-  - `openInterest`
-  - `fundingRate`
-- `whaleScore`
-- 역할 전용 evidence:
-  - 공통 스냅샷에서 각 캐릭터에게 필요한 2~4개 필드만 추려 재구성한 해석용 입력
-  - 다른 캐릭터의 전용 evidence를 그대로 재사용하지 않는다
-  - `Flip`만 예외적으로 다른 캐릭터 요약을 반론 evidence로 함께 받는다
-
-### 불리시팀 조사 방식
-- Aira:
-  - RSI, MACD, 추세선, 거래량 패턴 중심
-  - 질문: 추세가 유지되는가, 기술적 방어선이 살아 있는가
-- Judy:
-  - 뉴스, 공시, 일정, 정책 변화 중심
-  - 질문: 가격을 밀 수 있는 재료가 남아 있는가, 후속 이벤트가 있는가
-- Clover:
-  - 공포탐욕, 커뮤니티 온도, 군중 심리 중심
-  - 질문: 기대 심리가 남아 있는가, 정서가 식고 있는가
-- Blaze:
-  - 단기 변동률, 거래량, 돌파 속도 중심
-  - 질문: 지금 붙은 속도가 이어질 가능성이 있는가
-
-### 베어리시팀 조사 방식
-- Ledger:
-  - 온체인 자금 흐름이 이상적이지만, 현재 v1에서는 `volume24h`, `priceChange24h`, `priceChange7d`를 대체 지표로 쓴다
-  - 질문: 거래량이 가격 움직임을 받쳐주는가, 체력보다 기대가 앞서 있는가
-- Shade:
-  - `longShortRatio`, `openInterest`, `fundingRate`, 단기 가격 변동을 중심으로 본다
-  - 질문: 포지션이 과하게 쌓였는가, 펀딩이 한쪽으로 쏠렸는가
-  - 질문: 무너지면 어디서 먼저 무너지는가, 청산 리스크가 큰가
-- Vela:
-  - `whaleScore`, `volume24h`, `openInterest`를 대형 자금 프록시로 사용한다
-  - `Hyperliquid` 미결제약정과 실제 거래 강도로 방향 전환을 추정한다
-  - 질문: 큰 손이 실제로 들어오고 있는가, 개인 수급만 뜨거운가
-- Flip:
-  - 다른 캐릭터 논리의 허점과 역발상 시나리오 중심
-  - 질문: 다수가 믿는 논리의 약점은 무엇인가, 과열/공포를 뒤집어 볼 근거가 있는가
-
----
-
-## 최종 취합 에이전트 역할
-
-- 최종 취합 에이전트는 `Gemini` 직결 API를 사용한다.
-- 책임:
-  - 배틀 요약
-  - 승리 팀 핵심 논거 2개 재정리
-  - 패배 팀 약한 논거 1~2개 재정리
-  - `ruleVersion` 기준 결과 설명
-  - 플레이어가 왜 맞았거나 틀렸는지 회고용 문장 생성
-- 책임 밖:
-  - 실제 승패 판정
-  - XP 계산
-  - 시장 데이터 원본 계산
-
-메모:
-- 승패와 XP는 항상 `resolveBattle`과 `ruleVersion` 기준 계산 결과를 먼저 확정하고, `Gemini`는 그 결과를 설명만 한다.
+- `pnpm lint`
+- `pnpm typecheck`
+- `pnpm test`
