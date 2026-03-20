@@ -1,7 +1,5 @@
-import { getBattleMarketSnapshot } from "@/application/useCases/getBattleMarketSnapshot";
-import { getReusableDebateContext } from "@/application/useCases/getReusableDebateContext";
 import { generateCharacterMessage } from "@/application/useCases/generateBattleDebate";
-import { FileReportRepository } from "@/infrastructure/db/fileReportRepository";
+import { getPreparedBattleContext } from "@/application/useCases/preparedBattleContext";
 import { NextResponse } from "next/server";
 import { characters } from "@/shared/constants/characters";
 
@@ -19,21 +17,56 @@ export async function POST(request: Request) {
   }
 
   const coinId = body.coinId;
+  const preparedContextResult = await getPreparedBattleContext(coinId);
+  const firstCharacter = characters[0] ?? null;
+  const preparedFirstTurnDraft = firstCharacter
+    ? preparedContextResult.context.firstTurnDrafts[firstCharacter.id] ?? null
+    : null;
 
   const stream = new ReadableStream({
     async start(controller) {
       const encoder = new TextEncoder();
+
       try {
-        const { marketData, summary } = await getBattleMarketSnapshot(coinId);
-        const reusableDebateContext = await getReusableDebateContext(
-          new FileReportRepository(),
-          coinId,
-        );
+        const { marketData, summary, reusableDebateContext } = preparedContextResult.context;
 
         controller.enqueue(encoder.encode(toSseEvent("battle_start", { marketData, summary })));
 
         const messages = [];
-        for (const character of characters) {
+
+        if (firstCharacter) {
+          const firstMessage =
+            preparedFirstTurnDraft ??
+            (await generateCharacterMessage(
+              marketData,
+              firstCharacter,
+              messages,
+              reusableDebateContext,
+            ));
+          messages.push(firstMessage);
+          controller.enqueue(
+            encoder.encode(
+              toSseEvent("character_start", {
+                characterId: firstMessage.characterId,
+                characterName: firstMessage.characterName,
+                team: firstMessage.team,
+              }),
+            ),
+          );
+          controller.enqueue(encoder.encode(toSseEvent("message", firstMessage)));
+          controller.enqueue(
+            encoder.encode(
+              toSseEvent("character_done", {
+                characterId: firstMessage.characterId,
+                provider: firstMessage.provider,
+                model: firstMessage.model,
+                fallbackUsed: firstMessage.fallbackUsed,
+              }),
+            ),
+          );
+        }
+
+        for (const character of characters.slice(1)) {
           const message = await generateCharacterMessage(
             marketData,
             character,
@@ -95,6 +128,12 @@ export async function POST(request: Request) {
       "Content-Type": "text/event-stream",
       "Cache-Control": "no-cache, no-transform",
       Connection: "keep-alive",
+      "x-battle-prepared-context-hit": `${preparedContextResult.preparedContextHit}`,
+      "x-battle-prepared-first-turn-hit": `${preparedContextResult.preparedFirstTurnHit}`,
+      "x-battle-prepared-at-age-ms":
+        preparedContextResult.preparedAtAgeMs == null
+          ? ""
+          : `${preparedContextResult.preparedAtAgeMs}`,
     },
   });
 }

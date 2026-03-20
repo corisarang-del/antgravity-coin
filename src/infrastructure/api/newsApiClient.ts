@@ -1,5 +1,11 @@
 import { envConfig } from "@/shared/constants/envConfig";
-import { buildNewsSearchQuery, scoreNewsTitles, summarizeSentiment } from "@/infrastructure/api/newsSentimentKeywords";
+import {
+  buildNewsSearchQuery,
+  pickTopHeadlines,
+  scoreNewsTitles,
+  summarizeNewsEvent,
+  summarizeSentiment,
+} from "@/infrastructure/api/newsSentimentKeywords";
 
 interface NewsApiArticle {
   title?: string;
@@ -37,11 +43,14 @@ export async function fetchNewsApiSentiment(symbol: string) {
     throw new Error("NewsAPI response empty");
   }
 
+  const headlines = pickTopHeadlines(articles.map((article) => article.title ?? "").filter(Boolean));
   const sentimentScore = scoreNewsTitles(articles.map((article) => article.title ?? "").filter(Boolean));
 
   return {
     sentimentScore,
     summary: summarizeSentiment(sentimentScore, "NewsAPI"),
+    headlines,
+    eventSummary: summarizeNewsEvent(headlines, sentimentScore, "NewsAPI"),
     source: "newsapi" as const,
   };
 }

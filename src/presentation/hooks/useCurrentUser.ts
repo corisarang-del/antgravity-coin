@@ -1,7 +1,10 @@
 "use client";
 
-import { useCurrentUserStore } from "@/presentation/hooks/currentUserStore";
+import {
+  useCurrentUserStore,
+  type CurrentUserSnapshot,
+} from "@/presentation/hooks/currentUserStore";
 
-export function useCurrentUser() {
-  return useCurrentUserStore();
+export function useCurrentUser(initialSnapshot?: CurrentUserSnapshot) {
+  return useCurrentUserStore(initialSnapshot);
 }

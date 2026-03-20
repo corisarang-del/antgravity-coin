@@ -22,4 +22,8 @@ export const cachePolicy = {
     softTtlMs: 2 * 60 * 1000,
     hardTtlMs: 10 * 60 * 1000,
   } satisfies CacheTtlPolicy,
+  battlePrep: {
+    softTtlMs: 2 * 60 * 1000,
+    hardTtlMs: 10 * 60 * 1000,
+  } satisfies CacheTtlPolicy,
 } as const;

@@ -20,6 +20,8 @@ export interface CachedFearGreedValue {
 export interface CachedNewsSentimentValue {
   sentimentScore: number;
   summary: string;
+  headlines: string[];
+  eventSummary: string;
   source: "alpha-vantage" | "gdelt" | "newsapi";
 }
 

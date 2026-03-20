@@ -1,4 +1,5 @@
 import { ResultPageClient } from "@/app/battle/[coinId]/result/ResultPageClient";
+import { getInitialCurrentUserSnapshot } from "@/infrastructure/auth/getInitialCurrentUserSnapshot";
 
 interface ResultPageProps {
   params: Promise<{
@@ -8,5 +9,7 @@ interface ResultPageProps {
 
 export default async function ResultPage({ params }: ResultPageProps) {
   const { coinId } = await params;
-  return <ResultPageClient coinId={coinId} />;
+  const initialCurrentUserSnapshot = await getInitialCurrentUserSnapshot();
+
+  return <ResultPageClient coinId={coinId} initialCurrentUserSnapshot={initialCurrentUserSnapshot} />;
 }

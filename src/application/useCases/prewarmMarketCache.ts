@@ -1,20 +1,22 @@
-import { fetchMarketData } from "@/application/useCases/fetchMarketData";
+import { prewarmPreparedBattleContext } from "@/application/useCases/preparedBattleContext";
 import { cachePolicy } from "@/shared/constants/cachePolicy";
 
 export async function prewarmMarketCache(coinIds: readonly string[] = cachePolicy.prewarmCoinIds) {
   const results = await Promise.all(
     coinIds.map(async (coinId) => {
       try {
-        const marketData = await fetchMarketData(coinId);
+        const context = await prewarmPreparedBattleContext(coinId);
         return {
           coinId,
           ok: true,
-          symbol: marketData.symbol,
+          symbol: context.marketData.symbol,
+          prepared: true,
         };
       } catch (error) {
         return {
           coinId,
           ok: false,
+          prepared: false,
           error: error instanceof Error ? error.message : "unknown_error",
         };
       }

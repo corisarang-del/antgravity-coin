@@ -4,6 +4,9 @@ export interface BattleTimingMetrics {
   firstCharacterStartedAt: number | null;
   firstMessageDisplayedAt: number | null;
   debateCompletedAt: number | null;
+  preparedContextHit: boolean | null;
+  preparedFirstTurnHit: boolean | null;
+  preparedAtAgeMs: number | null;
 }
 
 export function createBattleTimingTracker(now: () => number = () => Date.now()) {
@@ -13,6 +16,9 @@ export function createBattleTimingTracker(now: () => number = () => Date.now()) 
     firstCharacterStartedAt: null,
     firstMessageDisplayedAt: null,
     debateCompletedAt: null,
+    preparedContextHit: null,
+    preparedFirstTurnHit: null,
+    preparedAtAgeMs: null,
   };
 
   return {
@@ -27,6 +33,15 @@ export function createBattleTimingTracker(now: () => number = () => Date.now()) 
     },
     markDebateCompleted() {
       metrics.debateCompletedAt ??= now();
+    },
+    markPreparedContext(input: {
+      preparedContextHit: boolean;
+      preparedFirstTurnHit: boolean;
+      preparedAtAgeMs: number | null;
+    }) {
+      metrics.preparedContextHit ??= input.preparedContextHit;
+      metrics.preparedFirstTurnHit ??= input.preparedFirstTurnHit;
+      metrics.preparedAtAgeMs ??= input.preparedAtAgeMs;
     },
     getMetrics() {
       return { ...metrics };

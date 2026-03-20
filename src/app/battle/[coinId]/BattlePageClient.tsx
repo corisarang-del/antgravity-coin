@@ -3,6 +3,8 @@
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { getCharacterById } from "@/shared/constants/characters";
+import type { CurrentUserSnapshot } from "@/presentation/hooks/currentUserStore";
 import { AppHeader } from "@/presentation/components/AppHeader";
 import { IndicatorCard } from "@/presentation/components/IndicatorCard";
 import { RiskDisclaimer } from "@/presentation/components/RiskDisclaimer";
@@ -27,9 +29,10 @@ const BattleFeed = dynamic(
 
 interface BattlePageClientProps {
   coinId: string;
+  initialCurrentUserSnapshot: CurrentUserSnapshot;
 }
 
-export function BattlePageClient({ coinId }: BattlePageClientProps) {
+export function BattlePageClient({ coinId, initialCurrentUserSnapshot }: BattlePageClientProps) {
   const router = useRouter();
   const { messages, marketData, summary, activeCharacterId, isComplete, error, timingMetrics } =
     useBattleStream({
@@ -38,10 +41,40 @@ export function BattlePageClient({ coinId }: BattlePageClientProps) {
 
   const lastMessage = messages[messages.length - 1] ?? null;
   const indicators = summary?.indicators ?? [];
+  const activeCharacter = activeCharacterId ? getCharacterById(activeCharacterId) : null;
+  const firstMessageSeconds = timingMetrics?.firstMessageDisplayedAt
+    ? Math.max(
+        0,
+        Math.round((timingMetrics.firstMessageDisplayedAt - timingMetrics.requestStartedAt) / 100) /
+          10,
+      )
+    : null;
+  const showPreMessageState = !error && messages.length === 0;
+
+  const preMessageHeadline = activeCharacter
+    ? `${activeCharacter.name}가 첫 발언을 정리 중이야.`
+    : summary
+      ? "시장 데이터는 준비됐고, 첫 캐릭터 순서를 맞추는 중이야."
+      : "시장, 뉴스, 파생 지표를 모으는 중이야.";
+
+  const preMessageSteps = [
+    {
+      label: "시장 데이터 수집",
+      status: summary ? "done" : "active",
+    },
+    {
+      label: "첫 캐릭터 준비",
+      status: activeCharacter ? "done" : summary ? "active" : "pending",
+    },
+    {
+      label: "첫 발언 수신",
+      status: messages.length > 0 ? "done" : activeCharacter ? "active" : "pending",
+    },
+  ] as const;
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <AppHeader />
+      <AppHeader initialCurrentUserSnapshot={initialCurrentUserSnapshot} />
       <main className="mx-auto max-w-5xl space-y-4 px-4 py-6">
         <section className="rounded-[28px] border border-border/80 bg-[linear-gradient(180deg,hsl(var(--card))_0%,hsl(var(--surface-3))_100%)] p-5 shadow-[0_18px_40px_rgba(17,29,61,0.08)]">
           <span className="inline-flex rounded-full bg-[hsl(var(--surface-2))] px-3 py-2 text-xs font-semibold text-muted-foreground">
@@ -53,6 +86,37 @@ export function BattlePageClient({ coinId }: BattlePageClientProps) {
           <p className="mt-3 text-sm leading-6 text-muted-foreground">
             {summary?.headline ?? "시장 데이터를 수집하고 캐릭터 발언을 준비 중이야."}
           </p>
+          {showPreMessageState ? (
+            <div className="mt-4 rounded-[20px] border border-border/80 bg-[hsl(var(--surface-2))] px-4 py-4">
+              <p className="text-sm font-semibold text-foreground">{preMessageHeadline}</p>
+              <p className="mt-2 text-xs text-muted-foreground">
+                첫 발언은 보통 10~20초 안에 도착해. 지표가 많거나 외부 응답이 느리면 조금 더 걸릴 수 있어.
+              </p>
+              <div className="mt-4 grid gap-2 sm:grid-cols-3">
+                {preMessageSteps.map((step) => (
+                  <div
+                    key={step.label}
+                    className={`rounded-[16px] border px-3 py-3 text-xs ${
+                      step.status === "done"
+                        ? "border-primary/20 bg-card text-foreground"
+                        : step.status === "active"
+                          ? "border-primary/25 bg-primary/5 text-foreground"
+                          : "border-border/80 bg-background text-muted-foreground"
+                    }`}
+                  >
+                    <p className="font-semibold">{step.label}</p>
+                    <p className="mt-1">
+                      {step.status === "done"
+                        ? "완료"
+                        : step.status === "active"
+                          ? "진행 중"
+                          : "대기 중"}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : null}
           {error ? (
             <div className="mt-4 rounded-[18px] border border-bear/20 bg-bear/10 px-4 py-4 text-sm text-bear">
               <p>{error}</p>
@@ -78,17 +142,8 @@ export function BattlePageClient({ coinId }: BattlePageClientProps) {
               ) : null}
             </div>
           ) : null}
-          {timingMetrics?.firstMessageDisplayedAt ? (
-            <p className="mt-3 text-xs text-muted-foreground">
-              첫 발언 도착 시간:{" "}
-              {Math.max(
-                0,
-                Math.round(
-                  (timingMetrics.firstMessageDisplayedAt - timingMetrics.requestStartedAt) / 100,
-                ) / 10,
-              )}
-              초
-            </p>
+          {firstMessageSeconds != null ? (
+            <p className="mt-3 text-xs text-muted-foreground">첫 발언 도착 시간: {firstMessageSeconds}초</p>
           ) : null}
         </section>
 
@@ -118,7 +173,7 @@ export function BattlePageClient({ coinId }: BattlePageClientProps) {
               className="mt-4 inline-flex min-h-12 items-center rounded-[18px] bg-primary px-4 py-3 font-semibold text-primary-foreground shadow-[0_12px_24px_rgba(17,29,61,0.14)]"
               href={`/battle/${coinId}/pick`}
             >
-              이제 팀 선택하러 가기
+              이제 내 선택하러 가기
             </Link>
           </div>
         ) : null}

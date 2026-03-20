@@ -7,6 +7,7 @@ import {
   type DebateEvidenceSource,
   getCharacterDebateProfile,
 } from "@/shared/constants/characterDebateProfiles";
+import { sanitizeDisplayText, sanitizeKoreanText } from "@/shared/utils/textIntegrity";
 
 const fallbackTemplates: Record<
   string,
@@ -25,81 +26,81 @@ const characterVoiceGuide: Record<
   aira: {
     bull: {
       summary: "차트 구조가 아직 위쪽으로 열려 있어.",
-      detail: "Aira답게 RSI와 추세, 거래량 흐름만 보면 지금은 기술적 방어가 먼저 보여. 뉴스보다 차트가 더 말해주고 있어.",
+      detail: "Aira답게 RSI, MACD, 밴드 흐름만 보면 기술적 방어가 먼저 보여. 뉴스보다 차트가 더 강하게 말하고 있어.",
     },
     bear: {
       summary: "차트가 버티는 척하지만 힘은 약해지고 있어.",
-      detail: "Aira 기준으로 보면 추세와 모멘텀이 같이 식고 있어. 지금은 반등 기대보다 지지 이탈 가능성을 먼저 경계해야 해.",
+      detail: "Aira 기준으로는 추세와 모멘텀이 함께 식고 있어서 반등 기대보다 추가 조정을 먼저 봐야 해.",
     },
   },
   judy: {
     bull: {
-      summary: "가격보다 먼저 움직일 재료가 아직 남아 있어.",
-      detail: "Judy는 뉴스와 일정, 정책 변화를 먼저 봐. 지금은 시장이 아직 다 반영하지 않은 재료가 있어서 강세 논리를 만들 수 있어.",
+      summary: "Judy: 뉴스 재료 흐름이 아직 가격을 더 밀 수 있어.",
+      detail: "Judy는 헤드라인과 이벤트를 먼저 읽어. 지금 들어온 재료 결이 살아 있어서 단기 기대가 아직 꺼지지 않았어.",
     },
     bear: {
-      summary: "재료가 있어 보여도 가격을 끌 만큼 강하진 않아.",
-      detail: "Judy 기준으로는 헤드라인 온도보다 실제 영향력이 약해 보여. 뉴스는 많지만 지속 매수로 이어질 확신은 부족해.",
+      summary: "Judy: 뉴스는 많아도 가격을 끝까지 끌 힘은 약해 보여.",
+      detail: "Judy 시선으로 보면 이벤트는 보여도 시장이 그 재료를 오래 붙잡는 분위기는 아니야.",
     },
   },
   clover: {
     bull: {
-      summary: "심리가 아직 완전히 식지 않았어.",
-      detail: "Clover는 공포탐욕과 커뮤니티 온도를 먼저 읽어. 지금은 군중 심리가 아직 risk-on 쪽에 가까워서 쉽게 꺾이지 않는 흐름이야.",
+      summary: "Clover: 군중 심리가 아직 완전히 꺾이지 않았어.",
+      detail: "공포가 강해도 기대가 미세하게 남아 있으면 심리 반등이 붙는 구간이 생겨. 지금은 그 가능성이 완전히 닫히진 않았어.",
     },
     bear: {
-      summary: "심리가 과열 쪽으로 기울어서 되돌림 위험이 커.",
-      detail: "Clover 시선으로 보면 기대가 너무 앞서 있어. 이런 구간은 작은 충격에도 분위기가 빠르게 뒤집힐 수 있어.",
+      summary: "Clover: 심리 불안이 다시 커지면 흔들림이 빨라질 수 있어.",
+      detail: "Clover는 숫자보다 군중의 떨림을 봐. 지금 분위기는 작은 충격에도 공포 쪽으로 기울 수 있어.",
     },
   },
   blaze: {
     bull: {
-      summary: "속도가 붙은 흐름은 한 번 더 뻗을 수 있어.",
-      detail: "Blaze는 돌파와 속도감을 본다. 거래량이 붙은 모멘텀이 살아 있으면 짧게라도 한 번 더 위로 치고 갈 여지가 있어.",
+      summary: "Blaze: 속도가 붙는 구간이라 한 번 더 위로 칠 수 있어.",
+      detail: "Blaze는 속도와 거래량을 먼저 본다. 지금은 추세 추종이 아직 먹힐 만한 장면이야.",
     },
     bear: {
-      summary: "속도는 좋지만 과열 구간이라 식는 순간이 빠를 수 있어.",
-      detail: "Blaze 관점에서도 모멘텀은 인정하지만, 이런 장은 꺾일 때도 급해. 추격보다 과열 해소를 먼저 봐야 해.",
+      summary: "Blaze: 속도는 좋지만 과열이라 식는 순간이 빠를 수 있어.",
+      detail: "모멘텀 장은 꺾일 때도 급해. Blaze답게 추격보다 되돌림 위험을 먼저 본다.",
     },
   },
   ledger: {
     bull: {
-      summary: "수급 구조가 아직 무너지진 않았어.",
-      detail: "Ledger는 온체인과 거래소 입출금 흐름을 본다. 지금은 체력 자체가 완전히 꺾였다고 보기 어려워서 버티는 힘이 남아 있어.",
+      summary: "Ledger: 거래 구조 체력이 아직 완전히 비진 않았어.",
+      detail: "Ledger는 지금 확보된 거래 구조만 본다. 거래량과 구조적 버팀이 남아 있으면 쉽게 무너질 자리는 아니야.",
     },
     bear: {
-      summary: "수급이 약해지면 가격보다 먼저 티가 나.",
-      detail: "Ledger 기준으로는 거래 강도와 자금 흐름이 둔해지는 쪽이 더 거슬려. 겉 가격보다 내부 체력이 먼저 흔들리고 있어.",
+      summary: "Ledger: 거래 구조는 아직 조심 쪽으로 기울어 있어.",
+      detail: "가격이 버티는 척해도 체력이 비면 아래로 밀릴 수 있어. Ledger답게 구조가 먼저 흔들리는지 본다.",
     },
   },
   shade: {
     bull: {
-      summary: "리스크는 있지만 아직 통제 가능한 구간이야.",
-      detail: "Shade는 늘 최악의 경우부터 본다. 지금은 경고등이 켜져 있어도 바로 무너질 만큼은 아니라서 방어적으로 버틸 여지는 있어.",
+      summary: "Shade: 리스크는 있지만 아직 통제 가능한 범위야.",
+      detail: "Shade는 손익보다 리스크를 먼저 본다. 지금은 바로 붕괴보다 관리 가능한 변동성 구간에 더 가까워.",
     },
     bear: {
-      summary: "지금은 수익보다 손실 관리가 먼저야.",
-      detail: "Shade 시선에서는 롱숏 비율과 미결제약정, 펀딩이 경고를 보내고 있어. 한 번 꼬이면 손실이 커질 수 있는 자리야.",
+      summary: "Shade: 리스크 지표가 먼저 경고를 보내고 있어.",
+      detail: "과열 포지션이 쌓이면 작은 충격도 청산 쪽으로 번질 수 있어. Shade 기준에선 방어가 우선이야.",
     },
   },
   vela: {
     bull: {
-      summary: "큰 손 움직임이 완전히 빠져나간 건 아니야.",
-      detail: "Vela는 큰 자금과 고래 신호를 추적해. 지금은 아직 방향을 접었다기보다 관망 또는 재진입 여지를 남긴 흐름으로 보여.",
+      summary: "Vela: 숨은 자금 흐름이 아직 완전히 꺾였다고 보긴 어려워.",
+      detail: "Vela는 수면 아래 흐름을 본다. 대형 자금이 급하게 도망가는 그림보단 아직 관망과 재진입이 섞여 보여.",
     },
     bear: {
-      summary: "고래가 확신 없이 움직이면 개인만 남을 수 있어.",
-      detail: "Vela 관점에서는 큰 자금이 분명하게 붙지 않을 때가 가장 위험해. 개인 심리만으로 밀어 올리기엔 힘이 약해 보여.",
+      summary: "Vela: 자금 방향이 흔들리면 개인만 남는 장이 될 수 있어.",
+      detail: "고래 흐름이 선명하지 않으면 가격을 오래 미는 힘도 약해져. Vela는 그 공백을 경계해.",
     },
   },
   flip: {
     bull: {
-      summary: "다들 과열을 말할 때가 오히려 빈틈일 수 있어.",
-      detail: "Flip은 역발상으로 본다. 시장이 너무 한쪽으로 기울어 경계할수록 반대로 더 버티거나 한 번 더 튈 자리도 생겨.",
+      summary: "Flip: 다들 조정을 말할수록 오히려 한 번 더 튈 자리도 남아 있어.",
+      detail: "Flip은 합의의 반대편을 본다. 조심이 과해지면 짧은 반대로 숏을 털 수 있어.",
     },
     bear: {
-      summary: "지금은 다들 강세를 믿는 만큼 반대로 꺾일 맛이 나는 구간이야.",
-      detail: "Flip 기준으로는 기대가 한쪽에 쏠렸어. 이런 때는 작은 실망도 크게 작용해서 오히려 하방 반전이 더 세게 나올 수 있어.",
+      summary: "Flip: 오히려 너무 낙관적이라 반대로 꺾일 쪽이 가까워 보여.",
+      detail: "모두가 위만 볼 때 작은 균열 하나가 크게 번지기도 해. Flip답게 그 반전을 노린다.",
     },
   },
 };
@@ -118,12 +119,8 @@ function extractJsonBlock(rawText: string) {
   return candidate.slice(start, end + 1);
 }
 
-function hasHangul(text: string) {
-  return /[가-힣]/.test(text);
-}
-
 function isKoreanDebateContent(summary: string, detail: string) {
-  return hasHangul(summary) && hasHangul(detail);
+  return summary.trim().length > 0 && detail.trim().length > 0;
 }
 
 function formatMarketEvidenceValue(
@@ -134,6 +131,10 @@ function formatMarketEvidenceValue(
 
   if (value == null) {
     return "없음";
+  }
+
+  if (Array.isArray(value)) {
+    return value.length > 0 ? value.join(" | ") : "없음";
   }
 
   if (typeof value === "string") {
@@ -175,19 +176,26 @@ function buildRoleEvidence(
 
   const items = profile.evidenceSources.map((evidenceSource) => {
     if (evidenceSource.kind === "previous_messages") {
-      return `${evidenceSource.label} ${
-        previousMessages.map((message) => message.summary).join(" | ") ||
+      const previousSummary =
+        previousMessages.map((message) => `${message.characterName}: ${message.summary}`).join(" | ") ||
         evidenceSource.emptyText ||
-        "없음"
-      }`;
+        "없음";
+
+      return `[원소스: ${evidenceSource.source}] ${evidenceSource.label}: ${previousSummary}`;
     }
 
     const rawValue = marketData[evidenceSource.field];
-    if (rawValue == null) {
+    const isMissingArray = Array.isArray(rawValue) && rawValue.length === 0;
+    const isMissingString = typeof rawValue === "string" && rawValue.trim().length === 0;
+
+    if (rawValue == null || isMissingArray || isMissingString) {
       hasMissingRequiredEvidence = true;
     }
 
-    return `${evidenceSource.label} ${formatMarketEvidenceValue(marketData, evidenceSource)}`;
+    return `[원소스: ${evidenceSource.source}] ${evidenceSource.label}: ${formatMarketEvidenceValue(
+      marketData,
+      evidenceSource,
+    )}`;
   });
 
   return {
@@ -202,8 +210,8 @@ function buildUnavailableEvidenceMessage(
 ): DebateMessage {
   const tensionPoint =
     previousMessages.length > 0
-      ? `직전 발언 "${previousMessages.at(-1)?.summary}"까지는 봤지만, 내 역할에 필요한 근거가 비어 있었어.`
-      : "첫 발언을 준비했지만, 내 역할에 꼭 필요한 근거가 부족했어.";
+      ? `직전 발언 "${previousMessages.at(-1)?.summary}"까지는 들었지만, 지금은 이 캐릭터가 써야 할 원소스 근거가 비어 있어.`
+      : "첫 발언을 준비했지만, 지금은 이 캐릭터가 써야 할 원소스 근거가 부족해.";
 
   return {
     id: `${character.id}-${Date.now()}-${previousMessages.length}`,
@@ -211,7 +219,7 @@ function buildUnavailableEvidenceMessage(
     characterName: character.name,
     team: character.team,
     stance: character.team === "bull" ? "bullish" : "bearish",
-    summary: `${character.name}: 지금은 내 역할에 맞는 근거가 부족해서 섣불리 결론 내리기 어려워.`,
+    summary: `${character.name}: 지금은 이 역할답게 말할 만큼 근거가 부족해 섣불리 결론 내리기 어려워.`,
     detail: `${tensionPoint} 다음 턴에서는 ${character.role}답게 더 분명한 근거로 말할게.`,
     indicatorLabel: "근거 상태",
     indicatorValue: "데이터 부족",
@@ -231,7 +239,7 @@ function buildFallbackMessage(
   const tensionPoint =
     previousMessages.length > 0
       ? `직전 발언 "${previousMessages.at(-1)?.summary}"도 참고했어.`
-      : "첫 발언이라 내 역할 기준만 먼저 정리할게.";
+      : "첫 발언이라 캐릭터 렌즈를 먼저 세울게.";
 
   const indicatorLabel = isBull
     ? marketData.rsi >= 50
@@ -257,12 +265,12 @@ function buildFallbackMessage(
             : `${marketData.priceChange24h.toFixed(2)}%`;
 
   const summary = isBull
-    ? `${character.name}: ${characterVoiceGuide[character.id]?.bull.summary ?? fallbackTemplates[character.id]?.bull.summary ?? `${marketData.symbol} 기준으로 아직 강세 논리가 남아 있어.`}`
-    : `${character.name}: ${characterVoiceGuide[character.id]?.bear.summary ?? fallbackTemplates[character.id]?.bear.summary ?? `${marketData.symbol} 기준으로 아직 하락 리스크가 더 커 보여.`}`;
+    ? characterVoiceGuide[character.id]?.bull.summary ?? fallbackTemplates[character.id]?.bull.summary
+    : characterVoiceGuide[character.id]?.bear.summary ?? fallbackTemplates[character.id]?.bear.summary;
 
   const detail = isBull
-    ? `${tensionPoint} ${characterVoiceGuide[character.id]?.bull.detail ?? fallbackTemplates[character.id]?.bull.detail ?? `${character.role} 관점에서는 아직 강세 쪽 근거가 더 분명해.`}`
-    : `${tensionPoint} ${characterVoiceGuide[character.id]?.bear.detail ?? fallbackTemplates[character.id]?.bear.detail ?? `${character.role} 관점에서는 지금 하락 가능성을 더 경계해야 해.`}`;
+    ? `${tensionPoint} ${characterVoiceGuide[character.id]?.bull.detail ?? fallbackTemplates[character.id]?.bull.detail}`
+    : `${tensionPoint} ${characterVoiceGuide[character.id]?.bear.detail ?? fallbackTemplates[character.id]?.bear.detail}`;
 
   return {
     id: `${character.id}-${Date.now()}-${previousMessages.length}`,
@@ -270,7 +278,7 @@ function buildFallbackMessage(
     characterName: character.name,
     team: character.team,
     stance: isBull ? "bullish" : "bearish",
-    summary,
+    summary: `${character.name}: ${summary}`,
     detail,
     indicatorLabel,
     indicatorValue,
@@ -347,7 +355,10 @@ export async function generateCharacterMessage(
           stance: "bullish" | "bearish";
         };
 
-        if (!isKoreanDebateContent(parsed.summary, parsed.detail)) {
+        const sanitizedSummary = sanitizeKoreanText(parsed.summary, "");
+        const sanitizedDetail = sanitizeKoreanText(parsed.detail, "");
+
+        if (!isKoreanDebateContent(sanitizedSummary, sanitizedDetail)) {
           console.warn(
             `[battle-llm:error] character=${character.id} provider=${aiResult.provider} model=${aiResult.model} reason=non_korean_response fallbackUsed=${aiResult.fallbackUsed}`,
           );
@@ -360,10 +371,10 @@ export async function generateCharacterMessage(
           characterName: character.name,
           team: character.team,
           stance: parsed.stance,
-          summary: parsed.summary,
-          detail: parsed.detail,
-          indicatorLabel: parsed.indicatorLabel,
-          indicatorValue: parsed.indicatorValue,
+          summary: sanitizedSummary,
+          detail: sanitizedDetail,
+          indicatorLabel: sanitizeDisplayText(parsed.indicatorLabel, "핵심 지표"),
+          indicatorValue: sanitizeDisplayText(parsed.indicatorValue, "값 없음"),
           provider: aiResult.provider,
           model: aiResult.model,
           fallbackUsed: aiResult.fallbackUsed,

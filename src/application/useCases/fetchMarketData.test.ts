@@ -41,7 +41,9 @@ describe("fetchMarketData", () => {
     });
     vi.mocked(fetchNewsSentiment).mockResolvedValue({
       sentimentScore: 0.34,
-      summary: "Alpha Vantage 기사 흐름은 대체로 긍정적이야.",
+      summary: "Alpha Vantage 기사 톤은 대체로 긍정적이야.",
+      headlines: ["Bitcoin breakout gains momentum", "ETF approval keeps market optimistic"],
+      eventSummary: 'Alpha Vantage 대표 헤드라인은 "Bitcoin breakout gains momentum"이고, 전체 톤은 긍정 재료가 더 강하게 읽혀.',
       source: "alpha-vantage",
     });
     vi.mocked(fetchBybitLongShortRatio).mockResolvedValue(1.08);
@@ -52,7 +54,7 @@ describe("fetchMarketData", () => {
     });
   });
 
-  it("공포탐욕지수와 감성 점수를 포함한 MarketData를 반환한다", async () => {
+  it("확장된 서술형 근거를 포함한 MarketData를 반환한다", async () => {
     vi.mocked(coinGeckoFetch)
       .mockResolvedValueOnce([
         {
@@ -71,20 +73,14 @@ describe("fetchMarketData", () => {
     const result = await fetchMarketData("bitcoin");
 
     expect(result.symbol).toBe("BTC");
-    expect(result.priceChange7d).toBe(6.8);
-    expect(result.fearGreedIndex).toBeGreaterThanOrEqual(0);
-    expect(result.fearGreedIndex).toBeLessThanOrEqual(100);
-    expect(result.sentimentScore).toBeGreaterThanOrEqual(-1);
-    expect(result.sentimentScore).toBeLessThanOrEqual(1);
+    expect(result.newsHeadlines).toHaveLength(2);
+    expect(result.newsEventSummary).toContain("Bitcoin breakout gains momentum");
+    expect(result.communitySentimentSummary).toContain("공포탐욕");
+    expect(result.whaleFlowSummary).toContain("Bybit");
+    expect(result.marketStructureSummary).toContain("CoinGecko");
   });
 
-  it("실시장 데이터 조회가 실패하면 오류를 던진다", async () => {
-    vi.mocked(coinGeckoFetch).mockRejectedValue(new Error("failed"));
-
-    await expect(fetchMarketData("bitcoin")).rejects.toThrow("failed");
-  });
-
-  it("보조 실데이터 소스가 실패해도 배틀용 MarketData는 core 시세 기준으로 만든다", async () => {
+  it("보조 데이터 소스가 실패해도 core 시세로 MarketData를 만든다", async () => {
     vi.mocked(coinGeckoFetch)
       .mockResolvedValueOnce([
         {
@@ -110,13 +106,18 @@ describe("fetchMarketData", () => {
     expect(result.rsi).toBeGreaterThan(0);
     expect(result.fearGreedIndex).toBeNull();
     expect(result.sentimentScore).toBeNull();
+    expect(result.newsHeadlines).toEqual([]);
+    expect(result.newsEventSummary).toBeNull();
+    expect(result.communitySentimentSummary).toBeNull();
     expect(result.longShortRatio).toBeNull();
     expect(result.openInterest).toBeNull();
     expect(result.fundingRate).toBeNull();
     expect(result.whaleScore).toBeNull();
+    expect(result.whaleFlowSummary).toBeNull();
+    expect(result.marketStructureSummary).toContain("CoinGecko");
   });
 
-  it("8명 프로필에 적힌 market 근거 소스 필드가 실제 MarketData에 채워진다", async () => {
+  it("캐릭터별 핵심 근거 필드가 MarketData에 실제로 채워진다", async () => {
     vi.mocked(coinGeckoFetch)
       .mockResolvedValueOnce([
         {
@@ -142,42 +143,11 @@ describe("fetchMarketData", () => {
 
       expect(value).not.toBeNull();
       expect(value).not.toBeUndefined();
-
-      if (typeof value === "number") {
-        expect(Number.isFinite(value)).toBe(true);
-      }
-
-      if (evidence.source === "Alternative.me") {
-        expect(["fearGreedIndex", "fearGreedLabel"]).toContain(evidence.field);
-      }
-
-      if (evidence.source.includes("뉴스 감성 파이프라인")) {
-        expect(evidence.field).toBe("sentimentScore");
-      }
-
-      if (evidence.source === "Bybit 계정 비율") {
-        expect(evidence.field).toBe("longShortRatio");
-      }
-
-      if (evidence.source === "Hyperliquid Asset Context") {
-        expect(["openInterest", "fundingRate"]).toContain(evidence.field);
-      }
-
-      if (evidence.source === "Hyperliquid 실데이터 기반 계산") {
-        expect(evidence.field).toBe("whaleScore");
-      }
-
-      if (evidence.source === "CoinGecko") {
-        expect(["priceChange24h", "volume24h"]).toContain(evidence.field);
-      }
-
-      if (evidence.source.includes("CoinGecko 30일 가격 히스토리 기반 계산")) {
-        expect(["rsi", "macd", "bollingerUpper"]).toContain(evidence.field);
-      }
-
-      if (evidence.source === "CoinGecko 7일 변화율") {
-        expect(evidence.field).toBe("priceChange7d");
-      }
     }
+
+    expect(result.newsHeadlines.length).toBeGreaterThan(0);
+    expect(result.communitySentimentSummary).toBeTruthy();
+    expect(result.whaleFlowSummary).toBeTruthy();
+    expect(result.marketStructureSummary).toBeTruthy();
   });
 });

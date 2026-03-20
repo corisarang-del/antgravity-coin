@@ -55,6 +55,8 @@ export function useBattleStream({ coinId }: UseBattleStreamOptions) {
     let currentMarketData: MarketData | null = null;
     let currentSummary: BattleSummary | null = null;
     let currentMessages: DebateMessage[] = [];
+    let currentSnapshotId: string | null = null;
+    let currentSavedToServerAt: string | null = null;
     let persistHandle: IdleHandle | null = null;
     const timingTracker = createBattleTimingTracker();
 
@@ -68,16 +70,50 @@ export function useBattleStream({ coinId }: UseBattleStreamOptions) {
           storageKeys.battleSnapshot,
           JSON.stringify({
             version: 1,
+            snapshotId: currentSnapshotId,
             coinId,
             marketData: currentMarketData,
             summary: currentSummary,
             messages: currentMessages,
             savedAt: new Date().toISOString(),
+            savedToServerAt: currentSavedToServerAt,
           }),
         );
         emitBattleSnapshotChange();
         persistHandle = null;
       });
+    };
+
+    const persistSnapshotToServer = async () => {
+      const snapshotId = currentSnapshotId ?? crypto.randomUUID();
+      const response = await fetch("/api/battle/snapshot", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          snapshotId,
+          coinId,
+          marketData: currentMarketData,
+          summary: currentSummary,
+          messages: currentMessages,
+          savedAt: new Date().toISOString(),
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("battle_snapshot_persist_failed");
+      }
+
+      const payload = (await response.json()) as {
+        snapshotId: string;
+        userId?: string;
+        battleId?: string | null;
+        savedAt?: string;
+      };
+      currentSnapshotId = payload.snapshotId;
+      currentSavedToServerAt = payload.savedAt ?? new Date().toISOString();
+      persistSnapshot();
     };
 
     const persistTimingMetrics = () => {
@@ -116,6 +152,15 @@ export function useBattleStream({ coinId }: UseBattleStreamOptions) {
         if (!response.body) {
           throw new Error("스트림 응답이 비어 있다.");
         }
+
+        timingTracker.markPreparedContext({
+          preparedContextHit: response.headers.get("x-battle-prepared-context-hit") === "true",
+          preparedFirstTurnHit: response.headers.get("x-battle-prepared-first-turn-hit") === "true",
+          preparedAtAgeMs: response.headers.get("x-battle-prepared-at-age-ms")
+            ? Number(response.headers.get("x-battle-prepared-at-age-ms"))
+            : null,
+        });
+        persistTimingMetrics();
 
         reader = response.body.getReader();
         const decoder = new TextDecoder();
@@ -191,6 +236,7 @@ export function useBattleStream({ coinId }: UseBattleStreamOptions) {
             if (event === "battle_complete") {
               timingTracker.markDebateCompleted();
               persistTimingMetrics();
+              await persistSnapshotToServer().catch(() => undefined);
               startTransition(() => {
                 setIsComplete((parsed as { completed: boolean }).completed);
               });

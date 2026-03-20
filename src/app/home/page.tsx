@@ -1,4 +1,5 @@
 import { getTopCoinsSnapshot } from "@/application/useCases/getTopCoinsSnapshot";
+import { getInitialCurrentUserSnapshot } from "@/infrastructure/auth/getInitialCurrentUserSnapshot";
 import { AppHeader } from "@/presentation/components/AppHeader";
 import { RecentCoinsList } from "@/presentation/components/RecentCoinsList";
 import { RiskDisclaimer } from "@/presentation/components/RiskDisclaimer";
@@ -7,13 +8,16 @@ import { TopCoinsGrid } from "@/presentation/components/TopCoinsGrid";
 import { characters } from "@/shared/constants/characters";
 
 export default async function HomePage() {
-  const topCoins = await getTopCoinsSnapshot();
+  const [topCoins, initialCurrentUserSnapshot] = await Promise.all([
+    getTopCoinsSnapshot(),
+    getInitialCurrentUserSnapshot(),
+  ]);
   const bullCount = characters.filter((character) => character.team === "bull").length;
   const bearCount = characters.length - bullCount;
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <AppHeader />
+      <AppHeader initialCurrentUserSnapshot={initialCurrentUserSnapshot} />
       <main className="mx-auto flex max-w-5xl flex-col gap-6 px-4 py-6">
         <section className="grid gap-4 rounded-[28px] border border-border bg-[linear-gradient(180deg,hsl(var(--card))_0%,hsl(var(--surface-3))_100%)] p-5 shadow-[0_22px_50px_rgba(17,29,61,0.08)] md:grid-cols-[1.5fr_1fr]">
           <div className="flex flex-col justify-between gap-5">

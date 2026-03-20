@@ -14,7 +14,10 @@ const spaceGrotesk = Space_Grotesk({
 
 export const metadata: Metadata = {
   title: "Ant Gravity",
-  description: "코인 시즌 트레이더 배틀",
+  description: "코인 트레이더 배틀 서비스",
+  icons: {
+    icon: "/icon.png",
+  },
 };
 
 export default function RootLayout({

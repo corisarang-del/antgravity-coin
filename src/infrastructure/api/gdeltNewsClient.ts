@@ -1,4 +1,10 @@
-import { getPrimaryNewsKeyword, scoreNewsTitles, summarizeSentiment } from "@/infrastructure/api/newsSentimentKeywords";
+import {
+  getPrimaryNewsKeyword,
+  pickTopHeadlines,
+  scoreNewsTitles,
+  summarizeNewsEvent,
+  summarizeSentiment,
+} from "@/infrastructure/api/newsSentimentKeywords";
 
 interface GdeltArticle {
   title?: string;
@@ -31,11 +37,14 @@ export async function fetchGdeltNewsSentiment(symbol: string) {
     throw new Error("GDELT response empty");
   }
 
+  const headlines = pickTopHeadlines(articles.map((article) => article.title ?? "").filter(Boolean));
   const sentimentScore = scoreNewsTitles(articles.map((article) => article.title ?? "").filter(Boolean));
 
   return {
     sentimentScore,
     summary: summarizeSentiment(sentimentScore, "GDELT"),
+    headlines,
+    eventSummary: summarizeNewsEvent(headlines, sentimentScore, "GDELT"),
     source: "gdelt" as const,
   };
 }

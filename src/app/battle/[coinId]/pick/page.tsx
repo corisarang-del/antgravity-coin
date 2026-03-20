@@ -1,4 +1,5 @@
 import { PickPageClient } from "@/app/battle/[coinId]/pick/PickPageClient";
+import { getInitialCurrentUserSnapshot } from "@/infrastructure/auth/getInitialCurrentUserSnapshot";
 
 interface PickPageProps {
   params: Promise<{
@@ -8,5 +9,7 @@ interface PickPageProps {
 
 export default async function PickPage({ params }: PickPageProps) {
   const { coinId } = await params;
-  return <PickPageClient coinId={coinId} />;
+  const initialCurrentUserSnapshot = await getInitialCurrentUserSnapshot();
+
+  return <PickPageClient coinId={coinId} initialCurrentUserSnapshot={initialCurrentUserSnapshot} />;
 }

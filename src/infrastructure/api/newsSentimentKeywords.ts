@@ -60,12 +60,41 @@ export function scoreNewsTitles(titles: string[]) {
 
 export function summarizeSentiment(sentimentScore: number, sourceName: string) {
   if (sentimentScore >= 0.2) {
-    return `${sourceName} 기사 흐름은 대체로 긍정적이야.`;
+    return `${sourceName} 기사 톤은 대체로 긍정적이야.`;
   }
 
   if (sentimentScore <= -0.2) {
-    return `${sourceName} 기사 흐름은 대체로 부정적이야.`;
+    return `${sourceName} 기사 톤은 대체로 부정적이야.`;
   }
 
-  return `${sourceName} 기사 흐름은 중립에 가까워.`;
+  return `${sourceName} 기사 톤은 중립에 가까워.`;
+}
+
+export function pickTopHeadlines(titles: string[], maxCount = 3) {
+  const uniqueTitles = titles
+    .map((title) => title.trim())
+    .filter(Boolean)
+    .filter((title, index, array) => array.findIndex((item) => item.toLowerCase() === title.toLowerCase()) === index);
+
+  return uniqueTitles.slice(0, maxCount);
+}
+
+export function summarizeNewsEvent(
+  headlines: string[],
+  sentimentScore: number,
+  sourceName: string,
+) {
+  if (headlines.length === 0) {
+    return `${sourceName} 기준으로 뚜렷한 이벤트 헤드라인을 확보하지 못했어.`;
+  }
+
+  const leadHeadline = headlines[0];
+  const tone =
+    sentimentScore >= 0.2
+      ? "긍정 재료가 더 강하게 읽혀."
+      : sentimentScore <= -0.2
+        ? "부정 재료가 더 무겁게 읽혀."
+        : "재료 방향은 아직 중립에 가까워.";
+
+  return `${sourceName} 대표 헤드라인은 "${leadHeadline}"이고, 전체 톤은 ${tone}`;
 }

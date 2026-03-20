@@ -3,6 +3,8 @@ interface CachedLlmResponse {
   value: string | null;
 }
 
+const LLM_PROMPT_CACHE_VERSION = "v2-role-source-split";
+
 const llmResponseCache = new Map<string, CachedLlmResponse>();
 
 export function buildLlmResponseCacheKey(input: {
@@ -14,7 +16,10 @@ export function buildLlmResponseCacheKey(input: {
   characterLessons: string[];
   previousMessagesSummary: string[];
 }) {
-  return JSON.stringify(input);
+  return JSON.stringify({
+    version: LLM_PROMPT_CACHE_VERSION,
+    ...input,
+  });
 }
 
 export function getCachedLlmResponse(key: string) {

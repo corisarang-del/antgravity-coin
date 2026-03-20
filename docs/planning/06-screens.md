@@ -1,204 +1,160 @@
-# 화면 목록
+# 화면 명세
 
-## 화면 구조
+작성시각: 2026-03-20 18:10 KST
+
+## 전체 흐름
 
 ```text
-랜딩 (/)
-  -> 홈 (/home)
-  -> 배틀 (/battle/[coinId])
-  -> 선택 (/battle/[coinId]/pick)
-  -> 대기 (/battle/[coinId]/waiting)
-  -> 결과 (/battle/[coinId]/result)
-  -> 캐릭터 (/characters)
+/ -> /home -> /battle/[coinId] -> /battle/[coinId]/pick -> /battle/[coinId]/waiting -> /battle/[coinId]/result
+                  └-> /login -> /me
 ```
 
----
+## 공통 헤더
 
-## S1. 랜딩 `/`
+대상 화면:
 
-### 목적
-- 첫 진입 게이트
-- 브랜드 톤 전달
-- 캐릭터 프리뷰와 도감 탐색 제공
+- `/home`
+- `/characters`
+- `/me`
+- `/battle/[coinId]`
+- `/battle/[coinId]/pick`
+- `/battle/[coinId]/waiting`
+- `/battle/[coinId]/result`
+
+현재 상태:
+
+- 각 페이지는 서버에서 `initialCurrentUserSnapshot`을 만들어 `AppHeader`에 props로 전달한다.
+- 헤더는 서버 초기 스냅샷으로 첫 화면을 그리고, 이후 클라이언트 store가 실제 세션 상태를 이어받는다.
+- 로그아웃 이후에는 `refreshCurrentUserStore()`로 다시 `/api/auth/session` 재검증 흐름을 탄다.
+
+## `/`
+
+목적:
+
+- 첫 진입 브랜드 경험
+- 캐릭터 분위기 전달
 - `/home` 진입 유도
 
-### 주요 요소
-- 입장 버튼
-- 대형 히어로 카피
-- 캐릭터 슬라이더
-- hover 비디오/오디오 프리뷰
-- 캐릭터 미리보기 모달
+현재 상태:
 
-### 실제 동작
-- 첫 진입 전에는 입장 게이트만 노출한다.
-- 입장 후 hover 프리뷰와 캐릭터 모달을 사용할 수 있다.
-- `배틀 입장`, `바로 배틀 시작` CTA는 `/home`으로 이동한다.
+- 정적인 히어로, 카드 섹션, CTA는 서버 렌더링이다.
+- 진입 오버레이(`LandingEnterOverlay`)와 캐릭터 hover/모달 레일(`LandingCharacterRail`)만 클라이언트 아일랜드다.
+- CTA는 `/home`으로 이동한다.
 
----
+## `/home`
 
-## S2. 홈 `/home`
+목적:
 
-### 목적
 - 코인 검색
 - Top 코인 진입
-- 최근 본 코인 확인
+- 최근 본 코인 복귀
 
-### 주요 컴포넌트
-- `AppHeader`
-- `SearchBar`
-- `TopCoinsGrid`
-- `RecentCoinsList`
-- `RiskDisclaimer`
+현재 상태:
 
-### 실제 동작
-- 서버에서 Top 코인을 먼저 가져와 렌더링한다.
-- 검색 자동완성과 Top 코인 카드는 바로 `/battle/[coinId]`로 이동한다.
-- 최근 본 코인은 로컬스토리지 기반이다.
+- 서버에서 `getTopCoinsSnapshot()`과 `initialCurrentUserSnapshot`을 병렬로 준비한다.
+- `SearchBar`는 초기 코인 목록을 props로 받는다.
+- `AppHeader`는 서버 초기 세션 스냅샷을 사용한다.
 
----
+## `/battle/[coinId]`
 
-## S3. 배틀 `/battle/[coinId]`
+목적:
 
-### 목적
-- 시장 스냅샷과 8명 캐릭터 토론 시청
+- 시장 개요와 8명 토론 메시지 스트리밍
 
-### 주요 컴포넌트
-- `TeamBoard`
-- `BattleFeed`
-- `SpeakerSpotlight`
-- `IndicatorCard`
-- `RiskDisclaimer`
+현재 상태:
 
-### 실제 동작
 - 진입 즉시 `/api/battle` 호출
-- `battle_start` 수신 후 스냅샷 저장
-- 메시지가 쌓일 때마다 로컬 `battleSnapshot` 갱신
-- 완료 후 선택 CTA 노출
+- SSE 이벤트로 토론 진행
+- 서버는 시장 데이터와 reusable debate context를 병렬 시작하고, 시장 데이터 준비 직후 `battle_start`를 먼저 보낸다.
+- 토론 중 localStorage snapshot 갱신
+- `battle_complete` 직후 snapshot 서버 저장
+- 완료 후 pick 화면으로 이동 가능
 
-메모:
-- 현재 사용자 노출 문구 일부는 한글 인코딩이 깨져 있다.
+## `/battle/[coinId]/pick`
 
-### 우선 개선 포인트
-- 깨진 한글 문구를 먼저 정상화해야 한다.
+목적:
 
-### 실패 시 사용자 경험
-- 배틀 시작 전 스냅샷 로드에 실패하면 "배틀 데이터를 불러오지 못했어. 다시 시도해줘." 문구를 보여준다.
-- 이 경우 CTA는 `다시 시도`, `홈으로 이동` 두 가지를 기본으로 둔다.
-- 배틀 도중 일부 지표가 fallback으로 채워진 경우 "일부 지표는 대체 데이터로 표시 중이야." 같은 보조 문구를 노출한다.
-- 배틀 도중 치명적 오류가 나면 이미 받은 메시지는 유지하고, `재시도` CTA를 추가한다.
+- 불리시/베어리시 선택
+- 차트 구간 선택
 
----
+현재 차트 구간:
 
-## S4. 선택 `/battle/[coinId]/pick`
+- `5m`
+- `30m`
+- `1h`
+- `4h`
+- `24h`
+- `7d`
 
-### 목적
-- 토론을 본 뒤 팀과 기간을 확정
+현재 상태:
 
-### 주요 컴포넌트
-- `TeamSummaryCard`
-- `PickButton`
-- `TimeframeSelector`
+- local snapshot에서 메시지 요약을 읽는다.
+- 선택 시 `battleId`, `snapshotId`, `settlementAt`, `marketSymbol`, `priceSource`를 저장한다.
+- 같은 시점 snapshot 서버 저장도 `battleId`를 다시 넣어 관계를 고정한다.
+- 헤더는 서버 초기 세션 스냅샷을 사용한다.
 
-### 현재 선택지
-- 팀: `bull`, `bear`
-- 기간: `24h`, `7d`
+## `/battle/[coinId]/waiting`
 
-### 실제 동작
-- `battleSnapshot` 로컬스토리지에서 bull/bear 메시지 요약을 뽑는다.
-- 선택 확정 시 `userBattle`을 로컬스토리지에 저장하고 대기 화면으로 이동한다.
-- 현재 pick 화면에는 `RiskDisclaimer`가 없다.
+목적:
 
-### 우선 개선 포인트
-- 팀별 차이를 더 명확히 보이도록 설득력 있는 카피와 요약 기준을 보강할 필요가 있다.
+- 정산 시점까지 대기
 
----
+현재 상태:
 
-## S5. 대기 `/battle/[coinId]/waiting`
+- `settlementAt` 기준 남은 시간을 보여준다.
+- 카운트다운은 UTC 정산 시각 기준이다.
+- 헤더는 서버 초기 세션 스냅샷을 사용한다.
 
-### 목적
-- 결과 화면 진입 전 완충 화면
+## `/battle/[coinId]/result`
 
-### 주요 컴포넌트
-- `CountdownTimer`
-- `MyPickSummary`
+목적:
 
-### 현재 구현 메모
-- 실제 장시간 대기 대신 데모용 짧은 카운트다운만 보여준다.
-- `24h` 선택 시 12초, `7d` 선택 시 18초로 표시한다.
-- 자동 결과 이동은 없고, 사용자가 직접 결과 보기 링크를 누른다.
-- 현재 가격 티커나 응원 캐릭터 행은 없다.
+- 실제 캔들 기준 승패와 리포트 표시
 
-### 우선 개선 포인트
-- 현재는 데모 UX라는 점을 더 분명히 관리하고, 실제 장기 대기 UX는 후속 범위로 분리해서 본다.
+현재 상태:
 
-### 데모 UX와 실제 UX 경계
-- 현재 카운트다운은 결과 대기 시뮬레이션용 데모 UX다.
-- 실서비스 전환 시에는 실제 만료 시점, 재진입 처리, 결과 도착 확인 로직이 별도 필요하다.
-- 현재 문서와 구현에서는 자동 이동보다 사용자의 명시적 결과 확인을 우선한다.
+- `settlementAt` 이전이면 pending 상태 화면
+- `settlementAt` 이후면 `/api/battle/outcome` 호출
+- 결과가 확정되면 XP 반영과 리포트 출력
+- 헤더는 서버 초기 세션 스냅샷을 사용한다.
 
----
+## `/characters`
 
-## S6. 결과 `/battle/[coinId]/result`
+목적:
 
-### 목적
-- 승패, XP 변화, 승리 하이라이트 노출
+- 캐릭터 소개
+- 팀/성격/선정 이유 표시
 
-### 주요 컴포넌트
-- `VerdictBanner`
-- `UserLevelChange`
-- `CharacterLevelChange`
-- `WinnerHighlight`
-- `RiskDisclaimer`
+현재 상태:
 
-### 실제 동작
-- `resolveBattle`로 즉시 결과 계산
-- `/api/battle/applications`로 중복 적용 여부 확인
-- 최초 반영 시에만 XP를 갱신
-- 액션 바 버튼은 현재 없다
-- `WinnerHighlight`는 승리 팀 메시지 2개를 보여주는 단순 규칙이다
-- `CharacterLevelChange`는 승리 팀 캐릭터 목록과 보너스 문구를 노출한다
+- 캐릭터 카드 목록 자체는 정적 데이터로 렌더링한다.
+- 상단 `sourceNotice` 문구는 서버에서 `getCharacterSourceNotice()`로 계산해서 props로 전달한다.
+- 클라이언트 마운트 후 `/api/characters`를 다시 호출하지 않는다.
+- 상세 모달만 dynamic import로 지연 로드한다.
 
-### 우선 개선 포인트
-- `WinnerHighlight`가 어떤 메시지를 대표 하이라이트로 고르는지 규칙을 명문화할 필요가 있다.
+## `/login`
 
-### 하이라이트 선정 규칙
-- 승리 팀 메시지만 후보로 본다.
-- summary에 핵심 지표 또는 명확한 주장 포인트가 포함된 메시지를 우선한다.
-- 같은 캐릭터를 중복 노출하지 않는다.
-- 기본 노출 수는 2개로 유지한다.
-- 조건이 같으면 먼저 도착한 메시지보다 정보 밀도가 높은 메시지를 우선한다.
+목적:
 
----
+- Google/Kakao 로그인
+- 계정 기반 기록 연동 안내
 
-## S7. 캐릭터 `/characters`
+현재 상태:
 
-### 목적
-- 캐릭터 카드와 상세 설정 공개
+- Google, Kakao OAuth 버튼 제공
+- 로그인 성공 후 `/auth/callback`을 거쳐 `next` 파라미터 또는 `/me`로 이동
 
-### 주요 컴포넌트
-- `CharacterCard`
-- `CharacterDetailModal`
-- `CharacterImage`
+## `/me`
 
-### 현재 캐릭터
-- Bull: `Aira`, `Judy`, `Clover`, `Blaze`
-- Bear: `Ledger`, `Shade`, `Vela`, `Flip`
+목적:
 
-### 실제 동작
-- 8명 캐릭터를 정적 카탈로그로 렌더링한다.
-- 카드 클릭 시 역할, 성격, 선정 이유를 보여주는 모달을 연다.
-- 과거 배틀 기록, 적중률, 레벨 통계는 현재 노출하지 않는다.
+- 로그인 사용자 프로필
+- 레벨/XP
+- 최근 배틀 기록
 
-### 외부 캐릭터 소스 실패 시 처리
-- `external` 소스 실패 시 로컬 캐릭터 카탈로그로 fallback한다.
-- 사용자는 캐릭터 목록을 계속 볼 수 있어야 한다.
-- 화면에는 "기본 라인업을 보여주고 있어." 수준의 가벼운 안내만 노출하고, 흐름 자체는 막지 않는다.
+현재 상태:
 
----
-
-## 공통 레이아웃
-
-- 모바일 우선
-- 최대 폭 중앙 정렬
-- 헤더 고정 진입점 유지
-- 리스크 고지 문구는 홈, 배틀, 결과에서 반복 노출
+- 로그인 필요 페이지
+- 서버에서 프로필, 진행도, 배틀 목록, 선택 배틀 상세를 병렬 조회한다.
+- 페이지 진입 시 local 익명 상태를 `/api/auth/merge-local`로 1회 병합한다.
+- 헤더는 서버 초기 세션 스냅샷을 사용한다.

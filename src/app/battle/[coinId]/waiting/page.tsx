@@ -1,4 +1,5 @@
 import { WaitingPageClient } from "@/app/battle/[coinId]/waiting/WaitingPageClient";
+import { getInitialCurrentUserSnapshot } from "@/infrastructure/auth/getInitialCurrentUserSnapshot";
 
 interface WaitingPageProps {
   params: Promise<{
@@ -8,5 +9,7 @@ interface WaitingPageProps {
 
 export default async function WaitingPage({ params }: WaitingPageProps) {
   const { coinId } = await params;
-  return <WaitingPageClient coinId={coinId} />;
+  const initialCurrentUserSnapshot = await getInitialCurrentUserSnapshot();
+
+  return <WaitingPageClient coinId={coinId} initialCurrentUserSnapshot={initialCurrentUserSnapshot} />;
 }

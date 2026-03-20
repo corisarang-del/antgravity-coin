@@ -1,5 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { generateBattleDebate, generateCharacterMessage } from "@/application/useCases/generateBattleDebate";
+import {
+  generateBattleDebate,
+  generateCharacterMessage,
+} from "@/application/useCases/generateBattleDebate";
 import { generateCharacterDebateChunk } from "@/infrastructure/api/llmRouter";
 import type { MarketData } from "@/domain/models/MarketData";
 import { getCharacterById } from "@/shared/constants/characters";
@@ -22,10 +25,15 @@ describe("generateBattleDebate", () => {
     fearGreedIndex: 61,
     fearGreedLabel: "Greed",
     sentimentScore: 0.34,
+    newsHeadlines: ["Bitcoin breakout gains momentum", "ETF approval keeps market optimistic"],
+    newsEventSummary: 'Alpha Vantage 대표 헤드라인은 "Bitcoin breakout gains momentum"이고, 전체 톤은 긍정 재료가 더 강하게 읽혀.',
+    communitySentimentSummary: "공포탐욕은 61(Greed), 뉴스 감성은 +0.34라서 기대 심리가 앞서 있어.",
     longShortRatio: 1.08,
     openInterest: 128_000_000,
     fundingRate: 0.0123,
     whaleScore: 64,
+    whaleFlowSummary: "Bybit 롱숏비율은 1.08이고, Hyperliquid 미결제약정은 $128.0M 수준이야.",
+    marketStructureSummary: "CoinGecko 기준 거래대금은 $31.0B이고, 미결제약정은 $128.0M 수준이라 구조가 가볍지 않아.",
     volume24h: 31_000_000_000,
   };
 
@@ -34,7 +42,7 @@ describe("generateBattleDebate", () => {
     vi.mocked(generateCharacterDebateChunk).mockResolvedValue(null);
   });
 
-  it('각 발언이 stance: "bullish" | "bearish" 를 포함한다', async () => {
+  it('각 발언은 stance: "bullish" | "bearish" 를 포함한다', async () => {
     const messages = await generateBattleDebate(marketData);
 
     expect(messages).toHaveLength(8);
@@ -51,10 +59,10 @@ describe("generateBattleDebate", () => {
     expect(aira?.detail).not.toBe(shade?.detail);
   });
 
-  it("fenced json 응답도 파싱해서 실제 메시지로 쓴다", async () => {
+  it("fenced json 응답을 파싱해서 실제 메시지로 만든다", async () => {
     vi.mocked(generateCharacterDebateChunk).mockResolvedValueOnce({
       content:
-        '```json\n{"summary":"첫 응답 성공","detail":"역할에 맞는 근거로 정리한다.","indicatorLabel":"RSI","indicatorValue":"62","stance":"bullish"}\n```',
+        '```json\n{"summary":"첫 응답 성공","detail":"역할에 맞는 근거로 정리했다.","indicatorLabel":"RSI","indicatorValue":"62","stance":"bullish"}\n```',
       provider: "openrouter",
       model: "stepfun/step-3.5-flash:free",
       fallbackUsed: false,
@@ -79,7 +87,7 @@ describe("generateBattleDebate", () => {
     expect(messages[0]?.fallbackUsed).toBe(true);
   });
 
-  it("Blaze 영어 응답은 한글 fallback으로 바꾼다", async () => {
+  it("Blaze 영문 응답은 한글 fallback으로 바꾼다", async () => {
     const blaze = getCharacterById("blaze");
 
     if (!blaze) {
@@ -102,7 +110,7 @@ describe("generateBattleDebate", () => {
     expect(message.detail).toMatch(/[가-힣]/);
   });
 
-  it("Clover 영어 응답은 한글 fallback으로 바꾼다", async () => {
+  it("Clover 영문 응답은 한글 fallback으로 바꾼다", async () => {
     const clover = getCharacterById("clover");
 
     if (!clover) {
@@ -125,7 +133,51 @@ describe("generateBattleDebate", () => {
     expect(message.detail).toMatch(/[가-힣]/);
   });
 
-  it("필수 근거 실데이터가 비면 사과 메시지로 대체하고 배틀은 계속 진행한다", async () => {
+  it("한글 문장 안에 중국어 조각이 섞이면 fallback으로 바꾼다", async () => {
+    const clover = getCharacterById("clover");
+
+    if (!clover) {
+      throw new Error("missing_clover");
+    }
+
+    vi.mocked(generateCharacterDebateChunk).mockResolvedValueOnce({
+      content:
+        '{"summary":"공포가 완화되며 回流 가능성이 보인다","detail":"심리는 회복 중이지만 结束的 반등으로 볼 가능성도 있다","indicatorLabel":"FGI","indicatorValue":"71","stance":"bullish"}',
+      provider: "openrouter",
+      model: "mixed-script-model",
+      fallbackUsed: false,
+    });
+
+    const message = await generateCharacterMessage(marketData, clover, []);
+
+    expect(message.fallbackUsed).toBe(true);
+    expect(message.summary).not.toContain("回流");
+    expect(message.detail).not.toContain("结束的");
+  });
+
+  it("한글 문장 안에 소문자 영문 단어가 섞이면 fallback으로 바꾼다", async () => {
+    const judy = getCharacterById("judy");
+
+    if (!judy) {
+      throw new Error("missing_judy");
+    }
+
+    vi.mocked(generateCharacterDebateChunk).mockResolvedValueOnce({
+      content:
+        '{"summary":"뉴스 감성이 회복되며 short covering 가능성이 있다","detail":"ETF 일정도 중요하지만 solchen 반응은 과열일 수 있다","indicatorLabel":"뉴스","indicatorValue":"0.07","stance":"bullish"}',
+      provider: "openrouter",
+      model: "mixed-latin-model",
+      fallbackUsed: false,
+    });
+
+    const message = await generateCharacterMessage(marketData, judy, []);
+
+    expect(message.fallbackUsed).toBe(true);
+    expect(message.summary).not.toContain("short");
+    expect(message.detail).not.toContain("solchen");
+  });
+
+  it("필수 근거 데이터가 비면 불가 메시지로 대체하고 배틀은 계속 진행한다", async () => {
     const vela = getCharacterById("vela");
 
     if (!vela) {
@@ -141,7 +193,7 @@ describe("generateBattleDebate", () => {
     const message = await generateCharacterMessage(partialMarketData, vela, []);
 
     expect(message.fallbackUsed).toBe(true);
-    expect(message.summary).toContain("근거가 부족해서");
+    expect(message.summary).toContain("근거가 부족해");
     expect(message.detail).toContain("다음 턴에서는");
     expect(message.model).toBe("live-evidence-unavailable");
   });

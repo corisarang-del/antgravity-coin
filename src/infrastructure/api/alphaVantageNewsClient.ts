@@ -1,5 +1,10 @@
 import { envConfig } from "@/shared/constants/envConfig";
-import { scoreNewsTitles, summarizeSentiment } from "@/infrastructure/api/newsSentimentKeywords";
+import {
+  pickTopHeadlines,
+  scoreNewsTitles,
+  summarizeNewsEvent,
+  summarizeSentiment,
+} from "@/infrastructure/api/newsSentimentKeywords";
 
 interface AlphaVantageNewsItem {
   title?: string;
@@ -36,6 +41,7 @@ export async function fetchAlphaVantageNewsSentiment(symbol: string) {
     throw new Error("Alpha Vantage response empty");
   }
 
+  const headlines = pickTopHeadlines(feed.map((item) => item.title ?? "").filter(Boolean));
   const scoreCandidates = feed
     .map((item) => Number(item.overall_sentiment_score))
     .filter((score) => Number.isFinite(score));
@@ -49,6 +55,8 @@ export async function fetchAlphaVantageNewsSentiment(symbol: string) {
   return {
     sentimentScore,
     summary: summarizeSentiment(sentimentScore, "Alpha Vantage"),
+    headlines,
+    eventSummary: summarizeNewsEvent(headlines, sentimentScore, "Alpha Vantage"),
     source: "alpha-vantage" as const,
   };
 }
