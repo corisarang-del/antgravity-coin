@@ -28,7 +28,7 @@ describe("provider routes api", () => {
                 characterId: "judy",
                 tier: "cheap",
                 provider: "openrouter",
-                model: "minimax/minimax-m2.5:free",
+                model: "arcee-ai/trinity-large-preview:free",
                 fallbackProvider: "openrouter",
                 fallbackModel: "qwen/qwen3.5-9b",
                 timeoutMs: 10000,

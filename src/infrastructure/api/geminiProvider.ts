@@ -17,8 +17,11 @@ interface GeminiResponse {
 
 export const geminiProvider: LlmProvider = {
   provider: "gemini",
-  async generateDebateChunk(input: GenerateDebateChunkInput, model: string) {
+  async generateDebateChunk(input: GenerateDebateChunkInput, model: string, timeoutMs = 12000) {
     if (!envConfig.geminiApiKey) {
+      console.warn(
+        `[battle-llm:error] character=${input.characterId} provider=gemini model=${model} reason=missing_api_key`,
+      );
       return null;
     }
 
@@ -27,6 +30,8 @@ export const geminiProvider: LlmProvider = {
     const url = `${baseUrl}/${model}:generateContent?key=${envConfig.geminiApiKey}`;
 
     try {
+      const controller = new AbortController();
+      const timeoutHandle = setTimeout(() => controller.abort(), timeoutMs);
       const response = await fetch(url, {
         method: "POST",
         headers: {
@@ -46,15 +51,25 @@ export const geminiProvider: LlmProvider = {
             temperature: 0.6,
           },
         }),
+        signal: controller.signal,
       });
+      clearTimeout(timeoutHandle);
 
       if (!response.ok) {
+        console.warn(
+          `[battle-llm:error] character=${input.characterId} provider=gemini model=${model} reason=http_status status=${response.status}`,
+        );
         return null;
       }
 
       const data = (await response.json()) as GeminiResponse;
       return data.candidates?.[0]?.content?.parts?.[0]?.text ?? null;
-    } catch {
+    } catch (error) {
+      const reason =
+        error instanceof DOMException && error.name === "AbortError" ? "timeout" : "network_or_unknown";
+      console.warn(
+        `[battle-llm:error] character=${input.characterId} provider=gemini model=${model} reason=${reason} timeoutMs=${timeoutMs}`,
+      );
       return null;
     }
   },

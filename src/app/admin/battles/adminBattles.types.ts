@@ -1,8 +1,10 @@
+import type { BattleTimeframe } from "@/domain/models/BattleTimeframe";
+
 export interface BattleListItem {
   battleId: string;
   coinId: string;
   coinSymbol: string;
-  timeframe: "24h" | "7d";
+  timeframe: BattleTimeframe;
   winningTeam: "bull" | "bear" | "draw";
   priceChangePercent: number;
   userWon: boolean;
@@ -17,7 +19,7 @@ export interface AdminBattleDetail {
     battleId: string;
     coinId: string;
     coinSymbol: string;
-    timeframe: "24h" | "7d";
+    timeframe: BattleTimeframe;
     winningTeam: "bull" | "bear" | "draw";
     priceChangePercent: number;
     userSelectedTeam: "bull" | "bear";

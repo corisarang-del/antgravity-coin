@@ -132,7 +132,7 @@ export const characterDebateProfiles: Record<string, CharacterDebateProfile> = {
     modelRoute: {
       tier: "cheap",
       provider: "openrouter",
-      model: "minimax/minimax-m2.5:free",
+      model: "arcee-ai/trinity-large-preview:free",
       fallbackProvider: "openrouter",
       fallbackModel: "qwen/qwen3.5-9b",
       timeoutMs: 8000,
@@ -242,7 +242,7 @@ export const characterDebateProfiles: Record<string, CharacterDebateProfile> = {
     modelRoute: {
       tier: "cheap",
       provider: "openrouter",
-      model: "openrouter/hunter-alpha",
+      model: "minimax/minimax-m2.5:free",
       fallbackProvider: "openrouter",
       fallbackModel: "qwen/qwen3.5-9b",
       timeoutMs: 8000,
@@ -297,7 +297,7 @@ export const characterDebateProfiles: Record<string, CharacterDebateProfile> = {
     modelRoute: {
       tier: "balanced",
       provider: "openrouter",
-      model: "nvidia/nemotron-3-super-120b-a12b:free",
+      model: "stepfun/step-3.5-flash:free",
       fallbackProvider: "openrouter",
       fallbackModel: "qwen/qwen3.5-9b",
       timeoutMs: 9000,
@@ -352,7 +352,7 @@ export const characterDebateProfiles: Record<string, CharacterDebateProfile> = {
     modelRoute: {
       tier: "cheap",
       provider: "openrouter",
-      model: "openrouter/hunter-alpha",
+      model: "arcee-ai/trinity-large-preview:free",
       fallbackProvider: "openrouter",
       fallbackModel: "qwen/qwen3.5-9b",
       timeoutMs: 8000,
@@ -414,7 +414,7 @@ export const characterDebateProfiles: Record<string, CharacterDebateProfile> = {
     modelRoute: {
       tier: "cheap",
       provider: "openrouter",
-      model: "minimax/minimax-m2.5:free",
+      model: "arcee-ai/trinity-large-preview:free",
       fallbackProvider: "openrouter",
       fallbackModel: "qwen/qwen3.5-9b",
       timeoutMs: 8000,
@@ -469,7 +469,7 @@ export const characterDebateProfiles: Record<string, CharacterDebateProfile> = {
     modelRoute: {
       tier: "balanced",
       provider: "openrouter",
-      model: "stepfun/step-3.5-flash:free",
+      model: "nvidia/nemotron-3-super-120b-a12b:free",
       fallbackProvider: "openrouter",
       fallbackModel: "qwen/qwen3.5-9b",
       timeoutMs: 9000,
