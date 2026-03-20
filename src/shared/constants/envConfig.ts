@@ -4,6 +4,8 @@ function readEnv(name: string) {
 }
 
 export const envConfig = {
+  supabaseUrl: readEnv("NEXT_PUBLIC_SUPABASE_URL"),
+  supabasePublishableKey: readEnv("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY"),
   openRouterApiKey: readEnv("OPENROUTER_API_KEY"),
   openRouterBaseUrl: readEnv("OPENROUTER_BASE_URL") || "https://openrouter.ai/api/v1/chat/completions",
   anthropicApiKey: readEnv("ANTHROPIC_API_KEY"),
