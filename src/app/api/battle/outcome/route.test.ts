@@ -1,6 +1,8 @@
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { GET, POST } from "@/app/api/battle/outcome/route";
+import { getRequestOwnerId } from "@/infrastructure/auth/requestOwner";
 import { FileBattleSnapshotRepository } from "@/infrastructure/db/fileBattleSnapshotRepository";
+import * as requestRateLimiter from "@/shared/utils/requestRateLimiter";
 
 vi.mock("@/infrastructure/api/geminiSynthesisClient", () => ({
   synthesizeBattleReportWithGemini: vi.fn().mockResolvedValue(null),
@@ -27,7 +29,7 @@ vi.mock("@/infrastructure/auth/requestOwner", () => ({
     ownerId: "anonymous",
     isAuthenticated: false,
     user: null,
-    supabase: null,
+    supabase: {} as never,
   }),
 }));
 
@@ -76,6 +78,16 @@ function createOutcomeRequest(input?: {
 }
 
 describe("POST /api/battle/outcome", () => {
+  beforeEach(() => {
+    requestRateLimiter.clearRequestRateLimitStore();
+    vi.mocked(getRequestOwnerId).mockResolvedValue({
+      ownerId: "anonymous",
+      isAuthenticated: false,
+      user: null,
+      supabase: {} as never,
+    });
+  });
+
   it("배틀 결과를 outcome, memory, report 구조로 변환한다", async () => {
     const battleId = `battle-${crypto.randomUUID()}`;
     const response = await POST(createOutcomeRequest({ battleId }));
@@ -103,6 +115,16 @@ describe("POST /api/battle/outcome", () => {
   it("battleId 기준으로 저장한 outcome을 조회한다", async () => {
     const battleId = `battle-${crypto.randomUUID()}`;
     await POST(createOutcomeRequest({ battleId }));
+    vi.spyOn(FileBattleSnapshotRepository.prototype, "getSnapshotByBattleIdForUser").mockResolvedValueOnce({
+      snapshotId: `snapshot-${crypto.randomUUID()}`,
+      userId: "anonymous",
+      battleId,
+      coinId: "bitcoin",
+      marketData: null,
+      summary: null,
+      messages: [],
+      savedAt: new Date().toISOString(),
+    });
     const response = await GET(
       new Request(`http://localhost/api/battle/outcome?battleId=${encodeURIComponent(battleId)}`),
     );
@@ -118,6 +140,26 @@ describe("POST /api/battle/outcome", () => {
     expect(data.battleOutcomeSeed.battleId).toBe(battleId);
     expect(data.report.report).toContain("BTC");
     expect(data.reportSource).toBe("fallback");
+  });
+
+  it("다른 owner가 같은 battleId 결과를 조회하면 404를 반환한다", async () => {
+    const battleId = `battle-${crypto.randomUUID()}`;
+    await POST(createOutcomeRequest({ battleId }));
+
+    vi.mocked(getRequestOwnerId).mockResolvedValue({
+      ownerId: "another-owner",
+      isAuthenticated: false,
+      user: null,
+      supabase: {} as never,
+    });
+
+    const response = await GET(
+      new Request(`http://localhost/api/battle/outcome?battleId=${encodeURIComponent(battleId)}`),
+    );
+    const data = (await response.json()) as { error: string };
+
+    expect(response.status).toBe(404);
+    expect(data.error).toBe("not_found");
   });
 
   it("같은 battleId로 다시 저장하면 recovered 응답을 준다", async () => {
@@ -281,4 +323,19 @@ describe("POST /api/battle/outcome", () => {
     expect(response.status).toBe(409);
     expect(data.error).toBe("snapshot_battle_mismatch");
   });
+
+  it("짧은 시간 안에 너무 많이 저장 요청하면 429를 반환한다", async () => {
+    vi.spyOn(requestRateLimiter, "consumeRequestRateLimit").mockReturnValueOnce({
+      allowed: false,
+      remaining: 0,
+      retryAfterSeconds: 60,
+      resetAt: Date.now() + 60_000,
+    });
+
+    const blocked = await POST(createOutcomeRequest({ battleId: "battle-rate-blocked" }));
+    const data = (await blocked.json()) as { error: string };
+
+    expect(blocked.status).toBe(429);
+    expect(data.error).toBe("rate_limit_exceeded");
+  }, 15_000);
 });

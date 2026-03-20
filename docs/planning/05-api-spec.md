@@ -9,6 +9,8 @@
 - 정산 가격 소스는 `bybit-linear`
 - owner 계산은 `auth user id -> guest cookie id`
 - battle outcome 저장은 `battleId` 단위 직렬화
+- `battleId` 조회 API는 현재 owner가 가진 snapshot 기준으로만 접근 가능
+- 일부 고비용 POST route는 in-memory rate limit을 건다
 
 ## 인증
 
@@ -124,6 +126,11 @@ x-battle-prepared-first-turn-hit
 x-battle-prepared-at-age-ms
 ```
 
+rate limit:
+
+- owner + client ip 기준 분당 5회
+- 초과 시 `429 rate_limit_exceeded`, `Retry-After` 헤더 반환
+
 구현 메모:
 
 - 4라운드 병렬 구조
@@ -138,6 +145,7 @@ x-battle-prepared-at-age-ms
 ### `GET /api/battle/snapshot?battleId=...`
 
 battleId로 연결된 snapshotId를 조회한다.
+단, 현재 owner가 소유한 snapshot일 때만 조회된다.
 
 ```ts
 {
@@ -207,6 +215,7 @@ snapshot 저장 또는 `battleId` 연결.
 ### `GET /api/battle/outcome?battleId=...`
 
 battleId 기준 기존 outcome, report, seeds 조회.
+단, 현재 owner가 가진 battle snapshot이 있을 때만 조회된다.
 
 ### `POST /api/battle/outcome`
 
@@ -231,9 +240,15 @@ battleId 기준 기존 outcome, report, seeds 조회.
 6. settled면 outcome/report/memo/seed/event/application 저장
 7. 로그인 사용자면 Supabase battle 자산 미러 저장
 
+rate limit:
+
+- owner + client ip 기준 분당 10회
+- 초과 시 `429 rate_limit_exceeded`, `Retry-After` 헤더 반환
+
 ### `GET /api/battle/events?battleId=...`
 
 event log 조회.
+단, 현재 owner가 가진 battle snapshot이 있을 때만 조회된다.
 
 ```ts
 { ok: true, events: EventLogEntry[] }
@@ -341,6 +356,11 @@ prepared battle context 예열.
   }>;
 }
 ```
+
+rate limit:
+
+- owner + client ip 기준 분당 2회
+- 초과 시 `429 rate_limit_exceeded`, `Retry-After` 헤더 반환
 
 ### `GET /api/admin/battles`
 

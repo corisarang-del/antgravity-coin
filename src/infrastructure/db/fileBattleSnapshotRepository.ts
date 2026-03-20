@@ -55,4 +55,13 @@ export class FileBattleSnapshotRepository {
         .sort((left, right) => right.savedAt.localeCompare(left.savedAt))[0] ?? null
     );
   }
+
+  async getSnapshotByBattleIdForUser(battleId: string, userId: string) {
+    const store = await ensureStore();
+    return (
+      [...store.items]
+        .filter((item) => item.battleId === battleId && item.userId === userId)
+        .sort((left, right) => right.savedAt.localeCompare(left.savedAt))[0] ?? null
+    );
+  }
 }

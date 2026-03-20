@@ -57,7 +57,7 @@ export async function GET(request: Request) {
   }
 
   if (battleId) {
-    const snapshot = await repository.getSnapshotByBattleId(battleId);
+    const snapshot = await repository.getSnapshotByBattleIdForUser(battleId, ownerId);
 
     if (!snapshot) {
       return NextResponse.json({ error: "not_found" }, { status: 404 });

@@ -22,6 +22,10 @@ import { FileSeedRepository } from "@/infrastructure/db/fileSeedRepository";
 import { persistAuthenticatedBattleOutcome } from "@/infrastructure/db/supabaseBattlePersistence";
 import { runSerializedByKey } from "@/shared/utils/keyedSerialExecutor";
 import { getRequestOwnerId } from "@/infrastructure/auth/requestOwner";
+import {
+  consumeRequestRateLimit,
+  getRequestRateLimitKey,
+} from "@/shared/utils/requestRateLimiter";
 
 export async function POST(request: Request) {
   const body = (await request.json()) as {
@@ -36,6 +40,24 @@ export async function POST(request: Request) {
   const userBattle = body.userBattle;
 
   const { ownerId: userId, user, supabase } = await getRequestOwnerId();
+  const rateLimit = consumeRequestRateLimit({
+    bucket: "battle-outcome-post",
+    key: getRequestRateLimitKey(request, "battle-outcome-post", userId),
+    max: 10,
+    windowMs: 60_000,
+  });
+
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { error: "rate_limit_exceeded", retryable: true },
+      {
+        status: 429,
+        headers: {
+          "Retry-After": `${rateLimit.retryAfterSeconds}`,
+        },
+      },
+    );
+  }
 
   const battleId = userBattle.battleId;
 
@@ -243,8 +265,15 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "missing_battle_id" }, { status: 400 });
   }
 
+  const { ownerId } = await getRequestOwnerId();
   const seedRepository = new FileSeedRepository();
   const reportRepository = new FileReportRepository();
+  const snapshotRepository = new FileBattleSnapshotRepository();
+  const snapshot = await snapshotRepository.getSnapshotByBattleIdForUser(battleId, ownerId);
+
+  if (!snapshot) {
+    return NextResponse.json({ error: "not_found" }, { status: 404 });
+  }
 
   const battleOutcomeSeed = await seedRepository.getBattleOutcomeSeed(battleId);
   const characterMemorySeeds = await seedRepository.getCharacterMemorySeeds(battleId);

@@ -1,10 +1,21 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { POST } from "@/app/api/battle/route";
 import { generateCharacterDebateChunk } from "@/infrastructure/api/llmRouter";
+import { getRequestOwnerId } from "@/infrastructure/auth/requestOwner";
 import { getPreparedBattleContext } from "@/application/useCases/preparedBattleContext";
+import { clearRequestRateLimitStore } from "@/shared/utils/requestRateLimiter";
 
 vi.mock("@/infrastructure/api/llmRouter", () => ({
   generateCharacterDebateChunk: vi.fn().mockResolvedValue(null),
+}));
+
+vi.mock("@/infrastructure/auth/requestOwner", () => ({
+  getRequestOwnerId: vi.fn().mockResolvedValue({
+    ownerId: "anonymous",
+    isAuthenticated: false,
+    user: null,
+    supabase: {} as never,
+  }),
 }));
 
 vi.mock("@/application/useCases/preparedBattleContext", () => ({
@@ -56,7 +67,14 @@ function createPreparedContext() {
 describe("POST /api/battle", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    clearRequestRateLimitStore();
     vi.mocked(generateCharacterDebateChunk).mockResolvedValue(null);
+    vi.mocked(getRequestOwnerId).mockResolvedValue({
+      ownerId: "anonymous",
+      isAuthenticated: false,
+      user: null,
+      supabase: {} as never,
+    });
     vi.mocked(getPreparedBattleContext).mockResolvedValue({
       context: createPreparedContext(),
       preparedContextHit: false,
@@ -195,5 +213,36 @@ describe("POST /api/battle", () => {
     );
 
     expect(response.status).toBe(400);
+  });
+
+  it("같은 owner가 짧은 시간 안에 너무 많이 호출하면 429를 반환한다", async () => {
+    for (let index = 0; index < 5; index += 1) {
+      const response = await POST(
+        new Request("http://localhost/api/battle", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ coinId: "bitcoin" }),
+        }),
+      );
+
+      expect(response.status).toBe(200);
+    }
+
+    const blocked = await POST(
+      new Request("http://localhost/api/battle", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ coinId: "bitcoin" }),
+      }),
+    );
+    const data = (await blocked.json()) as { error: string };
+
+    expect(blocked.status).toBe(429);
+    expect(data.error).toBe("rate_limit_exceeded");
+    expect(blocked.headers.get("Retry-After")).toBeTruthy();
   });
 });

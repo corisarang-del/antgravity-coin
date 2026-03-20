@@ -8,7 +8,7 @@ vi.mock("@/infrastructure/auth/requestOwner", () => ({
     ownerId: "anonymous",
     isAuthenticated: false,
     user: null,
-    supabase: null,
+    supabase: {} as never,
   }),
 }));
 
@@ -101,6 +101,30 @@ describe("POST /api/battle/snapshot", () => {
     expect(data.battleId).toBe(battleId);
     expect(data.coinId).toBe("bitcoin");
     expect(data.ownerMatched).toBe(true);
+  });
+
+  it("다른 owner의 battleId로는 snapshotId를 조회할 수 없다", async () => {
+    const battleId = `battle-${crypto.randomUUID()}`;
+
+    vi.mocked(getRequestOwnerId).mockResolvedValue({
+      ownerId: "another-owner",
+      isAuthenticated: false,
+      user: null,
+      supabase: {} as never,
+    });
+    vi.spyOn(FileBattleSnapshotRepository.prototype, "getSnapshotByBattleIdForUser").mockResolvedValueOnce(
+      null as unknown as Awaited<
+        ReturnType<FileBattleSnapshotRepository["getSnapshotByBattleIdForUser"]>
+      >,
+    );
+
+    const response = await GET(
+      new Request(`http://localhost/api/battle/snapshot?battleId=${battleId}`),
+    );
+    const data = (await response.json()) as { error: string };
+
+    expect(response.status).toBe(404);
+    expect(data.error).toBe("not_found");
   });
 
   it("다른 owner가 같은 snapshotId를 덮어쓰려 하면 403을 반환한다", async () => {

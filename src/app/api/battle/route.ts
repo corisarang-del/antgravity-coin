@@ -2,7 +2,12 @@ import { generateCharacterMessage } from "@/application/useCases/generateBattleD
 import { getPreparedBattleContext } from "@/application/useCases/preparedBattleContext";
 import type { DebateMessage } from "@/domain/models/DebateMessage";
 import { NextResponse } from "next/server";
+import { getRequestOwnerId } from "@/infrastructure/auth/requestOwner";
 import { characters } from "@/shared/constants/characters";
+import {
+  consumeRequestRateLimit,
+  getRequestRateLimitKey,
+} from "@/shared/utils/requestRateLimiter";
 
 function toSseEvent(event: string, payload: unknown) {
   return `event: ${event}\ndata: ${JSON.stringify(payload)}\n\n`;
@@ -63,6 +68,26 @@ export async function POST(request: Request) {
 
   if (!body.coinId?.trim()) {
     return NextResponse.json({ error: "missing_coin_id", retryable: false }, { status: 400 });
+  }
+
+  const { ownerId } = await getRequestOwnerId();
+  const rateLimit = consumeRequestRateLimit({
+    bucket: "battle-post",
+    key: getRequestRateLimitKey(request, "battle-post", ownerId),
+    max: 5,
+    windowMs: 60_000,
+  });
+
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { error: "rate_limit_exceeded", retryable: true },
+      {
+        status: 429,
+        headers: {
+          "Retry-After": `${rateLimit.retryAfterSeconds}`,
+        },
+      },
+    );
   }
 
   const coinId = body.coinId;
