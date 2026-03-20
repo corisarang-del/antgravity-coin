@@ -1,8 +1,9 @@
 import { z } from "zod";
+import { BattleTimeframeSchema } from "@/domain/models/BattleTimeframe";
 
 export const BattleResultSchema = z.object({
   coinId: z.string(),
-  timeframe: z.enum(["24h", "7d"]),
+  timeframe: BattleTimeframeSchema,
   winningTeam: z.enum(["bull", "bear", "draw"]),
   priceChangePercent: z.number(),
   userWon: z.boolean(),

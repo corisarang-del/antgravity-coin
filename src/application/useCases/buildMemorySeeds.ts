@@ -42,6 +42,11 @@ function buildPlayerDecisionSeed(
     selectedTeam: userBattle.selectedTeam,
     timeframe: userBattle.timeframe,
     selectedPrice: userBattle.selectedPrice,
+    snapshotId: userBattle.snapshotId,
+    settlementAt: battleOutcomeSeed.settlementAt,
+    priceSource: battleOutcomeSeed.priceSource,
+    marketSymbol: battleOutcomeSeed.marketSymbol,
+    settledPrice: battleOutcomeSeed.settledPrice,
     userWon: battleOutcomeSeed.userWon,
     createdAt: new Date().toISOString(),
   };

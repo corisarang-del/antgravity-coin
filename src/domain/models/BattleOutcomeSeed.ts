@@ -1,11 +1,17 @@
 import { z } from "zod";
+import { BattleTimeframeSchema } from "@/domain/models/BattleTimeframe";
+import { SettlementPriceSourceSchema } from "@/domain/models/BattleSettlementSnapshot";
 
 export const BattleOutcomeSeedSchema = z.object({
   id: z.string(),
   battleId: z.string(),
   coinId: z.string(),
   coinSymbol: z.string(),
-  timeframe: z.enum(["24h", "7d"]),
+  timeframe: BattleTimeframeSchema,
+  settlementAt: z.string(),
+  priceSource: SettlementPriceSourceSchema,
+  marketSymbol: z.string(),
+  settledPrice: z.number(),
   winningTeam: z.enum(["bull", "bear", "draw"]),
   priceChangePercent: z.number(),
   userSelectedTeam: z.enum(["bull", "bear"]),

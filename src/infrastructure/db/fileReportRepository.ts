@@ -3,6 +3,7 @@ import path from "node:path";
 import type { ReportRepository } from "@/application/ports/ReportRepository";
 import type { BattleReport } from "@/domain/models/BattleReport";
 import type { ReusableBattleMemo } from "@/domain/models/ReusableBattleMemo";
+import { runSerializedByKey } from "@/shared/utils/keyedSerialExecutor";
 
 interface ReportStore {
   reports: BattleReport[];
@@ -36,10 +37,12 @@ async function saveStore(store: ReportStore) {
 
 export class FileReportRepository implements ReportRepository {
   async saveReport(report: BattleReport) {
-    const store = await ensureStore();
-    store.reports = store.reports.filter((item) => item.id !== report.id);
-    store.reports.push(report);
-    await saveStore(store);
+    await runSerializedByKey(DATA_FILE, async () => {
+      const store = await ensureStore();
+      store.reports = store.reports.filter((item) => item.id !== report.id);
+      store.reports.push(report);
+      await saveStore(store);
+    });
   }
 
   async getByBattleId(battleId: string) {
@@ -48,10 +51,12 @@ export class FileReportRepository implements ReportRepository {
   }
 
   async saveReusableMemo(memo: ReusableBattleMemo) {
-    const store = await ensureStore();
-    store.reusableMemos = store.reusableMemos.filter((item) => item.id !== memo.id);
-    store.reusableMemos.push(memo);
-    await saveStore(store);
+    await runSerializedByKey(DATA_FILE, async () => {
+      const store = await ensureStore();
+      store.reusableMemos = store.reusableMemos.filter((item) => item.id !== memo.id);
+      store.reusableMemos.push(memo);
+      await saveStore(store);
+    });
   }
 
   async getReusableMemoByBattleId(battleId: string) {

@@ -1,90 +1,110 @@
 import { describe, expect, it, vi } from "vitest";
 import { GET, POST } from "@/app/api/battle/outcome/route";
+import { FileBattleSnapshotRepository } from "@/infrastructure/db/fileBattleSnapshotRepository";
 
 vi.mock("@/infrastructure/api/geminiSynthesisClient", () => ({
   synthesizeBattleReportWithGemini: vi.fn().mockResolvedValue(null),
   synthesizeBattleLessonsWithGemini: vi.fn().mockResolvedValue(null),
 }));
 
-describe("POST /api/battle/outcome", () => {
-  it("배틀 결과를 outcome/memory/report 구조로 저장 가능한 payload로 변환한다", async () => {
-    const response = await POST(
-      new Request("http://localhost/api/battle/outcome", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+vi.mock("@/application/useCases/fetchBattleSettlement", () => ({
+  fetchBattleSettlement: vi.fn().mockResolvedValue({
+    battleId: "battle-1",
+    timeframe: "24h",
+    settlementAt: "2026-03-21T00:00:00.000Z",
+    priceSource: "bybit-linear",
+    marketSymbol: "BTCUSDT",
+    entryPrice: 84000,
+    settledPrice: 86000,
+    priceChangePercent: 2.38,
+    winningTeam: "bull",
+    status: "settled",
+  }),
+}));
+
+vi.mock("@/infrastructure/auth/requestOwner", () => ({
+  getRequestOwnerId: vi.fn().mockResolvedValue({
+    ownerId: "anonymous",
+    isAuthenticated: false,
+    user: null,
+    supabase: null,
+  }),
+}));
+
+function createOutcomeRequest(input?: {
+  battleId?: string;
+  summary?: string;
+}) {
+  return new Request("http://localhost/api/battle/outcome", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      userBattle: {
+        battleId: input?.battleId ?? "battle-1",
+        coinId: "bitcoin",
+        coinSymbol: "BTC",
+        selectedTeam: "bull",
+        timeframe: "24h",
+        selectedPrice: 84000,
+        selectedAt: "2026-03-20T00:00:00.000Z",
+        settlementAt: "2026-03-21T00:00:00.000Z",
+        priceSource: "bybit-linear",
+        marketSymbol: "BTCUSDT",
+        settledPrice: null,
+      },
+      messages: [
+        {
+          id: "1",
+          characterId: "aira",
+          characterName: "Aira",
+          team: "bull",
+          stance: "bullish",
+          summary: input?.summary ?? "강한 상승 모멘텀이 이어지고 있어.",
+          detail: "detail",
+          indicatorLabel: "RSI",
+          indicatorValue: "61",
+          provider: "openrouter",
+          model: "qwen/qwen3.5-9b",
+          fallbackUsed: false,
+          createdAt: new Date().toISOString(),
         },
-        body: JSON.stringify({
-          userBattle: {
-            battleId: "battle-1",
-            coinId: "bitcoin",
-            coinSymbol: "BTC",
-            selectedTeam: "bull",
-            timeframe: "24h",
-            selectedPrice: 84000,
-            selectedAt: new Date().toISOString(),
-          },
-          marketData: {
-            coinId: "bitcoin",
-            symbol: "BTC",
-            currentPrice: 85000,
-            priceChange24h: 2.4,
-            priceChange7d: 5.1,
-            rsi: 61,
-            macd: 2.3,
-            bollingerUpper: 86200,
-            bollingerLower: 80100,
-            fearGreedIndex: 60,
-            fearGreedLabel: "Greed",
-            sentimentScore: 0.4,
-            longShortRatio: 1.1,
-            openInterest: 125000000,
-            fundingRate: 0.0123,
-            whaleScore: 66,
-            volume24h: 32000000000,
-          },
-          messages: [
-            {
-              id: "1",
-              characterId: "aira",
-              characterName: "Aira",
-              team: "bull",
-              stance: "bullish",
-              summary: "기술 구조가 버텨.",
-              detail: "detail",
-              indicatorLabel: "RSI",
-              indicatorValue: "61",
-              provider: "openrouter",
-              model: "qwen/qwen3.5-9b",
-              fallbackUsed: false,
-              createdAt: new Date().toISOString(),
-            },
-          ],
-        }),
-      }),
-    );
+      ],
+    }),
+  });
+}
+
+describe("POST /api/battle/outcome", () => {
+  it("배틀 결과를 outcome, memory, report 구조로 변환한다", async () => {
+    const battleId = `battle-${crypto.randomUUID()}`;
+    const response = await POST(createOutcomeRequest({ battleId }));
 
     const data = (await response.json()) as {
       ok: boolean;
-      battleOutcomeSeed: { battleId: string; ruleVersion: string };
+      battleOutcomeSeed: { battleId: string; ruleVersion: string; settledPrice: number };
       characterMemorySeeds: Array<{ characterId: string }>;
-      playerDecisionSeed: { selectedTeam: string };
+      playerDecisionSeed: { selectedTeam: string; marketSymbol: string };
       report: { report: string };
       reportSource: "gemini" | "fallback";
     };
 
     expect(data.ok).toBe(true);
-    expect(data.battleOutcomeSeed.battleId).toBe("battle-1");
+    expect(data.battleOutcomeSeed.battleId).toBe(battleId);
     expect(data.battleOutcomeSeed.ruleVersion).toBe("v1");
+    expect(data.battleOutcomeSeed.settledPrice).toBe(86000);
     expect(data.characterMemorySeeds[0]?.characterId).toBe("aira");
     expect(data.playerDecisionSeed.selectedTeam).toBe("bull");
-    expect(data.report.report).toContain("배틀");
+    expect(data.playerDecisionSeed.marketSymbol).toBe("BTCUSDT");
+    expect(data.report.report).toContain("BTC");
     expect(data.reportSource).toBe("fallback");
   });
 
-  it("battleId 기준으로 저장된 outcome 조회가 가능하다", async () => {
+  it("battleId 기준으로 저장한 outcome을 조회한다", async () => {
+    const battleId = `battle-${crypto.randomUUID()}`;
+    await POST(createOutcomeRequest({ battleId }));
     const response = await GET(
-      new Request("http://localhost/api/battle/outcome?battleId=battle-1"),
+      new Request(`http://localhost/api/battle/outcome?battleId=${encodeURIComponent(battleId)}`),
     );
 
     const data = (await response.json()) as {
@@ -95,8 +115,170 @@ describe("POST /api/battle/outcome", () => {
     };
 
     expect(data.ok).toBe(true);
-    expect(data.battleOutcomeSeed.battleId).toBe("battle-1");
-    expect(data.report.report).toContain("배틀");
+    expect(data.battleOutcomeSeed.battleId).toBe(battleId);
+    expect(data.report.report).toContain("BTC");
     expect(data.reportSource).toBe("fallback");
+  });
+
+  it("같은 battleId로 다시 저장하면 recovered 응답을 준다", async () => {
+    const battleId = `battle-${crypto.randomUUID()}`;
+
+    await POST(createOutcomeRequest({ battleId }));
+    const secondResponse = await POST(createOutcomeRequest({ battleId }));
+
+    const data = (await secondResponse.json()) as {
+      ok: boolean;
+      recovered?: boolean;
+    };
+
+    expect(data.ok).toBe(true);
+    expect(data.recovered).toBe(true);
+  });
+
+  it("messages가 없어도 snapshotId가 있으면 서버 snapshot으로 결과를 만든다", async () => {
+    const snapshotId = `snapshot-${crypto.randomUUID()}`;
+    const battleId = `battle-${crypto.randomUUID()}`;
+
+    vi.spyOn(FileBattleSnapshotRepository.prototype, "getSnapshotForUser").mockResolvedValueOnce({
+      snapshotId,
+      userId: "anonymous",
+      battleId,
+      coinId: "bitcoin",
+      marketData: null,
+      summary: null,
+      messages: [
+        {
+          id: "1",
+          characterId: "aira",
+          characterName: "Aira",
+          team: "bull",
+          stance: "bullish",
+          summary: "강한 상승 모멘텀이 이어지고 있어.",
+          detail: "detail",
+          indicatorLabel: "RSI",
+          indicatorValue: "61",
+          provider: "openrouter",
+          model: "qwen/qwen3.5-9b",
+          fallbackUsed: false,
+          createdAt: new Date().toISOString(),
+        },
+      ],
+      savedAt: new Date().toISOString(),
+    });
+
+    const response = await POST(
+      new Request("http://localhost/api/battle/outcome", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userBattle: {
+            battleId,
+            coinId: "bitcoin",
+            coinSymbol: "BTC",
+            selectedTeam: "bull",
+            timeframe: "24h",
+            selectedPrice: 84000,
+            selectedAt: "2026-03-20T00:00:00.000Z",
+            snapshotId,
+            settlementAt: "2026-03-21T00:00:00.000Z",
+            priceSource: "bybit-linear",
+            marketSymbol: "BTCUSDT",
+            settledPrice: null,
+          },
+        }),
+      }),
+    );
+
+    const data = (await response.json()) as {
+      ok: boolean;
+      battleOutcomeSeed: { battleId: string };
+      characterMemorySeeds: Array<{ characterId: string }>;
+    };
+
+    expect(data.ok).toBe(true);
+    expect(data.battleOutcomeSeed.battleId).toBe(battleId);
+    expect(data.characterMemorySeeds[0]?.characterId).toBe("aira");
+  });
+
+  it("영문 요약이 들어와도 저장 전에 한국어 fallback으로 정리한다", async () => {
+    const response = await POST(
+      createOutcomeRequest({
+        battleId: `battle-${crypto.randomUUID()}`,
+        summary: "Despite recent gains, BTC remains exposed to a sharp pullback.",
+      }),
+    );
+
+    const data = (await response.json()) as {
+      battleOutcomeSeed: { strongestWinningArgument: string };
+      characterMemorySeeds: Array<{ summary: string }>;
+      report: { report: string };
+    };
+
+    expect(data.battleOutcomeSeed.strongestWinningArgument).toContain("불리시");
+    expect(data.characterMemorySeeds[0]?.summary).toContain("Aira");
+    expect(data.report.report).not.toContain("Despite recent gains");
+  });
+
+  it("snapshot의 battleId가 요청 battleId와 다르면 409를 반환한다", async () => {
+    const snapshotId = `snapshot-${crypto.randomUUID()}`;
+
+    vi.spyOn(FileBattleSnapshotRepository.prototype, "getSnapshotForUser").mockResolvedValueOnce({
+      snapshotId,
+      userId: "anonymous",
+      battleId: "battle-original",
+      coinId: "bitcoin",
+      marketData: null,
+      summary: null,
+      messages: [
+        {
+          id: "1",
+          characterId: "aira",
+          characterName: "Aira",
+          team: "bull",
+          stance: "bullish",
+          summary: "강한 상승 모멘텀이 이어지고 있어.",
+          detail: "detail",
+          indicatorLabel: "RSI",
+          indicatorValue: "61",
+          provider: "openrouter",
+          model: "qwen/qwen3.5-9b",
+          fallbackUsed: false,
+          createdAt: new Date().toISOString(),
+        },
+      ],
+      savedAt: new Date().toISOString(),
+    });
+
+    const response = await POST(
+      new Request("http://localhost/api/battle/outcome", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userBattle: {
+            battleId: "battle-other",
+            coinId: "bitcoin",
+            coinSymbol: "BTC",
+            selectedTeam: "bull",
+            timeframe: "24h",
+            selectedPrice: 84000,
+            selectedAt: "2026-03-20T00:00:00.000Z",
+            snapshotId,
+            settlementAt: "2026-03-21T00:00:00.000Z",
+            priceSource: "bybit-linear",
+            marketSymbol: "BTCUSDT",
+            settledPrice: null,
+          },
+        }),
+      }),
+    );
+
+    const data = (await response.json()) as { error: string };
+
+    expect(response.status).toBe(409);
+    expect(data.error).toBe("snapshot_battle_mismatch");
   });
 });

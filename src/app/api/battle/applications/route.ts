@@ -1,20 +1,13 @@
-import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
+import { getRequestOwnerId } from "@/infrastructure/auth/requestOwner";
 import { FileBattleResultApplicationRepository } from "@/infrastructure/db/fileBattleResultApplicationRepository";
 
-const SESSION_COOKIE_NAME = "ant_gravity_user_id";
-
-async function getSessionUserId() {
-  const cookieStore = await cookies();
-  return cookieStore.get(SESSION_COOKIE_NAME)?.value ?? null;
-}
-
 export async function GET(request: Request) {
-  const userId = await getSessionUserId();
+  const { ownerId: userId } = await getRequestOwnerId();
   const battleId = new URL(request.url).searchParams.get("battleId");
 
-  if (!userId || !battleId) {
-    return NextResponse.json({ error: "missing_session_or_battle_id" }, { status: 400 });
+  if (!battleId) {
+    return NextResponse.json({ error: "missing_battle_id" }, { status: 400 });
   }
 
   const repository = new FileBattleResultApplicationRepository();
@@ -24,13 +17,13 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const userId = await getSessionUserId();
+  const { ownerId: userId } = await getRequestOwnerId();
   const body = (await request.json()) as {
     battleId?: string;
   };
 
-  if (!userId || !body.battleId) {
-    return NextResponse.json({ error: "missing_session_or_battle_id" }, { status: 400 });
+  if (!body.battleId) {
+    return NextResponse.json({ error: "missing_battle_id" }, { status: 400 });
   }
 
   const repository = new FileBattleResultApplicationRepository();

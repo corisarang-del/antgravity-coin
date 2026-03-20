@@ -1,6 +1,7 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import type { EventLog, EventLogEntry } from "@/application/ports/EventLog";
+import { runSerializedByKey } from "@/shared/utils/keyedSerialExecutor";
 
 interface StoredEventLog {
   items: EventLogEntry[];
@@ -28,13 +29,15 @@ async function saveStore(store: StoredEventLog) {
 
 export class FileEventLog implements EventLog {
   async append<TPayload>(entry: EventLogEntry<TPayload>) {
-    const store = await ensureStore();
-    if (store.items.some((item) => item.id === entry.id)) {
-      return;
-    }
+    await runSerializedByKey(DATA_FILE, async () => {
+      const store = await ensureStore();
+      if (store.items.some((item) => item.id === entry.id)) {
+        return;
+      }
 
-    store.items.push(entry as EventLogEntry);
-    await saveStore(store);
+      store.items.push(entry as EventLogEntry);
+      await saveStore(store);
+    });
   }
 
   async list() {

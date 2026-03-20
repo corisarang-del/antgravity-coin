@@ -3,6 +3,7 @@ import type { CharacterMemorySeed } from "@/domain/models/CharacterMemorySeed";
 import type { BattleReport } from "@/domain/models/BattleReport";
 import type { PlayerDecisionSeed } from "@/domain/models/PlayerDecisionSeed";
 import { synthesizeBattleReportWithGemini } from "@/infrastructure/api/geminiSynthesisClient";
+import { formatBattleTimeframeLabel } from "@/shared/constants/battleTimeframes";
 
 function buildFallbackReport(input: {
   battleOutcomeSeed: BattleOutcomeSeed;
@@ -13,12 +14,12 @@ function buildFallbackReport(input: {
     .map((seed) => seed.characterName);
 
   return [
-    `${input.battleOutcomeSeed.coinSymbol} ${input.battleOutcomeSeed.timeframe} 배틀 회고`,
+    `${input.battleOutcomeSeed.coinSymbol} ${formatBattleTimeframeLabel(input.battleOutcomeSeed.timeframe)} 차트 회고`,
     `승리 팀: ${input.battleOutcomeSeed.winningTeam}`,
-    `플레이어 적중 여부: ${input.battleOutcomeSeed.userWon ? "성공" : "실패"}`,
-    `가장 강했던 논거: ${input.battleOutcomeSeed.strongestWinningArgument}`,
-    `약했던 반대 논거: ${input.battleOutcomeSeed.weakestLosingArgument}`,
-    `이번 결과와 맞았던 캐릭터: ${correctCharacters.join(", ") || "없음"}`,
+    `플레이어 결과: ${input.battleOutcomeSeed.userWon ? "성공" : "실패"}`,
+    `가장 강한 승리 논거: ${input.battleOutcomeSeed.strongestWinningArgument}`,
+    `가장 약한 패배 논거: ${input.battleOutcomeSeed.weakestLosingArgument}`,
+    `이번 결과에 가까웠던 캐릭터: ${correctCharacters.join(", ") || "없음"}`,
   ].join("\n");
 }
 

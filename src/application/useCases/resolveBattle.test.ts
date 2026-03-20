@@ -3,7 +3,7 @@ import { resolveBattle } from "@/application/useCases/resolveBattle";
 import { updateLevels } from "@/application/useCases/updateLevels";
 
 describe("resolveBattle", () => {
-  it("24h 가격 상승이고 불리시 선택 시 사용자 경험치가 증가한다", () => {
+  it("실정산 가격 상승이고 불리시 선택 시 사용자 경험치가 증가한다", () => {
     const result = resolveBattle(
       {
         battleId: crypto.randomUUID(),
@@ -12,26 +12,24 @@ describe("resolveBattle", () => {
         selectedTeam: "bull",
         timeframe: "24h",
         selectedPrice: 84120,
-        selectedAt: new Date().toISOString(),
+        selectedAt: "2026-03-20T00:00:00.000Z",
+        snapshotId: "snapshot-1",
+        settlementAt: "2026-03-21T00:00:00.000Z",
+        priceSource: "bybit-linear",
+        marketSymbol: "BTCUSDT",
+        settledPrice: null,
       },
       {
-        coinId: "bitcoin",
-        symbol: "BTC",
-        currentPrice: 84120,
-        priceChange24h: 2.4,
-        priceChange7d: 5.1,
-        rsi: 61,
-        macd: 2.3,
-        bollingerUpper: 86200,
-        bollingerLower: 80100,
-        fearGreedIndex: 60,
-        fearGreedLabel: "Greed",
-        sentimentScore: 0.4,
-        longShortRatio: 1.1,
-        openInterest: 125000000,
-        fundingRate: 0.0123,
-        whaleScore: 66,
-        volume24h: 32000000000,
+        battleId: crypto.randomUUID(),
+        timeframe: "24h",
+        settlementAt: "2026-03-21T00:00:00.000Z",
+        priceSource: "bybit-linear",
+        marketSymbol: "BTCUSDT",
+        entryPrice: 84000,
+        settledPrice: 86000,
+        priceChangePercent: 2.38,
+        winningTeam: "bull",
+        status: "settled",
       },
     );
 

@@ -4,6 +4,7 @@ import type { SeedRepository } from "@/application/ports/SeedRepository";
 import type { BattleOutcomeSeed } from "@/domain/models/BattleOutcomeSeed";
 import type { CharacterMemorySeed } from "@/domain/models/CharacterMemorySeed";
 import type { PlayerDecisionSeed } from "@/domain/models/PlayerDecisionSeed";
+import { runSerializedByKey } from "@/shared/utils/keyedSerialExecutor";
 
 interface SeedStore {
   battleOutcomeSeeds: BattleOutcomeSeed[];
@@ -37,25 +38,33 @@ async function saveStore(store: SeedStore) {
 
 export class FileSeedRepository implements SeedRepository {
   async saveBattleOutcomeSeed(seed: BattleOutcomeSeed) {
-    const store = await ensureStore();
-    store.battleOutcomeSeeds = store.battleOutcomeSeeds.filter((item) => item.id !== seed.id);
-    store.battleOutcomeSeeds.push(seed);
-    await saveStore(store);
+    await runSerializedByKey(DATA_FILE, async () => {
+      const store = await ensureStore();
+      store.battleOutcomeSeeds = store.battleOutcomeSeeds.filter((item) => item.id !== seed.id);
+      store.battleOutcomeSeeds.push(seed);
+      await saveStore(store);
+    });
   }
 
   async saveCharacterMemorySeeds(seeds: CharacterMemorySeed[]) {
-    const store = await ensureStore();
-    const incomingIds = new Set(seeds.map((seed) => seed.id));
-    store.characterMemorySeeds = store.characterMemorySeeds.filter((seed) => !incomingIds.has(seed.id));
-    store.characterMemorySeeds.push(...seeds);
-    await saveStore(store);
+    await runSerializedByKey(DATA_FILE, async () => {
+      const store = await ensureStore();
+      const incomingIds = new Set(seeds.map((seed) => seed.id));
+      store.characterMemorySeeds = store.characterMemorySeeds.filter(
+        (seed) => !incomingIds.has(seed.id),
+      );
+      store.characterMemorySeeds.push(...seeds);
+      await saveStore(store);
+    });
   }
 
   async savePlayerDecisionSeed(seed: PlayerDecisionSeed) {
-    const store = await ensureStore();
-    store.playerDecisionSeeds = store.playerDecisionSeeds.filter((item) => item.id !== seed.id);
-    store.playerDecisionSeeds.push(seed);
-    await saveStore(store);
+    await runSerializedByKey(DATA_FILE, async () => {
+      const store = await ensureStore();
+      store.playerDecisionSeeds = store.playerDecisionSeeds.filter((item) => item.id !== seed.id);
+      store.playerDecisionSeeds.push(seed);
+      await saveStore(store);
+    });
   }
 
   async getBattleOutcomeSeed(battleId: string) {

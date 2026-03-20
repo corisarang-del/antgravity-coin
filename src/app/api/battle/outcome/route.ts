@@ -1,161 +1,238 @@
-import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { appendSeedEvents } from "@/application/useCases/appendSeedEvents";
 import { buildBattleOutcomeSeed } from "@/application/useCases/buildBattleOutcomeSeed";
 import { buildMemorySeeds } from "@/application/useCases/buildMemorySeeds";
 import { buildReusableBattleMemo } from "@/application/useCases/buildReusableBattleMemo";
+import { fetchBattleSettlement } from "@/application/useCases/fetchBattleSettlement";
 import { generateBattleReport } from "@/application/useCases/generateBattleReport";
+import {
+  sanitizeBattleOutcomeSeed,
+  sanitizeBattleReport,
+  sanitizeCharacterMemorySeeds,
+  sanitizeReusableBattleMemo,
+} from "@/application/useCases/sanitizeBattlePersistenceArtifacts";
 import type { DebateMessage } from "@/domain/models/DebateMessage";
-import type { MarketData } from "@/domain/models/MarketData";
 import type { UserBattle } from "@/domain/models/UserBattle";
+import { synthesizeBattleLessonsWithGemini } from "@/infrastructure/api/geminiSynthesisClient";
+import { FileBattleResultApplicationRepository } from "@/infrastructure/db/fileBattleResultApplicationRepository";
+import { FileBattleSnapshotRepository } from "@/infrastructure/db/fileBattleSnapshotRepository";
 import { FileEventLog } from "@/infrastructure/db/fileEventLog";
 import { FileReportRepository } from "@/infrastructure/db/fileReportRepository";
 import { FileSeedRepository } from "@/infrastructure/db/fileSeedRepository";
-import { synthesizeBattleLessonsWithGemini } from "@/infrastructure/api/geminiSynthesisClient";
-
-const SESSION_COOKIE_NAME = "ant_gravity_user_id";
+import { persistAuthenticatedBattleOutcome } from "@/infrastructure/db/supabaseBattlePersistence";
+import { runSerializedByKey } from "@/shared/utils/keyedSerialExecutor";
+import { getRequestOwnerId } from "@/infrastructure/auth/requestOwner";
 
 export async function POST(request: Request) {
   const body = (await request.json()) as {
     userBattle?: UserBattle;
-    marketData?: MarketData;
     messages?: DebateMessage[];
   };
 
-  if (!body.userBattle || !body.marketData || !body.messages) {
+  if (!body.userBattle) {
     return NextResponse.json({ error: "missing_payload" }, { status: 400 });
   }
 
-  let userId = "anonymous";
-  try {
-    const cookieStore = await cookies();
-    userId = cookieStore.get(SESSION_COOKIE_NAME)?.value ?? "anonymous";
-  } catch {
-    userId = "anonymous";
-  }
+  const userBattle = body.userBattle;
 
-  const battleOutcomeSeed = buildBattleOutcomeSeed({
-    userBattle: body.userBattle,
-    messages: body.messages,
-    marketData: body.marketData,
-  });
+  const { ownerId: userId, user, supabase } = await getRequestOwnerId();
 
-  const { characterMemorySeeds, playerDecisionSeed } = buildMemorySeeds({
-    battleOutcomeSeed,
-    messages: body.messages,
-    userBattle: body.userBattle,
-  });
+  const battleId = userBattle.battleId;
 
-  const report = await generateBattleReport({
-    battleOutcomeSeed,
-    characterMemorySeeds,
-    playerDecisionSeed,
-  });
-  const synthesizedLessons = await synthesizeBattleLessonsWithGemini({
-    battleOutcomeSeed,
-    characterMemorySeeds,
-    playerDecisionSeed,
-    report: report.report,
-  });
+  return runSerializedByKey(`battle-outcome:${battleId}`, async () => {
+    const seedRepository = new FileSeedRepository();
+    const reportRepository = new FileReportRepository();
+    const snapshotRepository = new FileBattleSnapshotRepository();
+    const eventLog = new FileEventLog();
+    const applicationRepository = new FileBattleResultApplicationRepository();
 
-  const reusableMemo = buildReusableBattleMemo({
-    battleOutcomeSeed,
-    characterMemorySeeds,
-    report,
-    synthesizedLessons,
-  });
+    const existingOutcomeSeed = await seedRepository.getBattleOutcomeSeed(battleId);
+    const existingPlayerDecisionSeed = await seedRepository.getPlayerDecisionSeed(battleId);
+    const existingCharacterMemorySeeds = await seedRepository.getCharacterMemorySeeds(battleId);
+    const existingReport = await reportRepository.getByBattleId(battleId);
 
-  const seedRepository = new FileSeedRepository();
-  const reportRepository = new FileReportRepository();
-  const eventLog = new FileEventLog();
+    if (existingOutcomeSeed && existingPlayerDecisionSeed && existingReport) {
+      await applicationRepository.markApplied({
+        battleId,
+        userId,
+        appliedAt: new Date().toISOString(),
+      });
 
-  const existingOutcomeSeed = await seedRepository.getBattleOutcomeSeed(body.userBattle.battleId);
-  const existingPlayerDecisionSeed = await seedRepository.getPlayerDecisionSeed(body.userBattle.battleId);
-  const existingCharacterMemorySeeds = await seedRepository.getCharacterMemorySeeds(body.userBattle.battleId);
-  const existingReport = await reportRepository.getByBattleId(body.userBattle.battleId);
+      return NextResponse.json({
+        ok: true,
+        battleOutcomeSeed: existingOutcomeSeed,
+        characterMemorySeeds: existingCharacterMemorySeeds,
+        playerDecisionSeed: existingPlayerDecisionSeed,
+        report: existingReport,
+        reportSource: existingReport.reportSource ?? "fallback",
+        recovered: true,
+      });
+    }
 
-  if (existingOutcomeSeed && existingPlayerDecisionSeed && existingReport) {
-    return NextResponse.json({
-      ok: true,
-      battleOutcomeSeed: existingOutcomeSeed,
-      characterMemorySeeds: existingCharacterMemorySeeds,
-      playerDecisionSeed: existingPlayerDecisionSeed,
-      report: existingReport,
-      reportSource: existingReport.reportSource ?? "fallback",
-      recovered: true,
-    });
-  }
+    const snapshot = userBattle.snapshotId
+      ? await snapshotRepository.getSnapshotForUser(userBattle.snapshotId, userId)
+      : null;
 
-  try {
-    await seedRepository.saveBattleOutcomeSeed(battleOutcomeSeed);
-    await seedRepository.saveCharacterMemorySeeds(characterMemorySeeds);
-    await seedRepository.savePlayerDecisionSeed(playerDecisionSeed);
-    await reportRepository.saveReport(report);
-    await reportRepository.saveReusableMemo(reusableMemo);
+    if (userBattle.snapshotId && !snapshot) {
+      return NextResponse.json({ error: "snapshot_not_found" }, { status: 404 });
+    }
 
-    await eventLog.append({
-      id: `event:battle_start:${battleOutcomeSeed.battleId}`,
-      battleId: battleOutcomeSeed.battleId,
-      userId,
-      type: "battle_start",
-      createdAt: new Date().toISOString(),
-      payload: {
-        coinId: battleOutcomeSeed.coinId,
-        timeframe: battleOutcomeSeed.timeframe,
-      },
-    });
+    if (snapshot?.battleId && snapshot.battleId !== battleId) {
+      return NextResponse.json({ error: "snapshot_battle_mismatch" }, { status: 409 });
+    }
 
-    await eventLog.append({
-      id: `event:debate_complete:${battleOutcomeSeed.battleId}`,
-      battleId: battleOutcomeSeed.battleId,
-      userId,
-      type: "debate_complete",
-      createdAt: new Date().toISOString(),
-      payload: {
-        messageCount: body.messages.length,
-        messages: body.messages.map((message) => ({
-          characterId: message.characterId,
-          provider: message.provider,
-          model: message.model,
-          fallbackUsed: message.fallbackUsed,
-        })),
-      },
+    const messages = body.messages ?? snapshot?.messages ?? [];
+
+    if (messages.length === 0) {
+      return NextResponse.json({ error: "missing_snapshot_messages" }, { status: 400 });
+    }
+
+    const settlementSnapshot = await fetchBattleSettlement(userBattle);
+
+    if (settlementSnapshot.status === "pending") {
+      return NextResponse.json(
+        {
+          error: "settlement_pending",
+          settlementAt: settlementSnapshot.settlementAt,
+          priceSource: settlementSnapshot.priceSource,
+          marketSymbol: settlementSnapshot.marketSymbol,
+        },
+        { status: 409 },
+      );
+    }
+
+    const battleOutcomeSeed = sanitizeBattleOutcomeSeed(
+      buildBattleOutcomeSeed({
+        userBattle,
+        messages,
+        settlementSnapshot,
+      }),
+    );
+
+    const { characterMemorySeeds: rawCharacterMemorySeeds, playerDecisionSeed } = buildMemorySeeds({
+      battleOutcomeSeed,
+      messages,
+      userBattle,
     });
 
-    await appendSeedEvents({
-      eventLog,
-      battleId: battleOutcomeSeed.battleId,
-      userId,
+    const characterMemorySeeds = sanitizeCharacterMemorySeeds(rawCharacterMemorySeeds);
+    const report = sanitizeBattleReport(
+      await generateBattleReport({
+        battleOutcomeSeed,
+        characterMemorySeeds,
+        playerDecisionSeed,
+      }),
+      battleOutcomeSeed,
+      characterMemorySeeds,
+    );
+
+    const synthesizedLessons = await synthesizeBattleLessonsWithGemini({
+      battleOutcomeSeed,
       characterMemorySeeds,
       playerDecisionSeed,
+      report: report.report,
     });
 
-    await eventLog.append({
-      id: `event:result_applied:${battleOutcomeSeed.battleId}`,
-      battleId: battleOutcomeSeed.battleId,
-      userId,
-      type: "result_applied",
-      createdAt: new Date().toISOString(),
-      payload: {
-        winningTeam: battleOutcomeSeed.winningTeam,
-        userWon: battleOutcomeSeed.userWon,
-        ruleVersion: battleOutcomeSeed.ruleVersion,
-      },
-    });
-  } catch {
-    return NextResponse.json(
-      { error: "outcome_persist_failed", retryable: true },
-      { status: 500 },
+    const reusableMemo = sanitizeReusableBattleMemo(
+      buildReusableBattleMemo({
+        battleOutcomeSeed,
+        characterMemorySeeds,
+        report,
+        synthesizedLessons,
+      }),
     );
-  }
 
-  return NextResponse.json({
-    ok: true,
-    battleOutcomeSeed,
-    characterMemorySeeds,
-    playerDecisionSeed,
-    report,
-    reportSource: report.reportSource ?? "fallback",
+    try {
+      await seedRepository.saveBattleOutcomeSeed(battleOutcomeSeed);
+      await seedRepository.saveCharacterMemorySeeds(characterMemorySeeds);
+      await seedRepository.savePlayerDecisionSeed(playerDecisionSeed);
+      await reportRepository.saveReport(report);
+      await reportRepository.saveReusableMemo(reusableMemo);
+
+      await eventLog.append({
+        id: `event:battle_start:${battleOutcomeSeed.battleId}`,
+        battleId: battleOutcomeSeed.battleId,
+        userId,
+        type: "battle_start",
+        createdAt: new Date().toISOString(),
+        payload: {
+          coinId: battleOutcomeSeed.coinId,
+          timeframe: battleOutcomeSeed.timeframe,
+          settlementAt: battleOutcomeSeed.settlementAt,
+          marketSymbol: battleOutcomeSeed.marketSymbol,
+          priceSource: battleOutcomeSeed.priceSource,
+        },
+      });
+
+      await eventLog.append({
+        id: `event:debate_complete:${battleOutcomeSeed.battleId}`,
+        battleId: battleOutcomeSeed.battleId,
+        userId,
+        type: "debate_complete",
+        createdAt: new Date().toISOString(),
+        payload: {
+          messageCount: messages.length,
+          messages: messages.map((message) => ({
+            characterId: message.characterId,
+            provider: message.provider,
+            model: message.model,
+            fallbackUsed: message.fallbackUsed,
+          })),
+        },
+      });
+
+      await appendSeedEvents({
+        eventLog,
+        battleId: battleOutcomeSeed.battleId,
+        userId,
+        characterMemorySeeds,
+        playerDecisionSeed,
+      });
+
+      await eventLog.append({
+        id: `event:result_applied:${battleOutcomeSeed.battleId}`,
+        battleId: battleOutcomeSeed.battleId,
+        userId,
+        type: "result_applied",
+        createdAt: new Date().toISOString(),
+        payload: {
+          winningTeam: battleOutcomeSeed.winningTeam,
+          userWon: battleOutcomeSeed.userWon,
+          ruleVersion: battleOutcomeSeed.ruleVersion,
+          settledPrice: battleOutcomeSeed.settledPrice,
+        },
+      });
+
+      await applicationRepository.markApplied({
+        battleId,
+        userId,
+        appliedAt: new Date().toISOString(),
+      });
+
+      if (user) {
+        await persistAuthenticatedBattleOutcome(supabase, user, {
+          userBattle,
+          battleOutcomeSeed,
+          playerDecisionSeed,
+          characterMemorySeeds,
+          report,
+        });
+      }
+    } catch {
+      return NextResponse.json(
+        { error: "outcome_persist_failed", retryable: true },
+        { status: 500 },
+      );
+    }
+
+    return NextResponse.json({
+      ok: true,
+      battleOutcomeSeed,
+      characterMemorySeeds,
+      playerDecisionSeed,
+      report,
+      reportSource: report.reportSource ?? "fallback",
+    });
   });
 }
 

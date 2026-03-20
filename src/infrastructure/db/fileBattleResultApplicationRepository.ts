@@ -4,6 +4,7 @@ import type {
   BattleResultApplication,
   BattleResultApplicationRepository,
 } from "@/application/ports/BattleResultApplicationRepository";
+import { runSerializedByKey } from "@/shared/utils/keyedSerialExecutor";
 
 interface StoredApplications {
   items: BattleResultApplication[];
@@ -38,16 +39,18 @@ export class FileBattleResultApplicationRepository
   }
 
   async markApplied(input: BattleResultApplication): Promise<void> {
-    const store = await ensureStore();
-    const alreadyExists = store.items.some(
-      (item) => item.battleId === input.battleId && item.userId === input.userId,
-    );
+    await runSerializedByKey(DATA_FILE, async () => {
+      const store = await ensureStore();
+      const alreadyExists = store.items.some(
+        (item) => item.battleId === input.battleId && item.userId === input.userId,
+      );
 
-    if (alreadyExists) {
-      return;
-    }
+      if (alreadyExists) {
+        return;
+      }
 
-    store.items.push(input);
-    await saveStore(store);
+      store.items.push(input);
+      await saveStore(store);
+    });
   }
 }

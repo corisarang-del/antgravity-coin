@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { BattleTimeframeSchema } from "@/domain/models/BattleTimeframe";
 
 export const ReusableBattleCharacterLessonSchema = z.object({
   characterId: z.string(),
@@ -12,7 +13,7 @@ export const ReusableBattleMemoSchema = z.object({
   battleId: z.string(),
   coinId: z.string(),
   coinSymbol: z.string(),
-  timeframe: z.enum(["24h", "7d"]),
+  timeframe: BattleTimeframeSchema,
   reportSource: z.enum(["gemini", "fallback"]),
   reportSummary: z.string(),
   winningTeam: z.enum(["bull", "bear", "draw"]),
