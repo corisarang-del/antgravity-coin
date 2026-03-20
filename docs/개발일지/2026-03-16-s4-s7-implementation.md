@@ -1,4 +1,4 @@
-# 개발일지 - S4~S7 구현
+﻿# 개발일지 - S4~S7 구현
 
 - 작성시각: 2026-03-16 21:30:00 +09:00
 - 해결하고자 한 문제:
@@ -25,3 +25,4 @@
   - 멀티 provider는 구조만 있고 실제 Anthropic 외 provider API 클라이언트는 아직 null provider다.
   - optimization은 실측 기반 자동 조정까지는 아니고, 수동 평가 입력을 처리하는 초안 수준이다.
   - 전체 `pnpm lint`는 `pptx/ant-gravity-report/*` 하위 기존 CommonJS 파일 때문에 여전히 실패한다. 이번 구현 범위인 `src` 기준 eslint는 통과했다.
+

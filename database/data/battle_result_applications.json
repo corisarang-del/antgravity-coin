@@ -19,6 +19,711 @@
       "battleId": "b9033941-0ed5-4e67-a465-a5e860298b09",
       "userId": "d5f2fe99-51ff-4b46-a0ca-75d72f81d1db",
       "appliedAt": "2026-03-16T12:11:13.797Z"
+    },
+    {
+      "battleId": "battle-1",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T01:56:23.041Z"
+    },
+    {
+      "battleId": "battle-7e7f8491-50ab-4578-be55-e9701e320034",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T01:56:23.233Z"
+    },
+    {
+      "battleId": "battle-2fb1f8ff-82cc-4232-89dd-ac606cc32087",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T01:56:23.578Z"
+    },
+    {
+      "battleId": "battle-43c8657c-42d4-48cb-ad87-e1a1a5035019",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T01:58:39.866Z"
+    },
+    {
+      "battleId": "battle-9ef9d4bc-b56b-4639-a8b6-873a0ab8aa47",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T01:58:41.185Z"
+    },
+    {
+      "battleId": "battle-f748984e-8871-49bb-be02-9bfce748143d",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T02:12:43.278Z"
+    },
+    {
+      "battleId": "battle-652559d3-04bf-431e-827d-fd98061ceeec",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T02:12:44.296Z"
+    },
+    {
+      "battleId": "battle-15362793-8c08-42bf-82a5-7777a7c63320",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T04:16:28.990Z"
+    },
+    {
+      "battleId": "battle-d68ea9da-d21e-4e47-801a-74c7dd36af52",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T04:16:29.070Z"
+    },
+    {
+      "battleId": "battle-34e2237a-45cc-4acc-89d3-e7222647e64e",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T04:17:04.750Z"
+    },
+    {
+      "battleId": "battle-6577e8ee-5883-4640-97a8-e1d09cfd5026",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T04:17:04.939Z"
+    },
+    {
+      "battleId": "battle-72054b9a-49eb-4aac-aeb6-ffcd1479386d",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T04:17:05.130Z"
+    },
+    {
+      "battleId": "battle-aeefe388-3eed-477e-bd80-085fb10deae7",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T04:17:05.317Z"
+    },
+    {
+      "battleId": "battle-5d61e85d-cab6-46ee-b31b-9533fdac38fa",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T05:23:41.858Z"
+    },
+    {
+      "battleId": "battle-ccd51fc2-7822-466e-8dee-0be3da7e7191",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T05:23:42.075Z"
+    },
+    {
+      "battleId": "battle-c0f51678-edd2-447e-9843-13423e6377e2",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T05:23:42.315Z"
+    },
+    {
+      "battleId": "battle-a0c17301-9e8f-48a5-82bf-3725a80bb579",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T05:23:42.728Z"
+    },
+    {
+      "battleId": "battle-1c6c4324-b5cb-4183-b881-fc2aa8190ca1",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T05:24:23.578Z"
+    },
+    {
+      "battleId": "battle-63939793-010a-43c9-9683-4cf9f6a3319b",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T05:24:23.854Z"
+    },
+    {
+      "battleId": "battle-c7df57dd-d8d3-4150-9583-5fe6846c4ede",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T05:24:24.152Z"
+    },
+    {
+      "battleId": "battle-4aee5cd9-21fb-4879-9a4b-f76138d5934f",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T05:24:24.689Z"
+    },
+    {
+      "battleId": "battle-c3c6bccb-5eda-4ed0-b9d4-80a2a20702a6",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T05:33:57.565Z"
+    },
+    {
+      "battleId": "battle-e821d99a-b5ed-47be-b70c-f8ee6b1eb711",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T05:33:57.892Z"
+    },
+    {
+      "battleId": "battle-fe4fa0de-8ab5-4a67-8701-a6a4cec80f4d",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T05:33:58.404Z"
+    },
+    {
+      "battleId": "battle-8805705d-1bc0-4565-ab95-de9fe270a139",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T05:33:59.122Z"
+    },
+    {
+      "battleId": "battle-8dc100df-201f-42cb-a953-8898b45e0a1c",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T05:33:59.455Z"
+    },
+    {
+      "battleId": "battle-10ba77f0-f165-438d-a664-cee3c2374e53",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T05:47:36.081Z"
+    },
+    {
+      "battleId": "battle-f325b072-f4cf-40b7-84b5-1094f9c08817",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T05:47:36.363Z"
+    },
+    {
+      "battleId": "battle-f119704d-c5c8-4ee3-8e80-6654bdeeab8c",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T05:47:36.757Z"
+    },
+    {
+      "battleId": "battle-ca538e6c-d47c-4781-a509-2170a7276d88",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T05:47:37.315Z"
+    },
+    {
+      "battleId": "battle-6ccd0101-177d-42a9-8322-9aff05b06b58",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T05:47:37.616Z"
+    },
+    {
+      "battleId": "battle-4b39a368-c7f1-4717-bfab-1e6fa9a654a5",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T06:47:23.493Z"
+    },
+    {
+      "battleId": "battle-56c89710-b526-4c46-b85e-08e64ed6e9c2",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T06:47:23.733Z"
+    },
+    {
+      "battleId": "battle-1898c58f-ff7c-4f12-97d3-4442e356d7e1",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T06:47:24.031Z"
+    },
+    {
+      "battleId": "battle-5dbbcc03-46c7-4b6c-b5b0-cb2d3d6b9639",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T06:47:24.260Z"
+    },
+    {
+      "battleId": "battle-0e21ad33-667c-44dd-9bcf-00a27f58981b",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T06:47:24.506Z"
+    },
+    {
+      "battleId": "battle-7d6e0469-d249-4375-98d2-c38fd2f0110e",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T06:59:37.630Z"
+    },
+    {
+      "battleId": "battle-2e9ce97c-9c95-44eb-b19b-00d24e6d5048",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T06:59:37.865Z"
+    },
+    {
+      "battleId": "battle-f16b1891-b70f-4e0d-a9a5-1560ff5ffce2",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T06:59:38.217Z"
+    },
+    {
+      "battleId": "battle-e0aee93f-5df0-4419-9c56-446d3a8c960d",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T06:59:38.508Z"
+    },
+    {
+      "battleId": "battle-2193bda2-5122-4a6b-b145-f66cd8ca8a33",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T06:59:38.679Z"
+    },
+    {
+      "battleId": "battle-c218cccb-0234-45da-99de-e97aacac861c",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T07:40:52.778Z"
+    },
+    {
+      "battleId": "battle-300cfd24-8eca-4e2e-8c7f-241ea3cea8cb",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T07:40:53.347Z"
+    },
+    {
+      "battleId": "battle-4e2ca0be-8ac8-4d19-94fd-2b22c4c72494",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T07:40:54.053Z"
+    },
+    {
+      "battleId": "battle-c5605bee-8b60-4970-a236-4d0909602d83",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T07:40:54.988Z"
+    },
+    {
+      "battleId": "battle-ee307012-78ee-43c2-b38d-8cb8fffd374d",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T07:40:55.223Z"
+    },
+    {
+      "battleId": "battle-656682a7-f6b9-4d22-8b83-59886d244358",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T11:06:24.328Z"
+    },
+    {
+      "battleId": "battle-85d4b764-9837-47dc-8b00-1cc1ccadda3e",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T11:06:25.452Z"
+    },
+    {
+      "battleId": "battle-5d41575f-c188-47ac-a972-8a42246adb3f",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T11:06:26.306Z"
+    },
+    {
+      "battleId": "battle-d528bfdd-546c-48a9-9cfc-06612da55b5b",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T11:06:27.475Z"
+    },
+    {
+      "battleId": "battle-427092ec-257e-4318-acf5-9e518f045e22",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T11:06:28.290Z"
+    },
+    {
+      "battleId": "battle-23497e19-bb74-4203-88f6-15bf469b0f17",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T11:18:42.360Z"
+    },
+    {
+      "battleId": "battle-fa1bd9f7-bf57-4741-ab6c-6f554aef8e0c",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T11:18:43.841Z"
+    },
+    {
+      "battleId": "battle-8d4b0c0e-0d66-46f1-9d34-85f4855fa3ae",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T11:18:44.670Z"
+    },
+    {
+      "battleId": "battle-bcc9fad5-0129-4758-bc69-84035344332a",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T11:18:46.632Z"
+    },
+    {
+      "battleId": "battle-e64fad2d-27a5-4233-9e8c-e8eed9a9304e",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T11:18:47.591Z"
+    },
+    {
+      "battleId": "battle-0dcd5187-6084-4b63-8124-ec3299bba7c1",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T11:35:40.759Z"
+    },
+    {
+      "battleId": "battle-cf8cd1cc-8f0c-4605-a3c2-2290aebfd5b1",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T11:35:42.276Z"
+    },
+    {
+      "battleId": "battle-131d46b1-b13e-4437-8b37-9ed3745f0ba6",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T11:35:44.464Z"
+    },
+    {
+      "battleId": "battle-993d1623-e744-4af3-a79e-71b1a450e165",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T11:35:48.232Z"
+    },
+    {
+      "battleId": "battle-8bd149cf-deae-44df-acfc-802623fe1039",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T11:35:50.309Z"
+    },
+    {
+      "battleId": "battle-61c0bf74-56a4-4bb2-8f02-1ce9fa2e64fb",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T12:05:33.430Z"
+    },
+    {
+      "battleId": "battle-f8ed0f85-f14e-4e48-abee-d65adc88b5f6",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T12:05:34.854Z"
+    },
+    {
+      "battleId": "battle-9923ff75-1426-43ae-af1a-6ee0888f8dbe",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T12:05:36.601Z"
+    },
+    {
+      "battleId": "battle-69ea5596-5956-46ee-b115-e8a4c142c982",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T12:05:37.897Z"
+    },
+    {
+      "battleId": "battle-8c6262ca-6e63-43c8-9b0c-0f951e5fab9c",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T12:05:38.912Z"
+    },
+    {
+      "battleId": "battle-63385657-874d-44a4-acd7-817a56bd24ea",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T12:07:03.788Z"
+    },
+    {
+      "battleId": "battle-15ee1071-831f-4542-9177-ad7ed84cba4b",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T12:07:04.785Z"
+    },
+    {
+      "battleId": "battle-d837e8cb-a812-4adc-93b9-ef514025f9fe",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T12:07:05.703Z"
+    },
+    {
+      "battleId": "battle-98dcb2c8-b965-4e05-915a-a097d38558b6",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T12:07:07.181Z"
+    },
+    {
+      "battleId": "battle-dba6320b-d0d5-48fc-abd3-51984917b1a9",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T12:07:08.111Z"
+    },
+    {
+      "battleId": "battle-fcd4d322-4e57-4e90-be7f-2423745b77a0",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T12:08:50.810Z"
+    },
+    {
+      "battleId": "battle-8d209f3d-6ebe-41b5-b2b7-9d23ca642de5",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T12:08:52.290Z"
+    },
+    {
+      "battleId": "battle-2f9f8382-1f48-45c9-8e50-2355ceb0b023",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T12:08:53.522Z"
+    },
+    {
+      "battleId": "battle-e952454c-ea8a-4c12-afc1-4d77c5d4c0d1",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T12:08:53.868Z"
+    },
+    {
+      "battleId": "battle-81a8c234-75d2-43ba-b2f6-32adcc180516",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T12:08:53.962Z"
+    },
+    {
+      "battleId": "battle-ad60e8be-d71f-4b5f-ad18-d789fc6d84a0",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T12:31:51.615Z"
+    },
+    {
+      "battleId": "battle-b07de0c0-15cc-4562-b538-3cc09a40ec41",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T12:31:52.576Z"
+    },
+    {
+      "battleId": "battle-13765e68-7a11-41f1-ae05-4dd6c0882888",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T12:31:53.513Z"
+    },
+    {
+      "battleId": "battle-72b5022e-d3ce-46b8-aa39-cf1e669ba03f",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T12:31:55.401Z"
+    },
+    {
+      "battleId": "battle-9ce6fb30-b48f-4a43-822d-59a580051e00",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T12:31:56.284Z"
+    },
+    {
+      "battleId": "battle-4593aef8-6e4c-426c-995f-f6b85ae44ded",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T13:20:36.491Z"
+    },
+    {
+      "battleId": "battle-ffbb349a-9b97-4fe8-8bd2-e1dd43367b88",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T13:20:37.660Z"
+    },
+    {
+      "battleId": "battle-1441699c-4223-45b6-ae81-bbf3d5921e5f",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T13:20:38.343Z"
+    },
+    {
+      "battleId": "battle-0b90c576-8705-4dd0-b785-6ed28eaeed67",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T13:20:39.114Z"
+    },
+    {
+      "battleId": "battle-52952b4c-082e-4a88-89fe-bd963c800e7f",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T13:20:40.237Z"
+    },
+    {
+      "battleId": "battle-c1e41c3b-3e1d-4d05-ade8-afefde7fb22a",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T13:22:15.270Z"
+    },
+    {
+      "battleId": "battle-ad456d77-381e-426c-a21d-6209bc47396b",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T13:22:17.218Z"
+    },
+    {
+      "battleId": "battle-3fb7a549-0ba1-425c-9eba-c66c8cf1e2bd",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T13:22:18.313Z"
+    },
+    {
+      "battleId": "battle-179daa0b-8bf4-4246-ad2f-aad2db271b85",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T13:22:21.226Z"
+    },
+    {
+      "battleId": "battle-c8bc03fe-d000-4199-9a5e-58623d07f80f",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T13:22:21.626Z"
+    },
+    {
+      "battleId": "battle-4fec53a7-e59e-4cbd-a54c-37dc9f10a48c",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T13:34:31.219Z"
+    },
+    {
+      "battleId": "battle-99328c36-425b-461c-8bb4-af919c508725",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T13:34:31.795Z"
+    },
+    {
+      "battleId": "battle-ec7a0331-a6eb-403a-9d38-fcc1d30a897b",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T13:34:32.983Z"
+    },
+    {
+      "battleId": "battle-768f3d7b-70f6-4ba9-9e1c-e66f38cdd64d",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T13:34:33.677Z"
+    },
+    {
+      "battleId": "battle-c686f9f8-5fd2-423c-8b0b-c9b2282bc621",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T13:34:34.777Z"
+    },
+    {
+      "battleId": "battle-23d28b9b-0a93-4b00-aea8-c07ffd78b2b6",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T14:01:21.616Z"
+    },
+    {
+      "battleId": "battle-1a0dcd4d-db86-416c-addb-6d8573c72772",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T14:01:22.774Z"
+    },
+    {
+      "battleId": "battle-0332950f-0272-463c-a7dd-69e79968bd12",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T14:01:23.996Z"
+    },
+    {
+      "battleId": "battle-f2370981-b702-45b0-9145-2e178f10d1e6",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T14:01:25.551Z"
+    },
+    {
+      "battleId": "battle-4959f753-5b19-4ad0-85c3-d624c6369070",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T14:01:25.685Z"
+    },
+    {
+      "battleId": "battle-9b743c38-0948-4e68-8efe-55a50eb468b7",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T14:28:56.615Z"
+    },
+    {
+      "battleId": "battle-4a611849-c1ac-4c28-9f46-9ac847dd8b95",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T14:28:58.359Z"
+    },
+    {
+      "battleId": "battle-e3aa0061-a08c-426f-b73b-93b5e439d7d1",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T14:28:59.668Z"
+    },
+    {
+      "battleId": "battle-2986ed8f-966e-4241-aa58-a428313d6227",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T14:29:01.053Z"
+    },
+    {
+      "battleId": "battle-f3ba018d-a74a-446e-a138-c0e451297957",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T14:31:02.395Z"
+    },
+    {
+      "battleId": "battle-160b057c-6355-47ac-9905-943520f2546c",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T14:31:03.875Z"
+    },
+    {
+      "battleId": "battle-cd373c43-69cc-4372-a562-587435b9d7eb",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T14:31:05.127Z"
+    },
+    {
+      "battleId": "battle-1cbc1772-b889-47f4-bdb4-c7084d054360",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T14:31:06.212Z"
+    },
+    {
+      "battleId": "battle-14cf4124-9224-4386-98a8-e65e61a977c7",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T14:31:07.540Z"
+    },
+    {
+      "battleId": "battle-47ea9862-e368-440e-bc1c-d0986292d596",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T14:35:16.738Z"
+    },
+    {
+      "battleId": "battle-95344ed5-e89e-4d6c-8aa5-fecc61a5348c",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T14:35:18.767Z"
+    },
+    {
+      "battleId": "battle-3c6d939e-8a1a-42a4-82eb-87fb8a147d86",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T14:35:19.595Z"
+    },
+    {
+      "battleId": "battle-56c09aff-1208-487b-be06-b88df474f9e5",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T14:35:21.474Z"
+    },
+    {
+      "battleId": "battle-4a1171b4-4713-458d-8c10-558f5949e81d",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T14:35:22.986Z"
+    },
+    {
+      "battleId": "battle-b27b96df-11a2-4484-99be-cd3fa7657475",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T15:57:37.720Z"
+    },
+    {
+      "battleId": "battle-56a80bc6-e401-4166-bdcb-86ace7e1eeea",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T15:57:38.969Z"
+    },
+    {
+      "battleId": "battle-03ca72ee-e734-4d55-8c40-fbc709bcc6c5",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T15:57:39.811Z"
+    },
+    {
+      "battleId": "battle-cee298fc-b88d-43e2-8f0c-c994a8d86973",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T15:57:40.773Z"
+    },
+    {
+      "battleId": "battle-5f72cae3-83d1-4a72-a478-5b2e192f3ab1",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T15:57:41.474Z"
+    },
+    {
+      "battleId": "battle-5bbbc5f4-bf37-4f8a-a044-323d1a62e85c",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T16:03:59.449Z"
+    },
+    {
+      "battleId": "battle-7f0e28b4-bd5b-48f2-95ed-9d781d0a77de",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T16:04:00.511Z"
+    },
+    {
+      "battleId": "battle-62aceab4-60df-428e-8306-6df79b5086d5",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T16:04:01.680Z"
+    },
+    {
+      "battleId": "battle-e62c30e0-ad59-46de-b7a7-6a4cf08fe05f",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T16:04:02.611Z"
+    },
+    {
+      "battleId": "battle-c136afb1-8ce4-4bd6-ba08-d21bc1ab7a91",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T16:04:03.417Z"
+    },
+    {
+      "battleId": "battle-a2990ee6-d6d5-403a-8202-b0741c170913",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T16:56:26.270Z"
+    },
+    {
+      "battleId": "battle-bceedcd9-e6d0-4e8e-b07e-eeb6ee9e7d6d",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T16:56:28.070Z"
+    },
+    {
+      "battleId": "battle-9ced726a-0a05-416e-9e19-2ebc4c5bc384",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T16:56:30.098Z"
+    },
+    {
+      "battleId": "battle-00c9e6b6-4aa5-4368-ad97-28b9240c0f3d",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T16:56:30.792Z"
+    },
+    {
+      "battleId": "battle-33665eb5-9d75-4a9b-b6c3-ff597c893dbf",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T16:56:31.088Z"
+    },
+    {
+      "battleId": "battle-b77b829b-2712-42b8-ad0d-c1fdf5680461",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T16:57:46.788Z"
+    },
+    {
+      "battleId": "battle-cbfa08c9-1037-41f2-af6e-d63747ffd3c1",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T16:57:47.060Z"
+    },
+    {
+      "battleId": "battle-073a460d-f01b-41c1-b595-c7fe46462a96",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T16:57:48.412Z"
+    },
+    {
+      "battleId": "battle-f8533c5a-4703-4d83-87af-22336e606ef1",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T16:57:50.144Z"
+    },
+    {
+      "battleId": "battle-7fd2bd83-0dbc-4f2d-9b67-a547b1159e73",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T16:57:51.585Z"
+    },
+    {
+      "battleId": "battle-898ee645-19fc-45a0-968f-b2d429cb596c",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T17:39:46.215Z"
+    },
+    {
+      "battleId": "battle-44398a2a-7653-4087-b19f-2258f30d01dc",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T17:41:41.823Z"
+    },
+    {
+      "battleId": "battle-c1fb17aa-83c2-4a87-846d-d70e8da09c4c",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T17:41:44.267Z"
+    },
+    {
+      "battleId": "battle-f96ec8fa-09fb-4c7a-9442-506232120dd8",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T17:41:44.737Z"
+    },
+    {
+      "battleId": "battle-fa6f2f76-9dd1-4ed1-a996-626f3b9fae5f",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T17:41:45.260Z"
+    },
+    {
+      "battleId": "battle-d00c9f22-396c-4c4b-b094-920a2dc55b61",
+      "userId": "anonymous",
+      "appliedAt": "2026-03-20T17:41:45.612Z"
     }
   ]
 }

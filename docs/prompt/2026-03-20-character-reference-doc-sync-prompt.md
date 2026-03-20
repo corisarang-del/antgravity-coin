@@ -1,4 +1,4 @@
-# Character Reference Doc Sync Prompt
+﻿# Character Reference Doc Sync Prompt
 
 - 작성시각: 2026-03-20 23:58 KST
 - 프롬프트 내용 간단 요약:
@@ -12,3 +12,4 @@
 
 ## 해결되지 않은 것
 - 없음
+

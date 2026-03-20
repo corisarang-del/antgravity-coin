@@ -1,4 +1,4 @@
-# 프롬프트 기록 - Wall of Love 레퍼런스 분석
+﻿# 프롬프트 기록 - Wall of Love 레퍼런스 분석
 
 작성시각: 2026-03-14 14:24 KST
 
@@ -23,3 +23,4 @@ $design-sample-master [Image #1] https://year-of-love.exploresyndrome.com/wall-o
 - 실제 UI 토큰 생성
 - 컴포넌트 적용
 - 프리뷰 페이지 구현
+

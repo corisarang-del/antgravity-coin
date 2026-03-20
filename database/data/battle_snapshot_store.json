@@ -1,0 +1,738 @@
+{
+  "items": [
+    {
+      "snapshotId": "snapshot-9e96b3e1-2be5-48e1-a813-f14fd6b0a22c",
+      "userId": "anonymous",
+      "battleId": "battle-original",
+      "coinId": "bitcoin",
+      "marketData": null,
+      "summary": null,
+      "messages": [
+        {
+          "id": "1",
+          "characterId": "aira",
+          "characterName": "Aira",
+          "team": "bull",
+          "stance": "bullish",
+          "summary": "강한 상승 모멘텀이 이어지고 있어.",
+          "detail": "detail",
+          "indicatorLabel": "RSI",
+          "indicatorValue": "61",
+          "provider": "openrouter",
+          "model": "qwen/qwen3.5-9b",
+          "fallbackUsed": false,
+          "createdAt": "2026-03-20T14:29:01.059Z"
+        }
+      ],
+      "savedAt": "2026-03-20T14:29:01.136Z"
+    },
+    {
+      "snapshotId": "snapshot-825b6149-3cbf-48ec-951d-442c587a8d0b",
+      "userId": "anonymous",
+      "battleId": "battle-6e26d514-7f99-4739-a945-3ed6e879f8e9",
+      "coinId": "bitcoin",
+      "marketData": null,
+      "summary": null,
+      "messages": [],
+      "savedAt": "2026-03-20T14:31:00.725Z"
+    },
+    {
+      "snapshotId": "snapshot-27fca7b9-65a7-4a09-8570-4b31f0f532c7",
+      "userId": "anonymous",
+      "battleId": "battle-a396a3f0-187f-4c80-a597-bd662a193e5c",
+      "coinId": "bitcoin",
+      "marketData": null,
+      "summary": null,
+      "messages": [],
+      "savedAt": "2026-03-20T14:31:00.745Z"
+    },
+    {
+      "snapshotId": "snapshot-8de4f61b-d377-441b-b45f-75da0e8c8e9f",
+      "userId": "anonymous",
+      "battleId": "battle-51622cd0-5889-4bc0-9302-34972f63b66b",
+      "coinId": "bitcoin",
+      "marketData": null,
+      "summary": null,
+      "messages": [],
+      "savedAt": "2026-03-20T14:35:18.570Z"
+    },
+    {
+      "snapshotId": "snapshot-7a409b1d-048f-4e7e-ab98-9e069f930b73",
+      "userId": "anonymous",
+      "battleId": "battle-b7941252-6b05-4743-b709-ada1cf6ad5a3",
+      "coinId": "bitcoin",
+      "marketData": null,
+      "summary": null,
+      "messages": [],
+      "savedAt": "2026-03-20T14:35:18.622Z"
+    },
+    {
+      "snapshotId": "8957252e-a33b-4e29-a0d2-f206ae9d8661",
+      "userId": "3f50d953-22c3-4b3a-a04a-3a6d0009e9e2",
+      "battleId": null,
+      "coinId": "bitcoin",
+      "marketData": {
+        "coinId": "bitcoin",
+        "symbol": "BTC",
+        "currentPrice": 69814,
+        "priceChange24h": 0.3,
+        "priceChange7d": -4.99,
+        "rsi": 55.22,
+        "macd": 1470.72,
+        "bollingerUpper": 74766.77,
+        "bollingerLower": 65393.63,
+        "fearGreedIndex": 11,
+        "fearGreedLabel": "Extreme Fear",
+        "sentimentScore": 0.12,
+        "newsHeadlines": [
+          "SEALSQ Deploys Post-Quantum Cryptography to Secure Blockchain and Digital Transaction Infrastructures Through the Deployment of Post-Quantum Cryptographic  ( PQC )  Technologies",
+          "Altcoin Volume Slumps 80% Amid 'Tighter' Monetary Conditions",
+          "Is Bitcoin Still Your Ticket to Becoming a Crypto Millionaire?"
+        ],
+        "newsEventSummary": "Alpha Vantage 대표 헤드라인은 \"SEALSQ Deploys Post-Quantum Cryptography to Secure Blockchain and Digital Transaction Infrastructures Through the Deployment of Post-Quantum Cryptographic  ( PQC )  Technologies\"이고, 전체 톤은 재료 방향은 아직 중립에 가까워.",
+        "communitySentimentSummary": "공포탐욕은 11(Extreme Fear), 뉴스 감성은 +0.12라서 군중 공포가 강하지만, 과매도 반등 심리도 함께 열릴 수 있어.",
+        "longShortRatio": 1.36,
+        "openInterest": 1863815396.03,
+        "fundingRate": 0.0002,
+        "whaleScore": 64,
+        "whaleFlowSummary": "Bybit 롱숏비율은 1.36이고, Hyperliquid 미결제약정은 $1.9B 수준이야. 펀딩비는 0.0002%라서 롱 포지션 쏠림이 강해. 고래 흔적은 있지만 방향 확신까지 줄 정도는 아니야.",
+        "marketStructureSummary": "CoinGecko 기준 거래대금은 $40.6B이고, 24시간은 0.30% 상승, 7일은 4.99% 하락 상태야. 미결제약정은 $1.9B 수준라서 현물 거래 강도는 충분해서 구조가 쉽게 비지 않아.",
+        "volume24h": 40608515617
+      },
+      "summary": {
+        "headline": "BTC RSI 55.2, 공포탐욕 11",
+        "bias": "단기 상승 모멘텀이 우세하지만 과열 여부를 함께 봐야 한다.",
+        "indicators": [
+          {
+            "label": "RSI",
+            "value": "55.2"
+          },
+          {
+            "label": "MACD",
+            "value": "1470.72"
+          },
+          {
+            "label": "공포탐욕",
+            "value": "11"
+          },
+          {
+            "label": "롱숏 비율",
+            "value": "1.36"
+          },
+          {
+            "label": "펀딩비",
+            "value": "0.0002%"
+          }
+        ]
+      },
+      "messages": [
+        {
+          "id": "aira-1774017240896-0",
+          "characterId": "aira",
+          "characterName": "Aira",
+          "team": "bull",
+          "stance": "bullish",
+          "summary": "Aira: 차트 구조가 아직 위쪽으로 열려 있어.",
+          "detail": "첫 발언이라 캐릭터 렌즈를 먼저 세울게. Aira답게 RSI, MACD, 밴드 흐름만 보면 기술적 방어가 먼저 보여. 뉴스보다 차트가 더 강하게 말하고 있어.",
+          "indicatorLabel": "RSI",
+          "indicatorValue": "55.2",
+          "provider": "fallback",
+          "model": "character-fallback",
+          "fallbackUsed": true,
+          "createdAt": "2026-03-20T14:34:00.896Z"
+        },
+        {
+          "id": "judy-1774017246201-1",
+          "characterId": "judy",
+          "characterName": "Judy",
+          "team": "bull",
+          "stance": "bullish",
+          "summary": "Judy: Judy: 뉴스 재료 흐름이 아직 가격을 더 밀 수 있어.",
+          "detail": "직전 발언 \"Aira: 차트 구조가 아직 위쪽으로 열려 있어.\"도 참고했어. Judy는 헤드라인과 이벤트를 먼저 읽어. 지금 들어온 재료 결이 살아 있어서 단기 기대가 아직 꺼지지 않았어.",
+          "indicatorLabel": "RSI",
+          "indicatorValue": "55.2",
+          "provider": "fallback",
+          "model": "character-fallback",
+          "fallbackUsed": true,
+          "createdAt": "2026-03-20T14:34:06.201Z"
+        },
+        {
+          "id": "clover-1774017265754-2",
+          "characterId": "clover",
+          "characterName": "Clover",
+          "team": "bull",
+          "stance": "bullish",
+          "summary": "Clover: Clover: 군중 심리가 아직 완전히 꺾이지 않았어.",
+          "detail": "직전 발언 \"Judy: Judy: 뉴스 재료 흐름이 아직 가격을 더 밀 수 있어.\"도 참고했어. 공포가 강해도 기대가 미세하게 남아 있으면 심리 반등이 붙는 구간이 생겨. 지금은 그 가능성이 완전히 닫히진 않았어.",
+          "indicatorLabel": "RSI",
+          "indicatorValue": "55.2",
+          "provider": "fallback",
+          "model": "character-fallback",
+          "fallbackUsed": true,
+          "createdAt": "2026-03-20T14:34:25.754Z"
+        },
+        {
+          "id": "blaze-1774017280642-3",
+          "characterId": "blaze",
+          "characterName": "Blaze",
+          "team": "bull",
+          "stance": "bullish",
+          "summary": "Blaze: Blaze: 속도가 붙는 구간이라 한 번 더 위로 칠 수 있어.",
+          "detail": "직전 발언 \"Clover: Clover: 군중 심리가 아직 완전히 꺾이지 않았어.\"도 참고했어. Blaze는 속도와 거래량을 먼저 본다. 지금은 추세 추종이 아직 먹힐 만한 장면이야.",
+          "indicatorLabel": "RSI",
+          "indicatorValue": "55.2",
+          "provider": "fallback",
+          "model": "character-fallback",
+          "fallbackUsed": true,
+          "createdAt": "2026-03-20T14:34:40.642Z"
+        },
+        {
+          "id": "ledger-1774017299970-4",
+          "characterId": "ledger",
+          "characterName": "Ledger",
+          "team": "bear",
+          "stance": "bearish",
+          "summary": "Ledger: Ledger: 거래 구조는 아직 조심 쪽으로 기울어 있어.",
+          "detail": "직전 발언 \"Blaze: Blaze: 속도가 붙는 구간이라 한 번 더 위로 칠 수 있어.\"도 참고했어. 가격이 버티는 척해도 체력이 비면 아래로 밀릴 수 있어. Ledger답게 구조가 먼저 흔들리는지 본다.",
+          "indicatorLabel": "롱숏 비율",
+          "indicatorValue": "1.36",
+          "provider": "fallback",
+          "model": "character-fallback",
+          "fallbackUsed": true,
+          "createdAt": "2026-03-20T14:34:59.970Z"
+        },
+        {
+          "id": "shade-1774017316963-5",
+          "characterId": "shade",
+          "characterName": "Shade",
+          "team": "bear",
+          "stance": "bearish",
+          "summary": "Shade: Shade: 리스크 지표가 먼저 경고를 보내고 있어.",
+          "detail": "직전 발언 \"Ledger: Ledger: 거래 구조는 아직 조심 쪽으로 기울어 있어.\"도 참고했어. 과열 포지션이 쌓이면 작은 충격도 청산 쪽으로 번질 수 있어. Shade 기준에선 방어가 우선이야.",
+          "indicatorLabel": "롱숏 비율",
+          "indicatorValue": "1.36",
+          "provider": "fallback",
+          "model": "character-fallback",
+          "fallbackUsed": true,
+          "createdAt": "2026-03-20T14:35:16.963Z"
+        },
+        {
+          "id": "vela-1774017320889-6",
+          "characterId": "vela",
+          "characterName": "Vela",
+          "team": "bear",
+          "stance": "bearish",
+          "summary": "Vela: Vela: 자금 방향이 흔들리면 개인만 남는 장이 될 수 있어.",
+          "detail": "직전 발언 \"Shade: Shade: 리스크 지표가 먼저 경고를 보내고 있어.\"도 참고했어. 고래 흐름이 선명하지 않으면 가격을 오래 미는 힘도 약해져. Vela는 그 공백을 경계해.",
+          "indicatorLabel": "롱숏 비율",
+          "indicatorValue": "1.36",
+          "provider": "fallback",
+          "model": "character-fallback",
+          "fallbackUsed": true,
+          "createdAt": "2026-03-20T14:35:20.889Z"
+        },
+        {
+          "id": "flip-1774017335184-7",
+          "characterId": "flip",
+          "characterName": "Flip",
+          "team": "bear",
+          "stance": "bearish",
+          "summary": "Flip: Flip: 오히려 너무 낙관적이라 반대로 꺾일 쪽이 가까워 보여.",
+          "detail": "직전 발언 \"Vela: Vela: 자금 방향이 흔들리면 개인만 남는 장이 될 수 있어.\"도 참고했어. 모두가 위만 볼 때 작은 균열 하나가 크게 번지기도 해. Flip답게 그 반전을 노린다.",
+          "indicatorLabel": "롱숏 비율",
+          "indicatorValue": "1.36",
+          "provider": "fallback",
+          "model": "character-fallback",
+          "fallbackUsed": true,
+          "createdAt": "2026-03-20T14:35:35.184Z"
+        }
+      ],
+      "savedAt": "2026-03-20T14:35:35.426Z"
+    },
+    {
+      "snapshotId": "4860c77e-9b71-4b12-916d-b06c619a4279",
+      "userId": "3f50d953-22c3-4b3a-a04a-3a6d0009e9e2",
+      "battleId": null,
+      "coinId": "bitcoin",
+      "marketData": {
+        "coinId": "bitcoin",
+        "symbol": "BTC",
+        "currentPrice": 70033,
+        "priceChange24h": 1.12,
+        "priceChange7d": -4.69,
+        "rsi": 55.89,
+        "macd": 1489.16,
+        "bollingerUpper": 74776.79,
+        "bollingerLower": 65406.72,
+        "fearGreedIndex": 11,
+        "fearGreedLabel": "Extreme Fear",
+        "sentimentScore": 0.12,
+        "newsHeadlines": [
+          "BitFuFu Cuts Self-Mined Bitcoin by 60% in 2025",
+          "Ancient Bitcoin Whale Moves $148 Million After 13 Years: What Does It Mean?",
+          "Carney Takes Regulation-First Approach to Crypto in Canada"
+        ],
+        "newsEventSummary": "Alpha Vantage 대표 헤드라인은 \"BitFuFu Cuts Self-Mined Bitcoin by 60% in 2025\"이고, 전체 톤은 재료 방향은 아직 중립에 가까워.",
+        "communitySentimentSummary": "공포탐욕은 11(Extreme Fear), 뉴스 감성은 +0.12라서 군중 공포가 강하지만, 과매도 반등 심리도 함께 열릴 수 있어.",
+        "longShortRatio": 1.36,
+        "openInterest": 1860022069.37,
+        "fundingRate": 0.0008,
+        "whaleScore": 63,
+        "whaleFlowSummary": "Bybit 롱숏비율은 1.36이고, Hyperliquid 미결제약정은 $1.9B 수준이야. 펀딩비는 0.0008%라서 롱 포지션 쏠림이 강해. 고래 흔적은 있지만 방향 확신까지 줄 정도는 아니야.",
+        "marketStructureSummary": "CoinGecko 기준 거래대금은 $41.0B이고, 24시간은 1.12% 상승, 7일은 4.69% 하락 상태야. 미결제약정은 $1.9B 수준라서 현물 거래 강도는 충분해서 구조가 쉽게 비지 않아.",
+        "volume24h": 41012428023
+      },
+      "summary": {
+        "headline": "BTC RSI 55.9, 공포탐욕 11",
+        "bias": "단기 상승 모멘텀이 우세하지만 과열 여부를 함께 봐야 한다.",
+        "indicators": [
+          {
+            "label": "RSI",
+            "value": "55.9"
+          },
+          {
+            "label": "MACD",
+            "value": "1489.16"
+          },
+          {
+            "label": "공포탐욕",
+            "value": "11"
+          },
+          {
+            "label": "롱숏 비율",
+            "value": "1.36"
+          },
+          {
+            "label": "펀딩비",
+            "value": "0.0008%"
+          }
+        ]
+      },
+      "messages": [
+        {
+          "id": "aira-1774017688814-0",
+          "characterId": "aira",
+          "characterName": "Aira",
+          "team": "bull",
+          "stance": "bullish",
+          "summary": "Aira: 차트 구조가 아직 위쪽으로 열려 있어.",
+          "detail": "첫 발언이라 캐릭터 렌즈를 먼저 세울게. RSI랑 MACD 흐름을 같이 보면 기술적 방어가 아직 먼저 보여. 뉴스보다 차트가 지금은 더 또렷하게 말하고 있어.",
+          "indicatorLabel": "RSI",
+          "indicatorValue": "55.9",
+          "provider": "fallback",
+          "model": "character-fallback",
+          "fallbackUsed": true,
+          "createdAt": "2026-03-20T14:41:28.814Z"
+        },
+        {
+          "id": "judy-1774017747316-1",
+          "characterId": "judy",
+          "characterName": "Judy",
+          "team": "bull",
+          "stance": "bullish",
+          "summary": "Judy: 뉴스 재료 흐름이 아직 가격을 더 밀 수 있어.",
+          "detail": "직전 발언 \"Aira: 차트 구조가 아직 위쪽으로 열려 있어.\"도 참고했어. 헤드라인이랑 이벤트를 먼저 보면 지금 들어온 재료 결이 아직 살아 있어. 단기 기대가 완전히 꺼진 분위기는 아니야.",
+          "indicatorLabel": "RSI",
+          "indicatorValue": "55.9",
+          "provider": "fallback",
+          "model": "character-fallback",
+          "fallbackUsed": true,
+          "createdAt": "2026-03-20T14:42:27.316Z"
+        },
+        {
+          "id": "clover-1774017772030-2",
+          "characterId": "clover",
+          "characterName": "Clover",
+          "team": "bull",
+          "stance": "bullish",
+          "summary": "Clover: 군중 심리가 아직 완전히 꺾이진 않았어.",
+          "detail": "직전 발언 \"Judy: 뉴스 재료 흐름이 아직 가격을 더 밀 수 있어.\"도 참고했어. 공포가 있어도 기대가 미세하게 남아 있으면 심리 반등이 붙는 구간이 생겨. 지금은 그 문이 완전히 닫힌 건 아니야.",
+          "indicatorLabel": "RSI",
+          "indicatorValue": "55.9",
+          "provider": "fallback",
+          "model": "character-fallback",
+          "fallbackUsed": true,
+          "createdAt": "2026-03-20T14:42:52.030Z"
+        },
+        {
+          "id": "blaze-1774017782098-3",
+          "characterId": "blaze",
+          "characterName": "Blaze",
+          "team": "bull",
+          "stance": "bullish",
+          "summary": "Blaze: 속도가 붙는 구간이라 한 번 더 위로 칠 수 있어.",
+          "detail": "직전 발언 \"Clover: 군중 심리가 아직 완전히 꺾이진 않았어.\"도 참고했어. 속도랑 거래량이 아직 같이 받쳐줘서 추세 추종이 한 번 더 먹힐 만한 장면이야.",
+          "indicatorLabel": "RSI",
+          "indicatorValue": "55.9",
+          "provider": "fallback",
+          "model": "character-fallback",
+          "fallbackUsed": true,
+          "createdAt": "2026-03-20T14:43:02.098Z"
+        },
+        {
+          "id": "ledger-1774017785574-4",
+          "characterId": "ledger",
+          "characterName": "Ledger",
+          "team": "bear",
+          "stance": "bullish",
+          "summary": "거래 구조가 버티고 있어. 단기 반등 가능성 열려 있어.",
+          "detail": "코인게코 기준 거래대금이 4조 1천억 수준이고, 24시간 상승 전환한 걸 봤어. 미결제약정도 1조 8천억 정도라 현물 거래 강도가 충분해. 구조가 쉽게 비지 않을 거 같아.",
+          "indicatorLabel": "미결제약정",
+          "indicatorValue": "$1860M",
+          "provider": "openrouter",
+          "model": "arcee-ai/trinity-large-preview:free",
+          "fallbackUsed": true,
+          "createdAt": "2026-03-20T14:43:05.574Z"
+        },
+        {
+          "id": "shade-1774017803320-5",
+          "characterId": "shade",
+          "characterName": "Shade",
+          "team": "bear",
+          "stance": "bearish",
+          "summary": "Shade: 리스크 지표가 먼저 경고를 보내고 있어.",
+          "detail": "직전 발언 \"거래 구조가 버티고 있어. 단기 반등 가능성 열려 있어.\"도 참고했어. 과열 포지션이 쌓이면 작은 충격도 청산 쪽으로 번질 수 있어. 지금은 공격보다 방어가 먼저야.",
+          "indicatorLabel": "롱숏 비율",
+          "indicatorValue": "1.36",
+          "provider": "fallback",
+          "model": "character-fallback",
+          "fallbackUsed": true,
+          "createdAt": "2026-03-20T14:43:23.320Z"
+        },
+        {
+          "id": "vela-1774017817761-6",
+          "characterId": "vela",
+          "characterName": "Vela",
+          "team": "bear",
+          "stance": "bearish",
+          "summary": "Vela: 자금 방향이 흔들리면 개인만 남는 장이 될 수 있어.",
+          "detail": "직전 발언 \"Shade: 리스크 지표가 먼저 경고를 보내고 있어.\"도 참고했어. 고래 흐름이 선명하지 않으면 가격을 오래 미는 힘도 약해져. 지금은 그 공백이 은근히 커 보여.",
+          "indicatorLabel": "롱숏 비율",
+          "indicatorValue": "1.36",
+          "provider": "fallback",
+          "model": "character-fallback",
+          "fallbackUsed": true,
+          "createdAt": "2026-03-20T14:43:37.761Z"
+        },
+        {
+          "id": "flip-1774017849295-7",
+          "characterId": "flip",
+          "characterName": "Flip",
+          "team": "bear",
+          "stance": "bearish",
+          "summary": "Flip: 오히려 너무 낙관적이라 반대로 꺾일 쪽이 가까워 보여.",
+          "detail": "직전 발언 \"Vela: 자금 방향이 흔들리면 개인만 남는 장이 될 수 있어.\"도 참고했어. 모두가 위만 볼 때는 작은 균열 하나도 크게 번지기 쉬워. 지금은 그 반전이 더 가까워 보여.",
+          "indicatorLabel": "롱숏 비율",
+          "indicatorValue": "1.36",
+          "provider": "fallback",
+          "model": "character-fallback",
+          "fallbackUsed": true,
+          "createdAt": "2026-03-20T14:44:09.295Z"
+        }
+      ],
+      "savedAt": "2026-03-20T14:44:09.297Z"
+    },
+    {
+      "snapshotId": "snapshot-37d9c3d2-c3fb-4caa-b05b-fd65fe70cfb4",
+      "userId": "anonymous",
+      "battleId": "battle-ee5fa4a1-42d4-4b49-bfb6-08a0c58adbcf",
+      "coinId": "bitcoin",
+      "marketData": null,
+      "summary": null,
+      "messages": [],
+      "savedAt": "2026-03-20T15:57:39.899Z"
+    },
+    {
+      "snapshotId": "snapshot-1b42e28c-9bb8-4cb4-a976-ed315f891b18",
+      "userId": "anonymous",
+      "battleId": "battle-e3a88efa-9600-46a8-a26b-4570b5a7e291",
+      "coinId": "bitcoin",
+      "marketData": null,
+      "summary": null,
+      "messages": [],
+      "savedAt": "2026-03-20T15:57:40.011Z"
+    },
+    {
+      "snapshotId": "snapshot-68e291de-4502-4951-8b1c-526ab7e48bb0",
+      "userId": "anonymous",
+      "battleId": "battle-d19cf224-01f8-4feb-84c1-285325d1c9d8",
+      "coinId": "bitcoin",
+      "marketData": null,
+      "summary": null,
+      "messages": [],
+      "savedAt": "2026-03-20T16:04:01.614Z"
+    },
+    {
+      "snapshotId": "snapshot-16578926-28c4-49be-bb12-0600d9d3b343",
+      "userId": "anonymous",
+      "battleId": "battle-c5ee09bf-ecaf-4fe7-a410-d4d932f63e9c",
+      "coinId": "bitcoin",
+      "marketData": null,
+      "summary": null,
+      "messages": [],
+      "savedAt": "2026-03-20T16:04:01.716Z"
+    },
+    {
+      "snapshotId": "snapshot-d6e61051-4c3f-4580-94ee-e25ae3b02dcd",
+      "userId": "anonymous",
+      "battleId": "battle-89e2c528-4231-43a5-b511-0a492545537a",
+      "coinId": "bitcoin",
+      "marketData": null,
+      "summary": null,
+      "messages": [],
+      "savedAt": "2026-03-20T16:56:25.118Z"
+    },
+    {
+      "snapshotId": "snapshot-3f18cf75-b1df-4719-a754-83efeb015983",
+      "userId": "anonymous",
+      "battleId": "battle-05d82325-2666-4e6a-b80a-92a56e051fe6",
+      "coinId": "bitcoin",
+      "marketData": null,
+      "summary": null,
+      "messages": [],
+      "savedAt": "2026-03-20T16:56:25.174Z"
+    },
+    {
+      "snapshotId": "snapshot-3d1852e6-ab5a-471c-b7d0-2726c7928685",
+      "userId": "anonymous",
+      "battleId": "battle-5e5ac67e-802b-41c6-b6f6-06adad160b2b",
+      "coinId": "bitcoin",
+      "marketData": null,
+      "summary": null,
+      "messages": [],
+      "savedAt": "2026-03-20T16:57:50.949Z"
+    },
+    {
+      "snapshotId": "snapshot-d6b2ebd8-6cc3-4735-bb92-4c1e0a78031e",
+      "userId": "anonymous",
+      "battleId": "battle-e4e951d8-451d-47ee-8f97-91a461d979aa",
+      "coinId": "bitcoin",
+      "marketData": null,
+      "summary": null,
+      "messages": [],
+      "savedAt": "2026-03-20T16:57:50.990Z"
+    },
+    {
+      "snapshotId": "95064c47-d6f1-4db2-90e9-a42b7b9270ff",
+      "userId": "6fe42b5c-a5c0-4ff7-8ffe-3b5489784556",
+      "battleId": "953515d8-adce-4ca5-8865-bfdbfa63982f",
+      "coinId": "bitcoin",
+      "marketData": {
+        "coinId": "bitcoin",
+        "symbol": "BTC",
+        "currentPrice": 69758,
+        "priceChange24h": 0.33,
+        "priceChange7d": -2.88,
+        "rsi": 55.01,
+        "macd": 1466.02,
+        "bollingerUpper": 74764.56,
+        "bollingerLower": 65389.95,
+        "fearGreedIndex": 11,
+        "fearGreedLabel": "Extreme Fear",
+        "sentimentScore": 0.34,
+        "newsHeadlines": [
+          "Bitcoin breakout gains momentum",
+          "ETF approval keeps market optimistic"
+        ],
+        "newsEventSummary": "Alpha Vantage 대표 헤드라인은 \"Bitcoin breakout gains momentum\"이고, 전체 톤은 긍정 재료가 더 강하게 읽혀.",
+        "communitySentimentSummary": "공포탐욕은 11(Extreme Fear), 뉴스 감성은 +0.34라서 군중 공포가 강하지만, 과매도 반등 심리도 함께 열릴 수 있어.",
+        "longShortRatio": 1.35,
+        "openInterest": 1890525477.39,
+        "fundingRate": 0.0008,
+        "whaleScore": 64,
+        "whaleFlowSummary": "Bybit 롱숏비율은 1.35이고, Hyperliquid 미결제약정은 $1.9B 수준이야. 펀딩비는 0.0008%라서 롱 포지션 쏠림이 강해. 고래 흔적은 있지만 방향 확신까지 줄 정도는 아니야.",
+        "marketStructureSummary": "CoinGecko 기준 거래대금은 $39.5B이고, 24시간은 0.33% 상승, 7일은 2.88% 하락 상태야. 미결제약정은 $1.9B 수준라서 현물 거래 강도는 충분해서 구조가 쉽게 비지 않아.",
+        "volume24h": 39483134920
+      },
+      "summary": {
+        "headline": "BTC RSI 55.0, 공포탐욕 11",
+        "bias": "단기 상승 모멘텀이 우세하지만 과열 여부를 함께 봐야 한다.",
+        "indicators": [
+          {
+            "label": "RSI",
+            "value": "55.0"
+          },
+          {
+            "label": "MACD",
+            "value": "1466.02"
+          },
+          {
+            "label": "공포탐욕",
+            "value": "11"
+          },
+          {
+            "label": "롱숏 비율",
+            "value": "1.35"
+          },
+          {
+            "label": "펀딩비",
+            "value": "0.0008%"
+          }
+        ]
+      },
+      "messages": [
+        {
+          "id": "aira-1774027211026-0",
+          "characterId": "aira",
+          "characterName": "Aira",
+          "team": "bull",
+          "stance": "bullish",
+          "summary": "내 눈엔 차트 구조가 아직 위쪽으로 열려 있어.",
+          "detail": "첫 발언이라 캐릭터 렌즈를 먼저 세울게. 차트상 RSI랑 MACD 흐름을 같이 보면 기술적 방어가 아직 먼저 보여. 뉴스보다 차트가 지금은 더 또렷하게 말하고 있어.",
+          "indicatorLabel": "RSI",
+          "indicatorValue": "55.0",
+          "provider": "fallback",
+          "model": "character-fallback",
+          "fallbackUsed": true,
+          "createdAt": "2026-03-20T17:20:11.026Z"
+        },
+        {
+          "id": "ledger-1774027221469-1",
+          "characterId": "ledger",
+          "characterName": "Ledger",
+          "team": "bear",
+          "stance": "bearish",
+          "summary": "숫자상 거래 구조는 아직 조심 쪽으로 기울어 있어.",
+          "detail": "직전 발언 \"내 눈엔 차트 구조가 아직 위쪽으로 열려 있어.\"도 참고했어. 구조적으로 보면 가격이 버티는 척해도 체력이 비면 아래로 밀릴 수 있어. 지금은 구조가 먼저 흔들리는 쪽이 더 신경 쓰여.",
+          "indicatorLabel": "롱숏 비율",
+          "indicatorValue": "1.35",
+          "provider": "fallback",
+          "model": "character-fallback",
+          "fallbackUsed": true,
+          "createdAt": "2026-03-20T17:20:21.469Z"
+        },
+        {
+          "id": "judy-1774027225054-2",
+          "characterId": "judy",
+          "characterName": "Judy",
+          "team": "bull",
+          "stance": "bullish",
+          "summary": "헤드라인만 보면 지금 재료는 아직 더 갈 수 있어.",
+          "detail": "직전 발언 \"숫자상 거래 구조는 아직 조심 쪽으로 기울어 있어.\"도 참고했어. 헤드라인이랑 이벤트를 먼저 보면 지금 들어온 재료 결이 아직 살아 있어. 뉴스 쪽 온도가 생각보다 덜 식었어.",
+          "indicatorLabel": "RSI",
+          "indicatorValue": "55.0",
+          "provider": "fallback",
+          "model": "character-fallback",
+          "fallbackUsed": true,
+          "createdAt": "2026-03-20T17:20:25.054Z"
+        },
+        {
+          "id": "shade-1774027235790-3",
+          "characterId": "shade",
+          "characterName": "Shade",
+          "team": "bear",
+          "stance": "bearish",
+          "summary": "내 기준엔 리스크 지표가 먼저 경고를 보내고 있어.",
+          "detail": "직전 발언 \"헤드라인만 보면 지금 재료는 아직 더 갈 수 있어.\"도 참고했어. 리스크 쪽에선 과열 포지션이 쌓이면 작은 충격도 청산 쪽으로 번질 수 있어. 지금은 공격보다 방어가 먼저야.",
+          "indicatorLabel": "롱숏 비율",
+          "indicatorValue": "1.35",
+          "provider": "fallback",
+          "model": "character-fallback",
+          "fallbackUsed": true,
+          "createdAt": "2026-03-20T17:20:35.790Z"
+        },
+        {
+          "id": "vela-1774027246051-4",
+          "characterId": "vela",
+          "characterName": "Vela",
+          "team": "bear",
+          "stance": "bearish",
+          "summary": "밑에서 보면 자금 방향이 흔들리면 개인만 남는 장이 될 수 있어.",
+          "detail": "직전 발언 \"내 기준엔 리스크 지표가 먼저 경고를 보내고 있어.\"도 참고했어. 자금 흐름상 고래 방향이 선명하지 않으면 가격을 오래 미는 힘도 약해져. 지금은 그 공백이 은근히 커 보여.",
+          "indicatorLabel": "롱숏 비율",
+          "indicatorValue": "1.35",
+          "provider": "fallback",
+          "model": "character-fallback",
+          "fallbackUsed": true,
+          "createdAt": "2026-03-20T17:20:46.051Z"
+        },
+        {
+          "id": "clover-1774027402633-5",
+          "characterId": "clover",
+          "characterName": "Clover",
+          "team": "bull",
+          "stance": "bullish",
+          "summary": "분위기상 군중 심리가 아직 완전히 꺾이진 않았어.",
+          "detail": "직전 발언 \"밑에서 보면 자금 방향이 흔들리면 개인만 남는 장이 될 수 있어.\"도 참고했어. 심리적으로 보면 공포가 있어도 기대가 미세하게 남아 있으면 반등이 붙는 구간이 생겨. 지금은 그 문이 완전히 닫힌 건 아니야.",
+          "indicatorLabel": "RSI",
+          "indicatorValue": "55.0",
+          "provider": "fallback",
+          "model": "character-fallback",
+          "fallbackUsed": true,
+          "createdAt": "2026-03-20T17:23:22.633Z"
+        },
+        {
+          "id": "flip-1774027411658-6",
+          "characterId": "flip",
+          "characterName": "Flip",
+          "team": "bear",
+          "stance": "bearish",
+          "summary": "근데 난 오히려 너무 낙관적이라 반대로 꺾일 쪽이 더 가까워 보여.",
+          "detail": "직전 발언 \"분위기상 군중 심리가 아직 완전히 꺾이진 않았어.\"도 참고했어. 오히려 지금은 모두가 위만 보고 있어서 작은 균열 하나도 크게 번지기 쉬워. 난 그 반전이 더 가깝다고 봐.",
+          "indicatorLabel": "롱숏 비율",
+          "indicatorValue": "1.35",
+          "provider": "fallback",
+          "model": "character-fallback",
+          "fallbackUsed": true,
+          "createdAt": "2026-03-20T17:23:31.658Z"
+        },
+        {
+          "id": "blaze-1774027411660-7",
+          "characterId": "blaze",
+          "characterName": "Blaze",
+          "team": "bull",
+          "stance": "bullish",
+          "summary": "지금은 속도가 붙는 구간이라 한 번 더 위로 칠 수 있어.",
+          "detail": "직전 발언 \"근데 난 오히려 너무 낙관적이라 반대로 꺾일 쪽이 더 가까워 보여.\"도 참고했어. 이 구간은 속도랑 거래량이 아직 같이 받쳐줘. 그래서 추세 추종이 한 번 더 먹힐 만한 장면이야.",
+          "indicatorLabel": "RSI",
+          "indicatorValue": "55.0",
+          "provider": "fallback",
+          "model": "character-fallback",
+          "fallbackUsed": true,
+          "createdAt": "2026-03-20T17:23:31.660Z"
+        }
+      ],
+      "savedAt": "2026-03-20T17:23:32.749Z"
+    },
+    {
+      "snapshotId": "snapshot-4c2d5a7d-936c-417b-9c04-ad7b871b88d9",
+      "userId": "anonymous",
+      "battleId": "battle-df2e6760-b6d0-4e20-b791-e823fd8747c6",
+      "coinId": "bitcoin",
+      "marketData": null,
+      "summary": null,
+      "messages": [],
+      "savedAt": "2026-03-20T17:39:49.389Z"
+    },
+    {
+      "snapshotId": "snapshot-f672de46-63be-4001-a1b9-2cc991b2d432",
+      "userId": "anonymous",
+      "battleId": "battle-40c93027-8a03-4e78-953e-5494f75b8084",
+      "coinId": "bitcoin",
+      "marketData": null,
+      "summary": null,
+      "messages": [],
+      "savedAt": "2026-03-20T17:39:49.545Z"
+    },
+    {
+      "snapshotId": "snapshot-a8116587-7ed1-4ce2-98ed-2704f70bb521",
+      "userId": "anonymous",
+      "battleId": "battle-c9a651eb-fb2d-4e92-ade2-53a325e1a7c7",
+      "coinId": "bitcoin",
+      "marketData": null,
+      "summary": null,
+      "messages": [],
+      "savedAt": "2026-03-20T17:41:46.546Z"
+    },
+    {
+      "snapshotId": "snapshot-bd2aa4c3-4b61-437b-be67-3444bdab4cda",
+      "userId": "anonymous",
+      "battleId": "battle-327d0518-67d6-4072-8295-1eded3b4a669",
+      "coinId": "bitcoin",
+      "marketData": null,
+      "summary": null,
+      "messages": [],
+      "savedAt": "2026-03-20T17:41:46.688Z"
+    }
+  ]
+}

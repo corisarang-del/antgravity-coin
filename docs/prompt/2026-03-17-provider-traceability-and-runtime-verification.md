@@ -1,4 +1,4 @@
-# 프롬프트 기록 - provider 추적성과 실런타임 검증
+﻿# 프롬프트 기록 - provider 추적성과 실런타임 검증
 
 - 작성시각: 2026-03-17 01:05:00 +09:00
 - 해결하고자 한 문제:
@@ -16,3 +16,4 @@
 - 검증 결과:
   - `pnpm test`, `pnpm typecheck`, `pnpm lint` 통과
   - 샘플 배틀 `messageCount=8`, `reportSource=gemini` 확인
+

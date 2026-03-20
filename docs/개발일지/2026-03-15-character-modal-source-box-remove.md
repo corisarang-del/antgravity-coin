@@ -1,4 +1,4 @@
-# 캐릭터 모달 소스 박스 제거
+﻿# 캐릭터 모달 소스 박스 제거
 
 - 작성시각: 2026-03-15 15:17 KST
 - 해결하고자 한 문제:
@@ -11,3 +11,4 @@
   - `pnpm lint`, `pnpm typecheck`, `pnpm test -- CharacterDetailModal` 통과
 - 해결되지 않은 것:
   - 없음
+

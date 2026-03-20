@@ -1,4 +1,4 @@
-# ledger webp 복구 프롬프트
+﻿# ledger webp 복구 프롬프트
 
 - 작성시각: 2026-03-15 16:40 KST
 - 해결하고자 한 문제:
@@ -10,3 +10,4 @@
   - `pnpm lint`, `pnpm typecheck` 통과
 - 해결되지 않은 것:
   - 없음
+

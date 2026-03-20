@@ -1,4 +1,4 @@
-# 실근거 소스 강제 및 외부 API 실호출 전환
+﻿# 실근거 소스 강제 및 외부 API 실호출 전환
 
 - 작성시각: 2026-03-17 14:55 KST
 - 해결하고자 한 문제:
@@ -17,3 +17,4 @@
 
 - 실제 서비스 실행에는 `CRYPTOPANIC_API_KEY`, `COINGLASS_API_KEY`가 반드시 필요하다.
 - CryptoPanic 점수는 API 원문 응답의 vote/title 신호를 바탕으로 내부 계산한 값이라, 향후 scoring 규칙은 더 다듬을 수 있다.
+

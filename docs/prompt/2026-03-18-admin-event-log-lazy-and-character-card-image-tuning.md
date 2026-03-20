@@ -1,4 +1,4 @@
-# admin event log lazy 분리와 character card 이미지 튜닝 프롬프트
+﻿# admin event log lazy 분리와 character card 이미지 튜닝 프롬프트
 
 - 작성시각: 2026-03-18 20:55 KST
 - 해결하고자 한 문제:
@@ -16,3 +16,4 @@ admin 상세 내부에서 Event Log만 별도 lazy 블록으로 더 쪼개기
 
 ## 아직 해결 안 된 것
 - 실제 브라우저 프로파일 기반 추가 이미지 튜닝은 아직 하지 않았다.
+

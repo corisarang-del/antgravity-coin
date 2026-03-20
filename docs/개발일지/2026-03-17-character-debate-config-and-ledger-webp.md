@@ -1,4 +1,4 @@
-# 캐릭터 토론 설정 파일화 및 ledger.webp 복구
+﻿# 캐릭터 토론 설정 파일화 및 ledger.webp 복구
 
 - 작성시각: 2026-03-17 14:25 KST
 - 해결하고자 한 문제:
@@ -23,3 +23,4 @@
 
 - `characterDebateProfiles.ts`를 자동으로 문서화하거나 UI에서 직접 편집하는 기능은 없다.
 - Claude direct client는 현재 이름 소문자 매핑으로 설정을 읽도록 맞췄고, 향후 `characterId`를 직접 넘기면 더 명시적일 수 있다.
+

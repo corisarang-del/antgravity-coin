@@ -1,4 +1,4 @@
-# Favicon Search And Battle Wait UX Prompt
+﻿# Favicon Search And Battle Wait UX Prompt
 
 - 작성시각: 2026-03-20 19:00 KST
 - 프롬프트 요약:
@@ -15,3 +15,4 @@
 ## 해결되지 않은 것
 
 - 로고 추가 시안 비교나 브랜딩 확장은 후속 범위로 남겨둠
+

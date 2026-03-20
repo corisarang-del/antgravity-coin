@@ -1,0 +1,80 @@
+⨯ SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at POST (src\app\api\battle\route.ts:12:31)
+  10 |
+  11 | export async function POST(request: Request) {
+> 12 |   const body = (await request.json()) as {
+     |                               ^
+  13 |     coinId?: string;
+  14 |   };
+  15 |
+[battle-llm:error] character=aira provider=openrouter model=stepfun/step-3.5-flash:free reason=non_korean_response fallbackUsed=false
+[battle-llm:error] character=judy provider=openrouter model=arcee-ai/trinity-large-preview:free reason=non_korean_response fallbackUsed=false
+[battle-llm:error] character=clover provider=openrouter model=nvidia/nemotron-3-super-120b-a12b:free reason=http_status status=429 body={"error":{"message":"Rate limit exceeded: free-models-per-day. Add 5 credits to unlock 1000 free model requests per day","code":429,"metadata":{"headers":{"X-RateLimit-Limit":"50","X-RateLimit-Remaining":"0","X-RateLimit-Reset":"17740512000
+[battle-llm:error] character=clover provider=openrouter model=qwen/qwen3.5-9b reason=empty_content body=
+         
+
+         
+
+         
+
+         
+
+         
+
+         
+
+         
+
+         
+
+         
+
+         
+
+         
+
+         
+
+         
+
+         
+
+         
+
+         
+
+         
+
+         
+
+         
+
+         
+
+         
+
+        
+[battle-llm:error] character=clover provider=openrouter model=stepfun/step-3.5-flash:free reason=non_korean_response fallbackUsed=true
+[battle-llm:error] character=aira provider=openrouter model=stepfun/step-3.5-flash:free reason=non_korean_response fallbackUsed=false
+[battle-llm:error] character=judy provider=openrouter model=arcee-ai/trinity-large-preview:free reason=message_parse_failed fallbackUsed=false
+[battle-llm:error] character=clover provider=openrouter model=nvidia/nemotron-3-super-120b-a12b:free reason=http_status status=429 body={"error":{"message":"Rate limit exceeded: free-models-per-day. Add 5 credits to unlock 1000 free model requests per day","code":429,"metadata":{"headers":{"X-RateLimit-Limit":"50","X-RateLimit-Remaining":"0","X-RateLimit-Reset":"17740512000
+[battle-llm:error] character=clover provider=openrouter model=qwen/qwen3.5-9b reason=non_korean_response fallbackUsed=true
+[battle-llm:error] character=blaze provider=openrouter model=minimax/minimax-m2.5:free reason=http_status status=429 body={"error":{"message":"Rate limit exceeded: free-models-per-day. Add 5 credits to unlock 1000 free model requests per day","code":429,"metadata":{"headers":{"X-RateLimit-Limit":"50","X-RateLimit-Remaining":"0","X-RateLimit-Reset":"17740512000
+[battle-llm:error] character=blaze provider=openrouter model=qwen/qwen3.5-9b reason=non_korean_response fallbackUsed=true
+[battle-llm:error] character=ledger provider=openrouter model=stepfun/step-3.5-flash:free reason=non_korean_response fallbackUsed=false
+[battle-llm:error] character=shade provider=openrouter model=arcee-ai/trinity-large-preview:free reason=non_korean_response fallbackUsed=false
+[battle-llm:error] character=vela provider=openrouter model=arcee-ai/trinity-large-preview:free reason=non_korean_response fallbackUsed=false
+[battle-llm:error] character=flip provider=openrouter model=nvidia/nemotron-3-super-120b-a12b:free reason=temporarily_unavailable
+[battle-llm:error] character=flip provider=openrouter model=qwen/qwen3.5-9b reason=non_korean_response fallbackUsed=true
+[battle-llm:error] character=aira provider=openrouter model=stepfun/step-3.5-flash:free reason=non_korean_response fallbackUsed=false
+[battle-llm:error] character=ledger provider=openrouter model=stepfun/step-3.5-flash:free reason=non_korean_response fallbackUsed=false
+[battle-llm:error] character=judy provider=openrouter model=arcee-ai/trinity-large-preview:free reason=non_korean_response fallbackUsed=false
+[battle-llm:error] character=shade provider=openrouter model=arcee-ai/trinity-large-preview:free reason=message_parse_failed fallbackUsed=false
+[battle-llm:error] character=clover provider=openrouter model=nvidia/nemotron-3-super-120b-a12b:free reason=http_status status=429 body={"error":{"message":"Rate limit exceeded: free-models-per-day. Add 5 credits to unlock 1000 free model requests per day","code":429,"metadata":{"headers":{"X-RateLimit-Limit":"50","X-RateLimit-Remaining":"0","X-RateLimit-Reset":"17740512000
+[battle-llm:error] character=vela provider=openrouter model=arcee-ai/trinity-large-preview:free reason=message_parse_failed fallbackUsed=false
+[battle-llm:error] character=clover provider=openrouter model=qwen/qwen3.5-9b reason=non_korean_response fallbackUsed=true
+[battle-llm:error] character=flip provider=openrouter model=nvidia/nemotron-3-super-120b-a12b:free reason=temporarily_unavailable
+[battle-llm:error] character=blaze provider=openrouter model=minimax/minimax-m2.5:free reason=http_status status=429 body={"error":{"message":"Rate limit exceeded: free-models-per-day. Add 5 credits to unlock 1000 free model requests per day","code":429,"metadata":{"headers":{"X-RateLimit-Limit":"50","X-RateLimit-Remaining":"0","X-RateLimit-Reset":"17740512000
+[battle-llm:error] character=flip provider=openrouter model=qwen/qwen3.5-9b reason=timeout timeoutMs=9000
+[battle-llm:error] character=blaze provider=openrouter model=qwen/qwen3.5-9b reason=timeout timeoutMs=8000

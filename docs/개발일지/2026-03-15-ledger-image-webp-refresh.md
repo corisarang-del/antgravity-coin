@@ -1,4 +1,4 @@
-# ledger 이미지 webp 교체와 설명 갱신
+﻿# ledger 이미지 webp 교체와 설명 갱신
 
 - 작성시각: 2026-03-15 15:16 KST
 - 해결하고자 한 문제:
@@ -12,3 +12,4 @@
   - `pnpm lint`, `pnpm typecheck`, `pnpm test -- characters` 통과
 - 해결되지 않은 것:
   - 없음
+

@@ -1,4 +1,4 @@
-# Aira/Flip 모델 교체와 근거 소스 검증
+﻿# Aira/Flip 모델 교체와 근거 소스 검증
 
 - 작성시각: 2026-03-17 14:34 KST
 - 해결하고자 한 문제:
@@ -17,3 +17,4 @@
 
 - `previous_messages` 계열 근거는 `MarketData`가 아니라 `DebateMessage` 기반이라 이번 테스트 범위에 포함하지 않았다.
 - 외부 API별 실네트워크 호출까지 검증하는 E2E는 아니고, 현재 앱이 생성하는 `MarketData` 계약 기준 검증이다.
+

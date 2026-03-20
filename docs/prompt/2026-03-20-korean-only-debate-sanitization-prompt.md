@@ -1,4 +1,4 @@
-# Korean Only Debate Sanitization Prompt
+﻿# Korean Only Debate Sanitization Prompt
 
 - 작성시각: 2026-03-20 20:20 KST
 - 프롬프트 요약:
@@ -14,3 +14,4 @@
 ## 해결되지 않은 것
 
 - 라이브 모델의 문장 자연스러움 자체는 별도 품질 개선 범위로 남아 있음
+

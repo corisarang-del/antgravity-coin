@@ -1,4 +1,4 @@
-# event log 지연 fetch와 character card sizes 재조정 프롬프트
+﻿# event log 지연 fetch와 character card sizes 재조정 프롬프트
 
 - 작성시각: 2026-03-18 21:01 KST
 - 해결하고자 한 문제:
@@ -16,3 +16,4 @@ Event Log를 진짜 지연 fetch 구조로 재작성
 
 ## 아직 해결 안 된 것
 - 실브라우저 네트워크 측정 기반 추가 미세 조정은 아직 하지 않았다.
+

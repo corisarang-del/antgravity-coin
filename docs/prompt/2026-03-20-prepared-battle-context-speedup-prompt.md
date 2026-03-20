@@ -1,4 +1,4 @@
-# Prepared Battle Context Speedup Prompt
+﻿# Prepared Battle Context Speedup Prompt
 
 - 작성시각: 2026-03-20 21:35 KST
 - 프롬프트 요약:
@@ -16,3 +16,4 @@
 ## 해결되지 않은 것
 
 - 실제 운영 트래픽에서의 체감 속도 차이 측정은 아직 남아 있음
+

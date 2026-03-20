@@ -1,4 +1,4 @@
-# Planning Doc Sync Audit Prompt
+﻿# Planning Doc Sync Audit Prompt
 
 - 작성시각: 2026-03-20 18:20 KST
 - 프롬프트 요약:
@@ -14,3 +14,4 @@
 ## 해결되지 않은 것
 
 - 후속 기능 변경이 생기면 planning 문서 재동기화가 다시 필요함
+

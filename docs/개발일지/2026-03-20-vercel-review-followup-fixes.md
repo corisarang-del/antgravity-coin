@@ -1,4 +1,4 @@
-# Vercel Review Follow-up Fixes
+﻿# Vercel Review Follow-up Fixes
 
 - 작성시각: 2026-03-20 18:05 KST
 - 해결하고자 한 문제:
@@ -15,3 +15,4 @@
 ## 해결되지 않은 것
 
 - 캐릭터 카드 본문 문자열 자체의 인코딩 정리는 이번 범위에서 다루지 않았음
+

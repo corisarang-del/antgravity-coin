@@ -1,4 +1,4 @@
-# 호버 프리뷰 비디오 preload/cache 구현
+﻿# 호버 프리뷰 비디오 preload/cache 구현
 
 - 작성시각: 2026-03-15 22:57:57 +09:00
 - 해결하고자 한 문제:
@@ -16,3 +16,4 @@
   - `pnpm test`, `pnpm lint`, `pnpm typecheck`를 통과함.
 - 해결되지 않은 것:
   - `ffmpeg` 부재로 실제 1~2MB 재인코딩은 못 했고, 설치 후 `pnpm videos:prepare`를 다시 실행해야 최적화가 적용됨.
+

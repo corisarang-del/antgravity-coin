@@ -1,4 +1,4 @@
-# 홈 카피 깨짐 회귀 수정
+﻿# 홈 카피 깨짐 회귀 수정
 
 - 작성시각: 2026-03-15 21:34:03 +09:00
 - 해결하고자 한 문제:
@@ -13,3 +13,4 @@
   - `pnpm test -- src/presentation/components/TopCoinsGrid.test.tsx src/presentation/components/RecentCoinsList.test.tsx`, `pnpm lint`, `pnpm typecheck`를 통과함.
 - 해결되지 않은 것:
   - 프로젝트 전체의 한글 인코딩/카피 이상 여부를 전수 점검하지는 않았음.
+

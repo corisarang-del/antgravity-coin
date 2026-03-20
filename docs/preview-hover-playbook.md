@@ -1,4 +1,4 @@
-# Preview Hover Playbook
+﻿# Preview Hover Playbook
 
 ## 목적
 
@@ -95,3 +95,4 @@
 ## 결론
 
 - 자산 변환, 브라우저 오디오 unlock, preview 레이어 재사용, 쿨다운 제어를 같이 설계해야 한 번에 성공한다.
+

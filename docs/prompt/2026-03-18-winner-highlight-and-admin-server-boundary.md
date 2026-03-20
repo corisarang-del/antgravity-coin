@@ -1,4 +1,4 @@
-# winner highlight 회귀 수정과 admin 서버 경계 재분리 프롬프트
+﻿# winner highlight 회귀 수정과 admin 서버 경계 재분리 프롬프트
 
 - 작성시각: 2026-03-18 20:43 KST
 - 해결하고자 한 문제:
@@ -17,3 +17,4 @@ AdminBattlesPageClient.tsx 서버/클라이언트 경계 재분리 또는 detail
 
 ## 아직 해결 안 된 것
 - admin 상세 패널 추가 lazy 분리는 아직 하지 않았다.
+

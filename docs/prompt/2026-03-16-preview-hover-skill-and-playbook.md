@@ -1,4 +1,4 @@
-# preview-hover 스킬과 플레이북 문서화
+﻿# preview-hover 스킬과 플레이북 문서화
 
 - 작성시각: 2026-03-16 00:00:00 +09:00
 - 해결하고자 한 문제:
@@ -13,3 +13,4 @@
   - `skill-staging/preview-hover/SKILL.md`를 작성함.
 - 해결되지 않은 것:
   - 글로벌 `.codex/skills` 설치는 아직 안 했음.
+

@@ -1,4 +1,4 @@
-# Bybit + Hyperliquid 전환
+﻿# Bybit + Hyperliquid 전환
 
 - 작성시각: 2026-03-17 15:22 KST
 - 해결하고자 한 문제:
@@ -17,3 +17,4 @@
 
 - `docs/planning`의 오래된 task/history 문서 일부에는 과거 `Coinglass` 언급이 남아 있을 수 있다.
 - 실제 운영 환경에서 Bybit/Hyperliquid 응답 제한이나 지역 제한은 별도 실서비스 검증이 필요하다.
+

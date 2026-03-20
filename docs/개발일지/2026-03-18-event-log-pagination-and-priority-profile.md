@@ -1,4 +1,4 @@
-# event log 페이지네이션과 character priority 실측 비교
+﻿# event log 페이지네이션과 character priority 실측 비교
 
 - 작성시각: 2026-03-18 21:10 KST
 - 해결하고자 한 문제:
@@ -15,3 +15,4 @@
 ## 아직 해결 안 된 것
 - 실제 네트워크 waterfall/LCP 비교까지는 별도 보고서 형태로 정리하지 않았다.
 - Event Log 가상화는 아직 적용하지 않았고, 현재는 페이지네이션만 추가한 상태다.
+

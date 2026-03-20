@@ -1,0 +1,12 @@
+
+> ant-gravity-coin@0.1.0 dev C:\Users\khc\Desktop\fastcampus\ant_gravity_coin
+> next dev
+
+▲ Next.js 16.1.6 (Turbopack)
+- Local:         http://localhost:3001
+- Network:       http://172.25.224.1:3001
+- Environments: .env.local, .env
+
+✓ Starting...
+✓ Ready in 3.6s
+○ Compiling /api/admin/cache/prewarm ...

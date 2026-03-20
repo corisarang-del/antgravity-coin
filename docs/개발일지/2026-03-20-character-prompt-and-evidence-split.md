@@ -1,4 +1,4 @@
-# Character Prompt And Evidence Split
+﻿# Character Prompt And Evidence Split
 
 - 작성시각: 2026-03-20 20:45 KST
 - 해결하고자 한 문제:
@@ -18,3 +18,4 @@
 
 - Judy, Clover, Vela처럼 차트 외 관점 캐릭터는 현재 데이터 모델상 숫자 요약 비중이 높아서, 완전히 차별화된 말투를 만들려면 뉴스 헤드라인/이벤트/원문 근거 같은 더 풍부한 입력이 필요함
 - 현재 UI에는 원소스 태그를 직접 보여주지 않고, 프롬프트 입력에서만 사용함
+

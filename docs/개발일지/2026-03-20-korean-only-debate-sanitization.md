@@ -1,4 +1,4 @@
-# Korean Only Debate Sanitization
+﻿# Korean Only Debate Sanitization
 
 - 작성시각: 2026-03-20 20:20 KST
 - 해결하고자 한 문제:
@@ -17,3 +17,4 @@
 
 - 캐릭터 이름이나 시장 심볼처럼 의도적으로 남겨둔 영문 표기는 그대로 유지됨
 - 실제 라이브 LLM 호출에서 문장 톤 자체가 부자연스러운 경우는 후속 품질 조정 범위
+

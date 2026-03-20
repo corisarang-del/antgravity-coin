@@ -1,4 +1,4 @@
-# 프롬프트 기록 - OpenRouter timeout과 배틀 스트리밍 수정
+﻿# 프롬프트 기록 - OpenRouter timeout과 배틀 스트리밍 수정
 
 - 작성시각: 2026-03-17 00:40:00 +09:00
 - 해결하고자 한 문제:
@@ -17,3 +17,4 @@
   - `pnpm test -- --run` 통과
   - `pnpm typecheck` 통과
   - `pnpm lint` 통과
+

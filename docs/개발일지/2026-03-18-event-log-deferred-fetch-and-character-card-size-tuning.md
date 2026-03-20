@@ -1,4 +1,4 @@
-# event log 지연 fetch와 character card sizes 재조정
+﻿# event log 지연 fetch와 character card sizes 재조정
 
 - 작성시각: 2026-03-18 21:01 KST
 - 해결하고자 한 문제:
@@ -16,3 +16,4 @@
 ## 아직 해결 안 된 것
 - 브라우저 실측 네트워크 프로파일까지는 아직 보지 않았다.
 - `Event Log` 항목이 아주 많을 때 가상화까지 적용하지는 않았다.
+

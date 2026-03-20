@@ -1,0 +1,286 @@
+{
+  "version": 1,
+  "items": [
+    {
+      "coinId": "ethereum",
+      "marketData": {
+        "coinId": "ethereum",
+        "symbol": "ETH",
+        "currentPrice": 2128.86,
+        "priceChange24h": 0.15,
+        "priceChange7d": -0.86,
+        "rsi": 60.94,
+        "macd": 73.82,
+        "bollingerUpper": 2307.17,
+        "bollingerLower": 1862.75,
+        "fearGreedIndex": 11,
+        "fearGreedLabel": "Extreme Fear",
+        "sentimentScore": 0.12,
+        "newsHeadlines": [
+          "The SEC Just Drew a Line in the Crypto Sand: What's a Security and What's Not?",
+          "Mutuum Finance Approaches $300M in Testnet Liquidity as V1 Protocol Activity Grows",
+          "Morning Minute: Bitcoin Rebounds as Oil Falls"
+        ],
+        "newsEventSummary": "Alpha Vantage 대표 헤드라인은 \"The SEC Just Drew a Line in the Crypto Sand: What's a Security and What's Not?\"이고, 전체 톤은 재료 방향은 아직 중립에 가까워.",
+        "communitySentimentSummary": "공포탐욕은 11(Extreme Fear), 뉴스 감성은 +0.12라서 군중 공포가 강하지만, 과매도 반등 심리도 함께 열릴 수 있어.",
+        "longShortRatio": 2.08,
+        "openInterest": 1232256768.58,
+        "fundingRate": 0.0001,
+        "whaleScore": 74,
+        "whaleFlowSummary": "Bybit 롱숏비율은 2.08이고, Hyperliquid 미결제약정은 $1.2B 수준이야. 펀딩비는 0.0001%라서 롱 포지션 쏠림이 강해. 큰 자금이 개입한 흔적이 비교적 또렷해.",
+        "marketStructureSummary": "CoinGecko 기준 거래대금은 $19.1B이고, 24시간은 0.15% 상승, 7일은 0.86% 하락 상태야. 미결제약정은 $1.2B 수준라서 현물 거래 강도는 충분해서 구조가 쉽게 비지 않아.",
+        "volume24h": 19066786648
+      },
+      "summary": {
+        "headline": "ETH RSI 60.9, 공포탐욕 11",
+        "bias": "단기 상승 모멘텀이 우세하지만 과열 여부를 함께 봐야 한다.",
+        "indicators": [
+          {
+            "label": "RSI",
+            "value": "60.9"
+          },
+          {
+            "label": "MACD",
+            "value": "73.82"
+          },
+          {
+            "label": "공포탐욕",
+            "value": "11"
+          },
+          {
+            "label": "롱숏 비율",
+            "value": "2.08"
+          },
+          {
+            "label": "펀딩비",
+            "value": "0.0001%"
+          }
+        ]
+      },
+      "reusableDebateContext": {
+        "recentBattleLessons": [
+          "[BTC 24h] 배틀 학습 포인트 1가 손상돼 기본 문장으로 대체했어.",
+          "[BTC 24h] 가장 강한 승리 논거는 \"BTC 배틀에서 불리시 진영의 핵심 논거가 정리되지 않아 기본 요약으로 대체했어.\"였어.",
+          "[BTC 24h] 가장 약한 패배 논거는 \"패배 팀 핵심 논거를 아직 추출하지 못했어.\"였어.",
+          "[BTC 24h] 최종 리포트 요약: BTC 24시간 후 차트 결과 보고",
+          "[BTC 24h] 가장 강한 승리 논거는 \"강한 상승 모멘텀이 이어지고 있어.\"였어."
+        ],
+        "characterLessonsById": {
+          "aira": [
+            "[BTC 24h] Aira의 학습 메모가 손상돼 기본 문장으로 대체했어."
+          ]
+        }
+      },
+      "preparedEvidence": {
+        "aira": [
+          "[원소스:첫 발언이라 캐릭터 렌즈를 먼저 세울게. 차트상 RSI랑 MACD 흐름을 같이 보면 기술적 방어가 아직 먼저 보여. 뉴스보다 차트가 지금은 더 또렷하게 말하고 있어."
+        ]
+      },
+      "firstTurnDrafts": {
+        "aira": {
+          "id": "aira-1774022480716-0",
+          "characterId": "aira",
+          "characterName": "Aira",
+          "team": "bull",
+          "stance": "bullish",
+          "summary": "내 눈엔 차트 구조가 아직 위쪽으로 열려 있어.",
+          "detail": "첫 발언이라 캐릭터 렌즈를 먼저 세울게. 차트상 RSI랑 MACD 흐름을 같이 보면 기술적 방어가 아직 먼저 보여. 뉴스보다 차트가 지금은 더 또렷하게 말하고 있어.",
+          "indicatorLabel": "RSI",
+          "indicatorValue": "60.9",
+          "provider": "fallback",
+          "model": "character-fallback",
+          "fallbackUsed": true,
+          "createdAt": "2026-03-20T16:01:20.716Z"
+        }
+      },
+      "preparedAt": "2026-03-20T16:01:20.716Z"
+    },
+    {
+      "coinId": "solana",
+      "marketData": {
+        "coinId": "solana",
+        "symbol": "SOL",
+        "currentPrice": 89.07,
+        "priceChange24h": 0.95,
+        "priceChange7d": -3.13,
+        "rsi": 58.65,
+        "macd": 2.58,
+        "bollingerUpper": 95.11,
+        "bollingerLower": 80.73,
+        "fearGreedIndex": 11,
+        "fearGreedLabel": "Extreme Fear",
+        "sentimentScore": 0.01,
+        "newsHeadlines": [
+          "Coinbase and Apex Tokenize Bitcoin Yield Fund on Base Network",
+          "Arizona Pulls the Plug on Renewable Mandates : Key Implications for the Energy Industry | Holland & Hart LLP",
+          "Baystreet . ca - Morgan Stanley Proceeds With Bitcoin ETF Despite Market Downturn"
+        ],
+        "newsEventSummary": "GDELT 대표 헤드라인은 \"Coinbase and Apex Tokenize Bitcoin Yield Fund on Base Network\"이고, 전체 톤은 재료 방향은 아직 중립에 가까워.",
+        "communitySentimentSummary": "공포탐욕은 11(Extreme Fear), 뉴스 감성은 +0.01라서 군중 공포가 강하지만, 과매도 반등 심리도 함께 열릴 수 있어.",
+        "longShortRatio": 2.3,
+        "openInterest": 314026100.06,
+        "fundingRate": -0.0008,
+        "whaleScore": 75,
+        "whaleFlowSummary": "Bybit 롱숏비율은 2.30이고, Hyperliquid 미결제약정은 $314.0M 수준이야. 펀딩비는 -0.0008%라서 롱 포지션 쏠림이 강해. 큰 자금이 개입한 흔적이 비교적 또렷해.",
+        "marketStructureSummary": "CoinGecko 기준 거래대금은 $3.2B이고, 24시간은 0.95% 상승, 7일은 3.13% 하락 상태야. 미결제약정은 $314.0M 수준라서 거래 구조 체력은 평이해서 쉽게 흔들릴 수 있어.",
+        "volume24h": 3219370694
+      },
+      "summary": {
+        "headline": "SOL RSI 58.6, 공포탐욕 11",
+        "bias": "단기 상승 모멘텀이 우세하지만 과열 여부를 함께 봐야 한다.",
+        "indicators": [
+          {
+            "label": "RSI",
+            "value": "58.6"
+          },
+          {
+            "label": "MACD",
+            "value": "2.58"
+          },
+          {
+            "label": "공포탐욕",
+            "value": "11"
+          },
+          {
+            "label": "롱숏 비율",
+            "value": "2.30"
+          },
+          {
+            "label": "펀딩비",
+            "value": "-0.0008%"
+          }
+        ]
+      },
+      "reusableDebateContext": {
+        "recentBattleLessons": [
+          "[BTC 24h] 배틀 학습 포인트 1가 손상돼 기본 문장으로 대체했어.",
+          "[BTC 24h] 가장 강한 승리 논거는 \"BTC 배틀에서 불리시 진영의 핵심 논거가 정리되지 않아 기본 요약으로 대체했어.\"였어.",
+          "[BTC 24h] 가장 약한 패배 논거는 \"패배 팀 핵심 논거를 아직 추출하지 못했어.\"였어.",
+          "[BTC 24h] 최종 리포트 요약: BTC 24시간 후 차트 결과 보고",
+          "[BTC 24h] 가장 강한 승리 논거는 \"강한 상승 모멘텀이 이어지고 있어.\"였어."
+        ],
+        "characterLessonsById": {
+          "aira": [
+            "[BTC 24h] Aira의 학습 메모가 손상돼 기본 문장으로 대체했어."
+          ]
+        }
+      },
+      "preparedEvidence": {
+        "aira": [
+          "[원소스:첫 발언이라 캐릭터 렌즈를 먼저 세울게. 차트상 RSI랑 MACD 흐름을 같이 보면 기술적 방어가 아직 먼저 보여. 뉴스보다 차트가 지금은 더 또렷하게 말하고 있어."
+        ]
+      },
+      "firstTurnDrafts": {
+        "aira": {
+          "id": "aira-1774022491058-0",
+          "characterId": "aira",
+          "characterName": "Aira",
+          "team": "bull",
+          "stance": "bullish",
+          "summary": "내 눈엔 차트 구조가 아직 위쪽으로 열려 있어.",
+          "detail": "첫 발언이라 캐릭터 렌즈를 먼저 세울게. 차트상 RSI랑 MACD 흐름을 같이 보면 기술적 방어가 아직 먼저 보여. 뉴스보다 차트가 지금은 더 또렷하게 말하고 있어.",
+          "indicatorLabel": "RSI",
+          "indicatorValue": "58.6",
+          "provider": "fallback",
+          "model": "character-fallback",
+          "fallbackUsed": true,
+          "createdAt": "2026-03-20T16:01:31.058Z"
+        }
+      },
+      "preparedAt": "2026-03-20T16:01:31.058Z"
+    },
+    {
+      "coinId": "bitcoin",
+      "marketData": {
+        "coinId": "bitcoin",
+        "symbol": "BTC",
+        "currentPrice": 69758,
+        "priceChange24h": 0.33,
+        "priceChange7d": -2.88,
+        "rsi": 55.01,
+        "macd": 1466.02,
+        "bollingerUpper": 74764.56,
+        "bollingerLower": 65389.95,
+        "fearGreedIndex": 11,
+        "fearGreedLabel": "Extreme Fear",
+        "sentimentScore": 0.34,
+        "newsHeadlines": [
+          "Bitcoin breakout gains momentum",
+          "ETF approval keeps market optimistic"
+        ],
+        "newsEventSummary": "Alpha Vantage 대표 헤드라인은 \"Bitcoin breakout gains momentum\"이고, 전체 톤은 긍정 재료가 더 강하게 읽혀.",
+        "communitySentimentSummary": "공포탐욕은 11(Extreme Fear), 뉴스 감성은 +0.34라서 군중 공포가 강하지만, 과매도 반등 심리도 함께 열릴 수 있어.",
+        "longShortRatio": 1.35,
+        "openInterest": 1890525477.39,
+        "fundingRate": 0.0008,
+        "whaleScore": 64,
+        "whaleFlowSummary": "Bybit 롱숏비율은 1.35이고, Hyperliquid 미결제약정은 $1.9B 수준이야. 펀딩비는 0.0008%라서 롱 포지션 쏠림이 강해. 고래 흔적은 있지만 방향 확신까지 줄 정도는 아니야.",
+        "marketStructureSummary": "CoinGecko 기준 거래대금은 $39.5B이고, 24시간은 0.33% 상승, 7일은 2.88% 하락 상태야. 미결제약정은 $1.9B 수준라서 현물 거래 강도는 충분해서 구조가 쉽게 비지 않아.",
+        "volume24h": 39483134920
+      },
+      "summary": {
+        "headline": "BTC RSI 55.0, 공포탐욕 11",
+        "bias": "단기 상승 모멘텀이 우세하지만 과열 여부를 함께 봐야 한다.",
+        "indicators": [
+          {
+            "label": "RSI",
+            "value": "55.0"
+          },
+          {
+            "label": "MACD",
+            "value": "1466.02"
+          },
+          {
+            "label": "공포탐욕",
+            "value": "11"
+          },
+          {
+            "label": "롱숏 비율",
+            "value": "1.35"
+          },
+          {
+            "label": "펀딩비",
+            "value": "0.0008%"
+          }
+        ]
+      },
+      "reusableDebateContext": {
+        "recentBattleLessons": [
+          "[BTC 24h] 배틀 학습 포인트 1가 손상돼 기본 문장으로 대체했어.",
+          "[BTC 24h] 가장 강한 승리 논거는 \"BTC 배틀에서 불리시 진영의 핵심 논거가 정리되지 않아 기본 요약으로 대체했어.\"였어.",
+          "[BTC 24h] 가장 약한 패배 논거는 \"패배 팀 핵심 논거를 아직 추출하지 못했어.\"였어.",
+          "[BTC 24h] 최종 리포트 요약: BTC 24시간 후 차트 결과 보고",
+          "[BTC 24h] 가장 강한 승리 논거는 \"강한 상승 모멘텀이 이어지고 있어.\"였어."
+        ],
+        "characterLessonsById": {
+          "aira": [
+            "[BTC 24h] Aira의 학습 메모가 손상돼 기본 문장으로 대체했어."
+          ]
+        }
+      },
+      "preparedEvidence": {
+        "aira": [
+          "[원소스:첫 발언이라 캐릭터 렌즈를 먼저 세울게. 차트상 RSI랑 MACD 흐름을 같이 보면 기술적 방어가 아직 먼저 보여. 뉴스보다 차트가 지금은 더 또렷하게 말하고 있어."
+        ]
+      },
+      "firstTurnDrafts": {
+        "aira": {
+          "id": "aira-1774027211026-0",
+          "characterId": "aira",
+          "characterName": "Aira",
+          "team": "bull",
+          "stance": "bullish",
+          "summary": "내 눈엔 차트 구조가 아직 위쪽으로 열려 있어.",
+          "detail": "첫 발언이라 캐릭터 렌즈를 먼저 세울게. 차트상 RSI랑 MACD 흐름을 같이 보면 기술적 방어가 아직 먼저 보여. 뉴스보다 차트가 지금은 더 또렷하게 말하고 있어.",
+          "indicatorLabel": "RSI",
+          "indicatorValue": "55.0",
+          "provider": "fallback",
+          "model": "character-fallback",
+          "fallbackUsed": true,
+          "createdAt": "2026-03-20T17:20:11.026Z"
+        }
+      },
+      "preparedAt": "2026-03-20T17:20:11.026Z"
+    }
+  ]
+}

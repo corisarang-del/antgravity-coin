@@ -1,4 +1,4 @@
-# Character Reference Doc Sync
+﻿# Character Reference Doc Sync
 
 - 작성시각: 2026-03-20 23:58 KST
 - 해결하고자 한 문제:
@@ -19,3 +19,4 @@
 ## 해결되지 않은 것
 - 과거 개발일지와 prompt 문서들 중 예전 모델 배치를 설명하는 기록은 그대로 남아 있음
 - 그 문서들은 당시 작업 기록이라 별도 정리 대상은 아님
+

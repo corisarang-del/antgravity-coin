@@ -1,4 +1,4 @@
-# 프롬프트 기록 - provider 라우팅 재정렬
+﻿# 프롬프트 기록 - provider 라우팅 재정렬
 
 - 작성시각: 2026-03-16 21:36:00 +09:00
 - 해결하고자 한 문제:
@@ -13,3 +13,4 @@
   - `pnpm typecheck` 통과
   - 변경 파일 eslint 통과
   - 개별 vitest는 sandbox `spawn EPERM`으로 실행 실패
+

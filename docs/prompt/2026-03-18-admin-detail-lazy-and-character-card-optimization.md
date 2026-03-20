@@ -1,4 +1,4 @@
-# admin 상세 lazy 분리와 character card 이미지 최적화 프롬프트
+﻿# admin 상세 lazy 분리와 character card 이미지 최적화 프롬프트
 
 - 작성시각: 2026-03-18 20:49 KST
 - 해결하고자 한 문제:
@@ -16,3 +16,4 @@ CharacterCard 이미지 3중 렌더 최적화
 
 ## 아직 해결 안 된 것
 - admin 상세 내부를 더 작은 블록 단위까지 lazy split 하지는 않았다.
+

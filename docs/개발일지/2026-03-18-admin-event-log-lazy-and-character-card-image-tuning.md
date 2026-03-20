@@ -1,4 +1,4 @@
-# admin event log lazy 분리와 character card 이미지 튜닝
+﻿# admin event log lazy 분리와 character card 이미지 튜닝
 
 - 작성시각: 2026-03-18 20:55 KST
 - 해결하고자 한 문제:
@@ -14,3 +14,4 @@
 ## 아직 해결 안 된 것
 - `Event Log` 내부 항목 수가 아주 많을 때 가상화까지 적용하지는 않았다.
 - `/characters`에 대한 실제 브라우저 네트워크 프로파일링까지는 이번 턴에서 수행하지 않았다.
+

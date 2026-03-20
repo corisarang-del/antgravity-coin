@@ -1,0 +1,75 @@
+▲ Next.js 16.1.6 (webpack)
+- Local:         http://localhost:3002
+- Network:       http://172.25.224.1:3002
+- Environments: .env.local, .env
+
+✓ Starting...
+✓ Ready in 3.1s
+○ Compiling / ...
+ GET / 200 in 6.7s (compile: 6.4s, render: 346ms)
+ GET / 200 in 77ms (compile: 8ms, render: 69ms)
+ GET / 200 in 120ms (compile: 16ms, render: 104ms)
+ GET /home 200 in 2.6s (compile: 2.3s, render: 326ms)
+ GET /battle/bitcoin 200 in 1728ms (compile: 1625ms, render: 103ms)
+ GET /battle/bitcoin 200 in 583ms (compile: 393ms, render: 190ms)
+ GET /battle/bitcoin 200 in 51ms (compile: 10ms, render: 41ms)
+[battle-llm] character=aira provider=openrouter model=stepfun/step-3.5-flash:free fallbackUsed=false
+ GET /battle/bitcoin 200 in 94ms (compile: 37ms, render: 57ms)
+[battle-llm] character=judy provider=openrouter model=arcee-ai/trinity-large-preview:free fallbackUsed=false
+ GET /battle/bitcoin 200 in 1088ms (compile: 682ms, render: 406ms)
+ GET /battle/bitcoin 200 in 345ms (compile: 81ms, render: 265ms)
+ GET /battle/bitcoin 200 in 212ms (compile: 66ms, render: 146ms)
+ GET /battle/bitcoin 200 in 124ms (compile: 52ms, render: 72ms)
+ POST /api/battle 200 in 7.7min (compile: 962ms, render: 7.7min)
+ GET /battle/bitcoin/pick 200 in 2.3s (compile: 1954ms, render: 306ms)
+ POST /api/battle/session 200 in 778ms (compile: 744ms, render: 34ms)
+ GET /battle/bitcoin/waiting 200 in 1416ms (compile: 1316ms, render: 100ms)
+ GET /battle/bitcoin/result 200 in 1762ms (compile: 1665ms, render: 97ms)
+ GET /battle/bitcoin/result 200 in 352ms (compile: 34ms, render: 317ms)
+ GET /api/battle/outcome?battleId=battle-03ca72ee-e734-4d55-8c40-fbc709bcc6c5 200 in 776ms (compile: 747ms, render: 29ms)
+ GET /battle/bitcoin/result 200 in 152ms (compile: 92ms, render: 61ms)
+ GET /battle/bitcoin/result 200 in 85ms (compile: 39ms, render: 46ms)
+[battle-llm] character=clover provider=openrouter model=stepfun/step-3.5-flash:free fallbackUsed=true
+ GET /battle/bitcoin/waiting 200 in 96ms (compile: 50ms, render: 46ms)
+ GET /battle/bitcoin/pick 200 in 85ms (compile: 44ms, render: 41ms)
+ GET /battle/bitcoin 200 in 403ms (compile: 42ms, render: 361ms)
+ GET /battle/bitcoin 200 in 594ms (compile: 146ms, render: 449ms)
+ GET /battle/bitcoin 200 in 386ms (compile: 249ms, render: 137ms)
+ GET /battle/bitcoin 200 in 61ms (compile: 10ms, render: 51ms)
+ POST /api/battle 200 in 4.2s (compile: 1323ms, render: 2.8s)
+[battle-llm] character=aira provider=openrouter model=stepfun/step-3.5-flash:free fallbackUsed=false
+[battle-llm] character=judy provider=openrouter model=arcee-ai/trinity-large-preview:free fallbackUsed=false
+[battle-llm] character=clover provider=openrouter model=qwen/qwen3.5-9b fallbackUsed=true
+[battle-llm] character=blaze provider=openrouter model=qwen/qwen3.5-9b fallbackUsed=true
+[battle-llm] character=ledger provider=openrouter model=stepfun/step-3.5-flash:free fallbackUsed=false
+[battle-llm] character=shade provider=openrouter model=arcee-ai/trinity-large-preview:free fallbackUsed=false
+[battle-llm] character=vela provider=openrouter model=arcee-ai/trinity-large-preview:free fallbackUsed=false
+[battle-llm] character=flip provider=openrouter model=qwen/qwen3.5-9b fallbackUsed=true
+ GET / 200 in 2.4s (compile: 1924ms, render: 456ms)
+ GET /battle/bitcoin 200 in 351ms (compile: 64ms, render: 288ms)
+ GET /battle/bitcoin 200 in 370ms (compile: 126ms, render: 244ms)
+ GET /battle/bitcoin 200 in 372ms (compile: 243ms, render: 129ms)
+ GET /battle/bitcoin 200 in 83ms (compile: 31ms, render: 52ms)
+[battle-llm] character=aira provider=openrouter model=stepfun/step-3.5-flash:free fallbackUsed=false
+ GET /battle/bitcoin 200 in 350ms (compile: 45ms, render: 305ms)
+ GET /battle/bitcoin 200 in 46ms (compile: 10ms, render: 36ms)
+[battle-llm] character=ledger provider=openrouter model=stepfun/step-3.5-flash:free fallbackUsed=false
+ GET /battle/bitcoin 200 in 125ms (compile: 45ms, render: 80ms)
+[battle-llm] character=judy provider=openrouter model=arcee-ai/trinity-large-preview:free fallbackUsed=false
+[battle-llm] character=shade provider=openrouter model=arcee-ai/trinity-large-preview:free fallbackUsed=false
+[battle-llm] character=vela provider=openrouter model=arcee-ai/trinity-large-preview:free fallbackUsed=false
+ GET /battle/bitcoin 200 in 116ms (compile: 41ms, render: 75ms)
+ GET /battle/bitcoin 200 in 72ms (compile: 27ms, render: 45ms)
+[battle-llm] character=clover provider=openrouter model=qwen/qwen3.5-9b fallbackUsed=true
+[battle-llm] character=flip provider=openrouter model=nvidia/nemotron-3-super-120b-a12b:free fallbackUsed=false
+[battle-llm] character=blaze provider=openrouter model=minimax/minimax-m2.5:free fallbackUsed=false
+ POST /api/battle 200 in 3.6min (compile: 1433ms, render: 3.6min)
+ POST /api/battle/snapshot 200 in 1065ms (compile: 1013ms, render: 52ms)
+ GET /battle/bitcoin 200 in 476ms (compile: 124ms, render: 352ms)
+ GET /battle/bitcoin 200 in 76ms (compile: 11ms, render: 65ms)
+ GET /battle/bitcoin/pick 200 in 76ms (compile: 46ms, render: 29ms)
+ POST /api/battle/snapshot 200 in 31ms (compile: 2ms, render: 29ms)
+ POST /api/battle/session 200 in 715ms (compile: 684ms, render: 31ms)
+ GET /battle/bitcoin/waiting 200 in 235ms (compile: 199ms, render: 37ms)
+ GET /battle/bitcoin/pick 200 in 242ms (compile: 109ms, render: 133ms)
+ GET /battle/bitcoin/result 200 in 73ms (compile: 46ms, render: 27ms)

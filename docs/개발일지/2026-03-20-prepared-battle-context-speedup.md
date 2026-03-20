@@ -1,4 +1,4 @@
-# Prepared Battle Context Speedup
+﻿# Prepared Battle Context Speedup
 
 - 작성시각: 2026-03-20 21:35 KST
 - 해결하고자 한 문제:
@@ -19,3 +19,4 @@
 
 - 브라우저에서 실제 prewarm hit 상태로 첫 발언 체감 속도 비교 측정은 아직 별도로 하지 않았음
 - 준비 컨텍스트를 UI에서 직접 노출하거나 운영 메트릭으로 수집하는 단계는 후속 작업임
+

@@ -1,4 +1,4 @@
-# Favicon Search And Battle Wait UX
+﻿# Favicon Search And Battle Wait UX
 
 - 작성시각: 2026-03-20 19:00 KST
 - 해결하고자 한 문제:
@@ -18,3 +18,4 @@
 ## 해결되지 않은 것
 
 - 생성한 로고의 추가 변형(단색형, 작은 픽셀 버전, 다크/라이트 별도 튜닝)은 아직 하지 않았음
+

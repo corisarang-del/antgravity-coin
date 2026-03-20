@@ -1,4 +1,4 @@
-# Vercel Review Follow-up Fixes Prompt
+﻿# Vercel Review Follow-up Fixes Prompt
 
 - 작성시각: 2026-03-20 18:05 KST
 - 프롬프트 요약:
@@ -13,3 +13,4 @@
 ## 해결되지 않은 것
 
 - 추가 UX 계측이나 네트워크 성능 측정은 아직 하지 않았음
+

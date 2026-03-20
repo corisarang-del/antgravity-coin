@@ -1,4 +1,4 @@
-# 개발일지 - planning 기반 즉시 구현 항목 보강
+﻿# 개발일지 - planning 기반 즉시 구현 항목 보강
 
 - 작성시각: 2026-03-16 22:12:00 +09:00
 - 해결하고자 한 문제:
@@ -20,3 +20,4 @@
   - 실제 provider API 키와 엔드포인트가 없으면 비-Anthropic provider는 여전히 null 응답이어서 fallback으로 간다.
   - provider optimization, shadow evaluation, timing metrics 활용은 여전히 초안 수준이다.
   - 전체 `pnpm lint`는 여전히 `pptx` 하위 기존 파일 때문에 실패 가능성이 남아 있다. 이번 검증은 `src` 기준 eslint를 사용했다.
+

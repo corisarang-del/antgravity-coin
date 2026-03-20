@@ -1,4 +1,4 @@
-# Bybit + Hyperliquid 전환 프롬프트
+﻿# Bybit + Hyperliquid 전환 프롬프트
 
 - 작성시각: 2026-03-17 15:22 KST
 - 해결하고자 한 문제:
@@ -18,3 +18,4 @@ https://bybit-exchange.github.io/docs/api-explorer/v5/category 랑 https://hyper
 ## 아직 안 된 것
 
 - 실제 배포 환경에서 지역 제한이나 응답 제한은 운영 검증이 더 필요하다.
+

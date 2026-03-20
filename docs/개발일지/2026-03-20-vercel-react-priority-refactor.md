@@ -1,4 +1,4 @@
-# Vercel React Priority Refactor
+﻿# Vercel React Priority Refactor
 
 - 작성시각: 2026-03-20 17:45 KST
 - 해결하고자 한 문제:
@@ -17,3 +17,4 @@
 
 - `useCurrentUserStore` 자체는 여전히 fallback용 클라이언트 fetch 경로를 유지하고 있어서, 초기 스냅샷을 주지 않는 다른 소비처가 생기면 추가 요청이 다시 발생할 수 있음
 - 랜딩 페이지의 기존 한국어 문자열은 일부 파일 인코딩 이슈가 남아 있어 후속 정리가 필요할 수 있음
+

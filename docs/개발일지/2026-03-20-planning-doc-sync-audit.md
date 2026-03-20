@@ -1,4 +1,4 @@
-# Planning Doc Sync Audit
+﻿# Planning Doc Sync Audit
 
 - 작성시각: 2026-03-20 18:20 KST
 - 해결하고자 한 문제:
@@ -17,3 +17,4 @@
 
 - 일부 기존 planning 문서의 문자열 인코딩 문제는 남아 있을 수 있음
 - 다음 변경이 생기면 `04-data-model`, `09-cache-strategy`, `10-storage-json-types`, `11-battle-api-test-gaps`도 함께 재점검 필요
+

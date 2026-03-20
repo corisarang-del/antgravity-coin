@@ -1,4 +1,4 @@
-# Vercel React Priority Refactor Prompt
+﻿# Vercel React Priority Refactor Prompt
 
 - 작성시각: 2026-03-20 17:45 KST
 - 프롬프트 요약:
@@ -17,3 +17,4 @@
 ## 해결되지 않은 것
 
 - 추가 성능 계측(번들 분석, 프로파일러 수치 비교)은 아직 하지 않았음
+

@@ -1,4 +1,4 @@
-# Character Prompt And Evidence Split Prompt
+﻿# Character Prompt And Evidence Split Prompt
 
 - 작성시각: 2026-03-20 20:45 KST
 - 프롬프트 요약:
@@ -15,3 +15,4 @@
 ## 해결되지 않은 것
 
 - 비차트 캐릭터를 더 살리려면 현재 숫자형 데이터 외에 뉴스 원문/이벤트 설명 입력이 추가로 필요함
+
