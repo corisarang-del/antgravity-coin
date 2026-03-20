@@ -25,82 +25,82 @@ const characterVoiceGuide: Record<
 > = {
   aira: {
     bull: {
-      summary: "차트 구조가 아직 위쪽으로 열려 있어.",
-      detail: "Aira답게 RSI, MACD, 밴드 흐름만 보면 기술적 방어가 먼저 보여. 뉴스보다 차트가 더 강하게 말하고 있어.",
+      summary: "내 눈엔 차트 구조가 아직 위쪽으로 열려 있어.",
+      detail: "차트상 RSI랑 MACD 흐름을 같이 보면 기술적 방어가 아직 먼저 보여. 뉴스보다 차트가 지금은 더 또렷하게 말하고 있어.",
     },
     bear: {
-      summary: "차트가 버티는 척하지만 힘은 약해지고 있어.",
-      detail: "Aira 기준으로는 추세와 모멘텀이 함께 식고 있어서 반등 기대보다 추가 조정을 먼저 봐야 해.",
+      summary: "내 눈엔 차트가 버티는 척하지만 힘은 약해지고 있어.",
+      detail: "차트상 추세랑 모멘텀이 같이 식는 쪽이라 반등 기대보다 추가 조정을 먼저 보는 게 맞아 보여.",
     },
   },
   judy: {
     bull: {
-      summary: "Judy: 뉴스 재료 흐름이 아직 가격을 더 밀 수 있어.",
-      detail: "Judy는 헤드라인과 이벤트를 먼저 읽어. 지금 들어온 재료 결이 살아 있어서 단기 기대가 아직 꺼지지 않았어.",
+      summary: "헤드라인만 보면 지금 재료는 아직 더 갈 수 있어.",
+      detail: "헤드라인이랑 이벤트를 먼저 보면 지금 들어온 재료 결이 아직 살아 있어. 뉴스 쪽 온도가 생각보다 덜 식었어.",
     },
     bear: {
-      summary: "Judy: 뉴스는 많아도 가격을 끝까지 끌 힘은 약해 보여.",
-      detail: "Judy 시선으로 보면 이벤트는 보여도 시장이 그 재료를 오래 붙잡는 분위기는 아니야.",
+      summary: "헤드라인은 많은데 재료 힘은 생각보다 약해 보여.",
+      detail: "이벤트는 보이는데 시장이 그 재료를 오래 붙잡을 만큼 들떠 있진 않아 보여. 지금 재료는 반짝하고 끝날 가능성도 커.",
     },
   },
   clover: {
     bull: {
-      summary: "Clover: 군중 심리가 아직 완전히 꺾이지 않았어.",
-      detail: "공포가 강해도 기대가 미세하게 남아 있으면 심리 반등이 붙는 구간이 생겨. 지금은 그 가능성이 완전히 닫히진 않았어.",
+      summary: "분위기상 군중 심리가 아직 완전히 꺾이진 않았어.",
+      detail: "심리적으로 보면 공포가 있어도 기대가 미세하게 남아 있으면 반등이 붙는 구간이 생겨. 지금은 그 문이 완전히 닫힌 건 아니야.",
     },
     bear: {
-      summary: "Clover: 심리 불안이 다시 커지면 흔들림이 빨라질 수 있어.",
-      detail: "Clover는 숫자보다 군중의 떨림을 봐. 지금 분위기는 작은 충격에도 공포 쪽으로 기울 수 있어.",
+      summary: "분위기상 심리 불안이 다시 커지면 흔들림이 빨라질 수 있어.",
+      detail: "심리적으로 보면 지금은 숫자보다 군중의 떨림이 더 신경 쓰여. 작은 충격에도 공포 쪽으로 금방 기울 수 있어 보여.",
     },
   },
   blaze: {
     bull: {
-      summary: "Blaze: 속도가 붙는 구간이라 한 번 더 위로 칠 수 있어.",
-      detail: "Blaze는 속도와 거래량을 먼저 본다. 지금은 추세 추종이 아직 먹힐 만한 장면이야.",
+      summary: "지금은 속도가 붙는 구간이라 한 번 더 위로 칠 수 있어.",
+      detail: "이 구간은 속도랑 거래량이 아직 같이 받쳐줘. 그래서 추세 추종이 한 번 더 먹힐 만한 장면이야.",
     },
     bear: {
-      summary: "Blaze: 속도는 좋지만 과열이라 식는 순간이 빠를 수 있어.",
-      detail: "모멘텀 장은 꺾일 때도 급해. Blaze답게 추격보다 되돌림 위험을 먼저 본다.",
+      summary: "지금은 속도는 좋은데 과열이라 식는 순간도 빠를 수 있어.",
+      detail: "이 구간은 모멘텀 장이라 꺾일 때도 급하게 무너져. 지금은 추격보다 되돌림 위험을 먼저 보는 쪽이 맞아.",
     },
   },
   ledger: {
     bull: {
-      summary: "Ledger: 거래 구조 체력이 아직 완전히 비진 않았어.",
-      detail: "Ledger는 지금 확보된 거래 구조만 본다. 거래량과 구조적 버팀이 남아 있으면 쉽게 무너질 자리는 아니야.",
+      summary: "숫자상 거래 구조 체력이 아직 완전히 비진 않았어.",
+      detail: "구조적으로 보면 지금 보이는 거래량이랑 버팀이 같이 남아 있어. 그래서 쉽게 무너질 자리는 아직 아니야.",
     },
     bear: {
-      summary: "Ledger: 거래 구조는 아직 조심 쪽으로 기울어 있어.",
-      detail: "가격이 버티는 척해도 체력이 비면 아래로 밀릴 수 있어. Ledger답게 구조가 먼저 흔들리는지 본다.",
+      summary: "숫자상 거래 구조는 아직 조심 쪽으로 기울어 있어.",
+      detail: "구조적으로 보면 가격이 버티는 척해도 체력이 비면 아래로 밀릴 수 있어. 지금은 구조가 먼저 흔들리는 쪽이 더 신경 쓰여.",
     },
   },
   shade: {
     bull: {
-      summary: "Shade: 리스크는 있지만 아직 통제 가능한 범위야.",
-      detail: "Shade는 손익보다 리스크를 먼저 본다. 지금은 바로 붕괴보다 관리 가능한 변동성 구간에 더 가까워.",
+      summary: "내 기준엔 리스크는 있지만 아직 통제 가능한 범위야.",
+      detail: "리스크 쪽에선 지금이 바로 붕괴라기보다 관리 가능한 변동성 구간에 더 가까워 보여. 겁낼 자리라기보다 선을 지켜야 할 자리야.",
     },
     bear: {
-      summary: "Shade: 리스크 지표가 먼저 경고를 보내고 있어.",
-      detail: "과열 포지션이 쌓이면 작은 충격도 청산 쪽으로 번질 수 있어. Shade 기준에선 방어가 우선이야.",
+      summary: "내 기준엔 리스크 지표가 먼저 경고를 보내고 있어.",
+      detail: "리스크 쪽에선 과열 포지션이 쌓이면 작은 충격도 청산 쪽으로 번질 수 있어. 지금은 공격보다 방어가 먼저야.",
     },
   },
   vela: {
     bull: {
-      summary: "Vela: 숨은 자금 흐름이 아직 완전히 꺾였다고 보긴 어려워.",
-      detail: "Vela는 수면 아래 흐름을 본다. 대형 자금이 급하게 도망가는 그림보단 아직 관망과 재진입이 섞여 보여.",
+      summary: "밑에서 보면 숨은 자금 흐름이 아직 완전히 꺾인 건 아니야.",
+      detail: "자금 흐름상 수면 아래를 보면 대형 자금이 급하게 도망가는 그림까진 아니야. 아직 관망이랑 재진입이 같이 섞여 보여.",
     },
     bear: {
-      summary: "Vela: 자금 방향이 흔들리면 개인만 남는 장이 될 수 있어.",
-      detail: "고래 흐름이 선명하지 않으면 가격을 오래 미는 힘도 약해져. Vela는 그 공백을 경계해.",
+      summary: "밑에서 보면 자금 방향이 흔들리면 개인만 남는 장이 될 수 있어.",
+      detail: "자금 흐름상 고래 방향이 선명하지 않으면 가격을 오래 미는 힘도 약해져. 지금은 그 공백이 은근히 커 보여.",
     },
   },
   flip: {
     bull: {
-      summary: "Flip: 다들 조정을 말할수록 오히려 한 번 더 튈 자리도 남아 있어.",
-      detail: "Flip은 합의의 반대편을 본다. 조심이 과해지면 짧은 반대로 숏을 털 수 있어.",
+      summary: "근데 난 다들 조정을 말할수록 오히려 한 번 더 튈 자리도 남아 있다고 봐.",
+      detail: "오히려 지금은 합의가 너무 빨리 조정 쪽으로 쏠렸어. 그러면 짧게 반대로 튀면서 숏을 먼저 털 수도 있어.",
     },
     bear: {
-      summary: "Flip: 오히려 너무 낙관적이라 반대로 꺾일 쪽이 가까워 보여.",
-      detail: "모두가 위만 볼 때 작은 균열 하나가 크게 번지기도 해. Flip답게 그 반전을 노린다.",
+      summary: "근데 난 오히려 너무 낙관적이라 반대로 꺾일 쪽이 더 가까워 보여.",
+      detail: "오히려 지금은 모두가 위만 보고 있어서 작은 균열 하나도 크게 번지기 쉬워. 난 그 반전이 더 가깝다고 봐.",
     },
   },
 };
@@ -204,6 +204,68 @@ function buildRoleEvidence(
   };
 }
 
+function compressPreviousMessages(
+  previousMessages: DebateMessage[],
+  currentTeam: "bull" | "bear",
+) {
+  if (previousMessages.length === 0) {
+    return [];
+  }
+
+  const lastMessage = previousMessages.at(-1) ?? null;
+  const latestOpposingMessage =
+    [...previousMessages].reverse().find((message) => message.team !== currentTeam) ?? null;
+  const latestSameTeamMessage =
+    [...previousMessages].reverse().find((message) => message.team === currentTeam) ?? null;
+  const latestBullMessage =
+    [...previousMessages].reverse().find((message) => message.team === "bull") ?? null;
+  const latestBearMessage =
+    [...previousMessages].reverse().find((message) => message.team === "bear") ?? null;
+
+  const commonSummaryParts = [
+    latestBullMessage ? `불리시 최근: ${latestBullMessage.summary}` : null,
+    latestBearMessage ? `베어리시 최근: ${latestBearMessage.summary}` : null,
+  ].filter(Boolean);
+
+  const commonSummaryMessage: DebateMessage | null =
+    commonSummaryParts.length > 0
+      ? {
+          id: `context-summary-${previousMessages.length}`,
+          characterId: "context-summary",
+          characterName: "공통 요약",
+          team: currentTeam,
+          stance: currentTeam === "bull" ? "bullish" : "bearish",
+          summary: commonSummaryParts.join(" / "),
+          detail: commonSummaryParts.join(" / "),
+          indicatorLabel: "요약",
+          indicatorValue: "압축",
+          provider: "system",
+          model: "compressed-context",
+          fallbackUsed: false,
+          createdAt: new Date().toISOString(),
+        }
+      : null;
+
+  const companionMessage =
+    latestOpposingMessage && latestOpposingMessage.id !== lastMessage?.id
+      ? latestOpposingMessage
+      : latestSameTeamMessage && latestSameTeamMessage.id !== lastMessage?.id
+        ? latestSameTeamMessage
+        : null;
+
+  const uniqueMessages = new Map<string, DebateMessage>();
+
+  for (const message of [lastMessage, companionMessage, commonSummaryMessage]) {
+    if (!message) {
+      continue;
+    }
+
+    uniqueMessages.set(message.id, message);
+  }
+
+  return [...uniqueMessages.values()];
+}
+
 function buildUnavailableEvidenceMessage(
   character: (typeof characters)[number],
   previousMessages: DebateMessage[],
@@ -219,7 +281,7 @@ function buildUnavailableEvidenceMessage(
     characterName: character.name,
     team: character.team,
     stance: character.team === "bull" ? "bullish" : "bearish",
-    summary: `${character.name}: 지금은 이 역할답게 말할 만큼 근거가 부족해 섣불리 결론 내리기 어려워.`,
+    summary: "지금은 이 역할답게 말할 만큼 근거가 부족해서 섣불리 결론 내리기 어려워.",
     detail: `${tensionPoint} 다음 턴에서는 ${character.role}답게 더 분명한 근거로 말할게.`,
     indicatorLabel: "근거 상태",
     indicatorValue: "데이터 부족",
@@ -278,7 +340,7 @@ function buildFallbackMessage(
     characterName: character.name,
     team: character.team,
     stance: isBull ? "bullish" : "bearish",
-    summary: `${character.name}: ${summary}`,
+    summary,
     detail,
     indicatorLabel,
     indicatorValue,
@@ -313,7 +375,12 @@ export async function generateCharacterMessage(
   },
 ) {
   const marketSummary = `${marketData.symbol} 24h ${marketData.priceChange24h}% / 7d ${marketData.priceChange7d}% / RSI ${marketData.rsi}`;
-  const roleEvidence = buildRoleEvidence(marketData, character.id, previousMessages);
+  const compressedPreviousMessages = compressPreviousMessages(previousMessages, character.team);
+  const roleEvidence = buildRoleEvidence(
+    marketData,
+    character.id,
+    compressedPreviousMessages,
+  );
 
   if (roleEvidence.hasMissingRequiredEvidence) {
     return buildUnavailableEvidenceMessage(character, previousMessages);
@@ -336,7 +403,7 @@ export async function generateCharacterMessage(
         evidence: roleEvidence.items,
         recentBattleLessons: reusableDebateContext.recentBattleLessons,
         characterLessons: reusableDebateContext.characterLessonsById[character.id] ?? [],
-        previousMessages,
+        previousMessages: compressedPreviousMessages,
       },
     });
 

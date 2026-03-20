@@ -59,6 +59,22 @@ describe("generateBattleDebate", () => {
     expect(aira?.detail).not.toBe(shade?.detail);
   });
 
+  it("fallback 메시지에 캐릭터별 말버릇 차이가 드러난다", async () => {
+    const messages = await generateBattleDebate(marketData);
+
+    const aira = messages.find((message) => message.characterId === "aira");
+    const judy = messages.find((message) => message.characterId === "judy");
+    const shade = messages.find((message) => message.characterId === "shade");
+    const vela = messages.find((message) => message.characterId === "vela");
+    const flip = messages.find((message) => message.characterId === "flip");
+
+    expect(aira?.summary).toContain("내 눈엔");
+    expect(judy?.summary).toContain("헤드라인만 보면");
+    expect(shade?.summary).toContain("내 기준엔");
+    expect(vela?.summary).toContain("밑에서 보면");
+    expect(flip?.summary).toContain("근데 난");
+  });
+
   it("fenced json 응답을 파싱해서 실제 메시지로 만든다", async () => {
     vi.mocked(generateCharacterDebateChunk).mockResolvedValueOnce({
       content:
@@ -87,6 +103,92 @@ describe("generateBattleDebate", () => {
     expect(messages[0]?.fallbackUsed).toBe(true);
   });
 
+  it("이전 발언은 직전 1개, 반대팀 핵심 1개, 공통 요약 1개로 압축한다", async () => {
+    vi.mocked(generateCharacterDebateChunk).mockResolvedValueOnce({
+      content:
+        '{"summary":"압축 확인","detail":"핵심만 보고 답했어.","indicatorLabel":"RSI","indicatorValue":"61","stance":"bullish"}',
+      provider: "openrouter",
+      model: "stepfun/step-3.5-flash:free",
+      fallbackUsed: false,
+    });
+
+    const blaze = getCharacterById("blaze");
+    if (!blaze) {
+      throw new Error("missing_blaze");
+    }
+
+    await generateCharacterMessage(marketData, blaze, [
+      {
+        id: "m1",
+        characterId: "aira",
+        characterName: "Aira",
+        team: "bull",
+        stance: "bullish",
+        summary: "Aira 요약",
+        detail: "Aira detail",
+        indicatorLabel: "RSI",
+        indicatorValue: "61.2",
+        provider: "test",
+        model: "fixture",
+        fallbackUsed: false,
+        createdAt: new Date().toISOString(),
+      },
+      {
+        id: "m2",
+        characterId: "ledger",
+        characterName: "Ledger",
+        team: "bear",
+        stance: "bearish",
+        summary: "Ledger 요약",
+        detail: "Ledger detail",
+        indicatorLabel: "온체인",
+        indicatorValue: "약세",
+        provider: "test",
+        model: "fixture",
+        fallbackUsed: false,
+        createdAt: new Date().toISOString(),
+      },
+      {
+        id: "m3",
+        characterId: "judy",
+        characterName: "Judy",
+        team: "bull",
+        stance: "bullish",
+        summary: "Judy 요약",
+        detail: "Judy detail",
+        indicatorLabel: "뉴스",
+        indicatorValue: "긍정",
+        provider: "test",
+        model: "fixture",
+        fallbackUsed: false,
+        createdAt: new Date().toISOString(),
+      },
+      {
+        id: "m4",
+        characterId: "shade",
+        characterName: "Shade",
+        team: "bear",
+        stance: "bearish",
+        summary: "Shade 요약",
+        detail: "Shade detail",
+        indicatorLabel: "리스크",
+        indicatorValue: "경고",
+        provider: "test",
+        model: "fixture",
+        fallbackUsed: false,
+        createdAt: new Date().toISOString(),
+      },
+    ]);
+
+    const input = vi.mocked(generateCharacterDebateChunk).mock.calls[0]?.[0]?.llmInput;
+
+    expect(input?.previousMessages).toHaveLength(3);
+    expect(input?.previousMessages.at(0)?.summary).toBe("Shade 요약");
+    expect(input?.previousMessages.some((message) => message.characterName === "공통 요약")).toBe(
+      true,
+    );
+  });
+
   it("Blaze 영문 응답은 한글 fallback으로 바꾼다", async () => {
     const blaze = getCharacterById("blaze");
 
@@ -105,7 +207,6 @@ describe("generateBattleDebate", () => {
     const message = await generateCharacterMessage(marketData, blaze, []);
 
     expect(message.fallbackUsed).toBe(true);
-    expect(message.summary).toContain("Blaze");
     expect(message.summary).toMatch(/[가-힣]/);
     expect(message.detail).toMatch(/[가-힣]/);
   });
@@ -128,7 +229,6 @@ describe("generateBattleDebate", () => {
     const message = await generateCharacterMessage(marketData, clover, []);
 
     expect(message.fallbackUsed).toBe(true);
-    expect(message.summary).toContain("Clover");
     expect(message.summary).toMatch(/[가-힣]/);
     expect(message.detail).toMatch(/[가-힣]/);
   });

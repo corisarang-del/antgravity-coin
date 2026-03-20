@@ -44,6 +44,7 @@ export function useBattleStream({ coinId }: UseBattleStreamOptions) {
   const [marketData, setMarketData] = useState<MarketData | null>(null);
   const [summary, setSummary] = useState<BattleSummary | null>(null);
   const [activeCharacterId, setActiveCharacterId] = useState<string | null>(null);
+  const [isPickReady, setIsPickReady] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [timingMetrics, setTimingMetrics] = useState<BattleTimingMetrics | null>(null);
@@ -128,6 +129,7 @@ export function useBattleStream({ coinId }: UseBattleStreamOptions) {
     setMarketData(null);
     setSummary(null);
     setActiveCharacterId(null);
+    setIsPickReady(false);
     setIsComplete(false);
     setError(null);
 
@@ -238,7 +240,15 @@ export function useBattleStream({ coinId }: UseBattleStreamOptions) {
               persistTimingMetrics();
               await persistSnapshotToServer().catch(() => undefined);
               startTransition(() => {
+                setIsPickReady(true);
                 setIsComplete((parsed as { completed: boolean }).completed);
+              });
+              continue;
+            }
+
+            if (event === "battle_pick_ready") {
+              startTransition(() => {
+                setIsPickReady(true);
               });
               continue;
             }
@@ -276,6 +286,7 @@ export function useBattleStream({ coinId }: UseBattleStreamOptions) {
     marketData,
     summary,
     activeCharacterId,
+    isPickReady,
     isComplete,
     error,
     timingMetrics,

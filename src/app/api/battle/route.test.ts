@@ -100,6 +100,21 @@ describe("POST /api/battle", () => {
             fallbackUsed: false,
             createdAt: new Date().toISOString(),
           },
+          ledger: {
+            id: "draft-2",
+            characterId: "ledger",
+            characterName: "Ledger",
+            team: "bear",
+            stance: "bearish",
+            summary: "Ledger: 준비된 첫 반박",
+            detail: "준비된 ledger detail",
+            indicatorLabel: "롱숏 비율",
+            indicatorValue: "1.08",
+            provider: "prep",
+            model: "prep-draft",
+            fallbackUsed: false,
+            createdAt: new Date().toISOString(),
+          },
         },
       },
       preparedContextHit: true,
@@ -119,7 +134,30 @@ describe("POST /api/battle", () => {
 
     const text = await response.text();
     expect(text).toContain("Aira: 준비된 첫 발언");
+    expect(text).toContain("Ledger: 준비된 첫 반박");
     expect(response.headers.get("x-battle-prepared-first-turn-hit")).toBe("true");
+  });
+
+  it("양 팀 핵심 논거가 2개씩 모이면 battle_pick_ready 이벤트를 먼저 보낸다", async () => {
+    const response = await POST(
+      new Request("http://localhost/api/battle", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ coinId: "bitcoin" }),
+      }),
+    );
+
+    const text = await response.text();
+    const pickReadyIndex = text.indexOf("event: battle_pick_ready");
+    const battleCompleteIndex = text.indexOf("event: battle_complete");
+
+    expect(pickReadyIndex).toBeGreaterThan(-1);
+    expect(battleCompleteIndex).toBeGreaterThan(-1);
+    expect(pickReadyIndex).toBeLessThan(battleCompleteIndex);
+    expect(text).toContain('"bullCount":2');
+    expect(text).toContain('"bearCount":2');
   });
 
   it("중간 llm 예외가 있어도 나머지 message 이벤트와 완료 이벤트를 유지한다", async () => {

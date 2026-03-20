@@ -5,6 +5,7 @@ export interface CacheTtlPolicy {
 
 export const cachePolicy = {
   prewarmCoinIds: ["bitcoin", "ethereum", "xrp", "solana"],
+  prewarmMaxConcurrency: 2,
   topCoinsSoftLimit: 4,
   marketSeed: {
     softTtlMs: 2 * 60 * 1000,

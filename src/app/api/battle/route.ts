@@ -1,10 +1,59 @@
 import { generateCharacterMessage } from "@/application/useCases/generateBattleDebate";
 import { getPreparedBattleContext } from "@/application/useCases/preparedBattleContext";
+import type { DebateMessage } from "@/domain/models/DebateMessage";
 import { NextResponse } from "next/server";
 import { characters } from "@/shared/constants/characters";
 
 function toSseEvent(event: string, payload: unknown) {
   return `event: ${event}\ndata: ${JSON.stringify(payload)}\n\n`;
+}
+
+function buildDebateRounds() {
+  const bullCharacters = characters.filter((character) => character.team === "bull");
+  const bearCharacters = characters.filter((character) => character.team === "bear");
+  const roundCount = Math.max(bullCharacters.length, bearCharacters.length);
+
+  return Array.from({ length: roundCount }, (_, index) =>
+    [bullCharacters[index], bearCharacters[index]].filter(Boolean),
+  );
+}
+
+function getPickReadyPayload(messages: DebateMessage[]) {
+  const bullCount = messages.filter((message) => message.team === "bull").length;
+  const bearCount = messages.filter((message) => message.team === "bear").length;
+
+  return {
+    bullCount,
+    bearCount,
+    ready: bullCount >= 2 && bearCount >= 2,
+  };
+}
+
+async function emitMessageLifecycle(
+  controller: ReadableStreamDefaultController<Uint8Array>,
+  encoder: TextEncoder,
+  message: DebateMessage,
+) {
+  controller.enqueue(
+    encoder.encode(
+      toSseEvent("character_start", {
+        characterId: message.characterId,
+        characterName: message.characterName,
+        team: message.team,
+      }),
+    ),
+  );
+  controller.enqueue(encoder.encode(toSseEvent("message", message)));
+  controller.enqueue(
+    encoder.encode(
+      toSseEvent("character_done", {
+        characterId: message.characterId,
+        provider: message.provider,
+        model: message.model,
+        fallbackUsed: message.fallbackUsed,
+      }),
+    ),
+  );
 }
 
 export async function POST(request: Request) {
@@ -18,10 +67,7 @@ export async function POST(request: Request) {
 
   const coinId = body.coinId;
   const preparedContextResult = await getPreparedBattleContext(coinId);
-  const firstCharacter = characters[0] ?? null;
-  const preparedFirstTurnDraft = firstCharacter
-    ? preparedContextResult.context.firstTurnDrafts[firstCharacter.id] ?? null
-    : null;
+  const preparedFirstTurnDrafts = preparedContextResult.context.firstTurnDrafts;
 
   const stream = new ReadableStream({
     async start(controller) {
@@ -32,68 +78,44 @@ export async function POST(request: Request) {
 
         controller.enqueue(encoder.encode(toSseEvent("battle_start", { marketData, summary })));
 
-        const messages = [];
+        const messages: DebateMessage[] = [];
+        const debateRounds = buildDebateRounds();
+        let pickReadySent = false;
 
-        if (firstCharacter) {
-          const firstMessage =
-            preparedFirstTurnDraft ??
-            (await generateCharacterMessage(
-              marketData,
-              firstCharacter,
-              messages,
-              reusableDebateContext,
-            ));
-          messages.push(firstMessage);
-          controller.enqueue(
-            encoder.encode(
-              toSseEvent("character_start", {
-                characterId: firstMessage.characterId,
-                characterName: firstMessage.characterName,
-                team: firstMessage.team,
-              }),
-            ),
-          );
-          controller.enqueue(encoder.encode(toSseEvent("message", firstMessage)));
-          controller.enqueue(
-            encoder.encode(
-              toSseEvent("character_done", {
-                characterId: firstMessage.characterId,
-                provider: firstMessage.provider,
-                model: firstMessage.model,
-                fallbackUsed: firstMessage.fallbackUsed,
-              }),
-            ),
-          );
-        }
-
-        for (const character of characters.slice(1)) {
-          const message = await generateCharacterMessage(
-            marketData,
+        for (const roundCharacters of debateRounds) {
+          const pendingTasks = roundCharacters.map((character) => ({
             character,
-            messages,
-            reusableDebateContext,
-          );
-          messages.push(message);
-          controller.enqueue(
-            encoder.encode(
-              toSseEvent("character_start", {
-                characterId: message.characterId,
-                characterName: message.characterName,
-                team: message.team,
-              }),
-            ),
-          );
-          controller.enqueue(encoder.encode(toSseEvent("message", message)));
-          controller.enqueue(
-            encoder.encode(
-              toSseEvent("character_done", {
-                characterId: message.characterId,
-                provider: message.provider,
-                model: message.model,
-                fallbackUsed: message.fallbackUsed,
-              }),
-            ),
-          );
+            promise:
+              preparedFirstTurnDrafts[character.id]
+                ? Promise.resolve(preparedFirstTurnDrafts[character.id])
+                : generateCharacterMessage(
+                    marketData,
+                    character,
+                    messages,
+                    reusableDebateContext,
+                  ),
+          }));
+
+          while (pendingTasks.length > 0) {
+            const settled = await Promise.race(
+              pendingTasks.map((task) =>
+                task.promise.then((message) => ({
+                  task,
+                  message,
+                })),
+              ),
+            );
+
+            pendingTasks.splice(pendingTasks.indexOf(settled.task), 1);
+            messages.push(settled.message);
+            await emitMessageLifecycle(controller, encoder, settled.message);
+
+            const pickReadyPayload = getPickReadyPayload(messages);
+            if (!pickReadySent && pickReadyPayload.ready) {
+              pickReadySent = true;
+              controller.enqueue(encoder.encode(toSseEvent("battle_pick_ready", pickReadyPayload)));
+            }
+          }
         }
 
         controller.enqueue(

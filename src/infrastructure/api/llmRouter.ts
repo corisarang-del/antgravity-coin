@@ -1,4 +1,5 @@
 import type { GenerateDebateChunkInput, LlmProvider } from "@/application/ports/LlmProvider";
+import type { CharacterModelRoute } from "@/shared/constants/characterModelRoutes";
 import {
   buildLlmResponseCacheKey,
   getCachedLlmResponse,
@@ -18,6 +19,34 @@ export interface DebateChunkResult {
   provider: string;
   model: string;
   fallbackUsed: boolean;
+}
+
+function buildRouteAttempts(route: CharacterModelRoute) {
+  const attempts: Array<{
+    provider: string;
+    model: string;
+    fallbackUsed: boolean;
+  }> = [
+    {
+      provider: route.provider,
+      model: route.model,
+      fallbackUsed: false,
+    },
+  ];
+
+  const seen = new Set([`${route.provider}:${route.model}`]);
+  const configuredFallbackKey = `${route.fallbackProvider}:${route.fallbackModel}`;
+
+  if (!seen.has(configuredFallbackKey)) {
+    seen.add(configuredFallbackKey);
+    attempts.push({
+      provider: route.fallbackProvider,
+      model: route.fallbackModel,
+      fallbackUsed: true,
+    });
+  }
+
+  return attempts;
 }
 
 export async function generateCharacterDebateChunk(input: {
@@ -50,33 +79,46 @@ export async function generateCharacterDebateChunk(input: {
     };
   }
 
-  const provider = providers[route.provider];
-  const fallbackProvider = providers[route.fallbackProvider];
-  const primaryResponse =
-    provider && (await provider.generateDebateChunk(input.llmInput, route.model, route.timeoutMs));
-  const shouldTryFallback =
-    !primaryResponse &&
-    fallbackProvider &&
-    (route.fallbackProvider !== route.provider || route.fallbackModel !== route.model);
-  const fallbackResponse =
-    shouldTryFallback &&
-    (await fallbackProvider.generateDebateChunk(
-      input.llmInput,
-      route.fallbackModel,
-      route.timeoutMs,
-    ));
-  const response = primaryResponse || fallbackResponse || null;
-  const result: DebateChunkResult = {
-    content: response,
-    provider: primaryResponse ? route.provider : route.fallbackProvider,
-    model: primaryResponse ? route.model : route.fallbackModel,
-    fallbackUsed: !primaryResponse && Boolean(fallbackResponse),
+  const attempts = buildRouteAttempts(route);
+  let result: DebateChunkResult = {
+    content: null,
+    provider: route.provider,
+    model: route.model,
+    fallbackUsed: false,
   };
+
+  for (const attempt of attempts) {
+    const provider = providers[attempt.provider];
+    if (!provider) {
+      continue;
+    }
+
+    const response = await provider.generateDebateChunk(
+      input.llmInput,
+      attempt.model,
+      route.timeoutMs,
+    );
+
+    if (!response) {
+      continue;
+    }
+
+    result = {
+      content: response,
+      provider: attempt.provider,
+      model: attempt.model,
+      fallbackUsed: attempt.fallbackUsed,
+    };
+    break;
+  }
 
   console.log(
     `[battle-llm] character=${input.characterId} provider=${result.provider} model=${result.model} fallbackUsed=${result.fallbackUsed}`,
   );
 
-  setCachedLlmResponse(cacheKey, response, route.cacheTtlSeconds);
+  if (result.content) {
+    setCachedLlmResponse(cacheKey, result.content, route.cacheTtlSeconds);
+  }
+
   return result;
 }
