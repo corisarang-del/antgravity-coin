@@ -62,7 +62,7 @@ export async function persistAuthenticatedBattleOutcome(
     battleOutcomeSeed: BattleOutcomeSeed;
     playerDecisionSeed: PlayerDecisionSeed;
     characterMemorySeeds: CharacterMemorySeed[];
-    report: BattleReport;
+    report?: BattleReport | null;
   },
 ) {
   await persistAuthenticatedBattleSession(supabase, user, {
@@ -78,7 +78,7 @@ export async function persistAuthenticatedBattleOutcome(
     user_won: input.battleOutcomeSeed.userWon,
     strongest_winning_argument: input.battleOutcomeSeed.strongestWinningArgument,
     weakest_losing_argument: input.battleOutcomeSeed.weakestLosingArgument,
-    report_json: input.report,
+    report_json: input.report ?? {},
     rule_version: input.battleOutcomeSeed.ruleVersion,
     created_at: input.battleOutcomeSeed.createdAt,
   });

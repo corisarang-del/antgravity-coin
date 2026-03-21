@@ -36,6 +36,7 @@ vi.mock("@/infrastructure/auth/requestOwner", () => ({
 function createOutcomeRequest(input?: {
   battleId?: string;
   summary?: string;
+  mode?: "settlement" | "full";
 }) {
   return new Request("http://localhost/api/battle/outcome", {
     method: "POST",
@@ -43,6 +44,7 @@ function createOutcomeRequest(input?: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
+      mode: input?.mode,
       userBattle: {
         battleId: input?.battleId ?? "battle-1",
         coinId: "bitcoin",
@@ -140,6 +142,48 @@ describe("POST /api/battle/outcome", () => {
     expect(data.battleOutcomeSeed.battleId).toBe(battleId);
     expect(data.report.report).toContain("BTC");
     expect(data.reportSource).toBe("fallback");
+  });
+
+  it("settlement 모드는 report 없이 outcome seed를 먼저 반환한다", async () => {
+    const battleId = `battle-${crypto.randomUUID()}`;
+    const response = await POST(createOutcomeRequest({ battleId, mode: "settlement" }));
+
+    const data = (await response.json()) as {
+      ok: boolean;
+      battleOutcomeSeed: { battleId: string };
+      report: null;
+      reportPending: boolean;
+    };
+
+    expect(data.ok).toBe(true);
+    expect(data.battleOutcomeSeed.battleId).toBe(battleId);
+    expect(data.report).toBeNull();
+    expect(data.reportPending).toBe(true);
+
+    vi.spyOn(FileBattleSnapshotRepository.prototype, "getSnapshotByBattleIdForUser").mockResolvedValueOnce({
+      snapshotId: `snapshot-${crypto.randomUUID()}`,
+      userId: "anonymous",
+      battleId,
+      coinId: "bitcoin",
+      marketData: null,
+      summary: null,
+      messages: [],
+      savedAt: new Date().toISOString(),
+    });
+
+    const getResponse = await GET(
+      new Request(`http://localhost/api/battle/outcome?battleId=${encodeURIComponent(battleId)}`),
+    );
+
+    const getData = (await getResponse.json()) as {
+      ok: boolean;
+      report: null;
+      reportPending: boolean;
+    };
+
+    expect(getData.ok).toBe(true);
+    expect(getData.report).toBeNull();
+    expect(getData.reportPending).toBe(true);
   });
 
   it("다른 owner가 같은 battleId 결과를 조회하면 404를 반환한다", async () => {

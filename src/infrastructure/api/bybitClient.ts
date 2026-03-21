@@ -33,6 +33,7 @@ export interface BybitKlineCandle {
 }
 
 const BASE_URL = "https://api.bybit.com";
+const BYBIT_TIMEOUT_MS = 4_000;
 
 function toLinearSymbol(symbol: string) {
   return `${symbol.toUpperCase()}USDT`;
@@ -81,29 +82,37 @@ export async function fetchBybitLongShortRatio(symbol: string) {
   url.searchParams.set("period", "1h");
   url.searchParams.set("limit", "1");
 
-  const response = await fetch(url, {
-    next: { revalidate: 300 },
-  });
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), BYBIT_TIMEOUT_MS);
 
-  if (!response.ok) {
-    throw new Error(`Bybit account ratio request failed: ${response.status}`);
+  try {
+    const response = await fetch(url, {
+      next: { revalidate: 300 },
+      signal: controller.signal,
+    });
+
+    if (!response.ok) {
+      throw new Error(`Bybit account ratio request failed: ${response.status}`);
+    }
+
+    const data = (await response.json()) as BybitAccountRatioResponse;
+    const latest = data.result?.list?.[0];
+
+    if (!latest) {
+      throw new Error("Bybit account ratio response empty");
+    }
+
+    const buyRatio = Number(latest.buyRatio ?? latest.longAccount);
+    const sellRatio = Number(latest.sellRatio ?? latest.shortAccount);
+
+    if (!Number.isFinite(buyRatio) || !Number.isFinite(sellRatio) || sellRatio <= 0) {
+      throw new Error("Bybit account ratio response invalid");
+    }
+
+    return Number((buyRatio / sellRatio).toFixed(2));
+  } finally {
+    clearTimeout(timeout);
   }
-
-  const data = (await response.json()) as BybitAccountRatioResponse;
-  const latest = data.result?.list?.[0];
-
-  if (!latest) {
-    throw new Error("Bybit account ratio response empty");
-  }
-
-  const buyRatio = Number(latest.buyRatio ?? latest.longAccount);
-  const sellRatio = Number(latest.sellRatio ?? latest.shortAccount);
-
-  if (!Number.isFinite(buyRatio) || !Number.isFinite(sellRatio) || sellRatio <= 0) {
-    throw new Error("Bybit account ratio response invalid");
-  }
-
-  return Number((buyRatio / sellRatio).toFixed(2));
 }
 
 export async function fetchBybitKlines(input: {
@@ -127,54 +136,62 @@ export async function fetchBybitKlines(input: {
     url.searchParams.set("end", `${input.endMs}`);
   }
 
-  const response = await fetch(url, {
-    next: { revalidate: 30 },
-  });
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), BYBIT_TIMEOUT_MS);
 
-  if (!response.ok) {
-    throw new Error(`Bybit kline request failed: ${response.status}`);
+  try {
+    const response = await fetch(url, {
+      next: { revalidate: 30 },
+      signal: controller.signal,
+    });
+
+    if (!response.ok) {
+      throw new Error(`Bybit kline request failed: ${response.status}`);
+    }
+
+    const data = (await response.json()) as BybitKlineResponse;
+    const candles = (data.result?.list ?? [])
+      .map((item) => {
+        const startTimeMs = Number(item[0]);
+        const openPrice = Number(item[1]);
+        const highPrice = Number(item[2]);
+        const lowPrice = Number(item[3]);
+        const closePrice = Number(item[4]);
+        const volume = Number(item[5]);
+        const turnover = Number(item[6]);
+
+        if (
+          !Number.isFinite(startTimeMs) ||
+          !Number.isFinite(openPrice) ||
+          !Number.isFinite(highPrice) ||
+          !Number.isFinite(lowPrice) ||
+          !Number.isFinite(closePrice)
+        ) {
+          return null;
+        }
+
+        return {
+          startTimeMs,
+          openPrice,
+          highPrice,
+          lowPrice,
+          closePrice,
+          volume: Number.isFinite(volume) ? volume : 0,
+          turnover: Number.isFinite(turnover) ? turnover : 0,
+          endTimeMs: startTimeMs + getIntervalDurationMs(input.interval),
+        } satisfies BybitKlineCandle;
+      })
+      .filter((candle): candle is BybitKlineCandle => candle !== null)
+      .sort((left, right) => left.startTimeMs - right.startTimeMs);
+
+    if (candles.length === 0) {
+      throw new Error("Bybit kline response empty");
+    }
+
+    return candles;
+  } finally {
+    clearTimeout(timeout);
   }
-
-  const data = (await response.json()) as BybitKlineResponse;
-  const candles = (data.result?.list ?? [])
-    .map((item) => {
-      const startTimeMs = Number(item[0]);
-      const openPrice = Number(item[1]);
-      const highPrice = Number(item[2]);
-      const lowPrice = Number(item[3]);
-      const closePrice = Number(item[4]);
-      const volume = Number(item[5]);
-      const turnover = Number(item[6]);
-
-      if (
-        !Number.isFinite(startTimeMs) ||
-        !Number.isFinite(openPrice) ||
-        !Number.isFinite(highPrice) ||
-        !Number.isFinite(lowPrice) ||
-        !Number.isFinite(closePrice)
-      ) {
-        return null;
-      }
-
-      return {
-        startTimeMs,
-        openPrice,
-        highPrice,
-        lowPrice,
-        closePrice,
-        volume: Number.isFinite(volume) ? volume : 0,
-        turnover: Number.isFinite(turnover) ? turnover : 0,
-        endTimeMs: startTimeMs + getIntervalDurationMs(input.interval),
-      } satisfies BybitKlineCandle;
-    })
-    .filter((candle): candle is BybitKlineCandle => candle !== null)
-    .sort((left, right) => left.startTimeMs - right.startTimeMs);
-
-  if (candles.length === 0) {
-    throw new Error("Bybit kline response empty");
-  }
-
-  return candles;
 }
 
 export async function fetchBybitEntryCandleClose(marketSymbol: string, selectedAt: string) {

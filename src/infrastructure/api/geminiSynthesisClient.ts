@@ -17,6 +17,8 @@ interface GeminiResponse {
   }>;
 }
 
+const GEMINI_TIMEOUT_MS = 3_500;
+
 export interface GeminiBattleLessons {
   reportSummary: string;
   globalLessons: string[];
@@ -38,29 +40,36 @@ async function requestGemini(prompt: string) {
   const url = `${baseUrl}/gemini-2.5-pro:generateContent?key=${envConfig.geminiApiKey}`;
 
   try {
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        contents: [
-          {
-            parts: [{ text: prompt }],
-          },
-        ],
-        generationConfig: {
-          temperature: 0.4,
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), GEMINI_TIMEOUT_MS);
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      }),
-    });
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [{ text: prompt }],
+            },
+          ],
+          generationConfig: {
+            temperature: 0.4,
+          },
+        }),
+        signal: controller.signal,
+      });
 
-    if (!response.ok) {
-      return null;
+      if (!response.ok) {
+        return null;
+      }
+
+      const data = (await response.json()) as GeminiResponse;
+      return data.candidates?.[0]?.content?.parts?.[0]?.text ?? null;
+    } finally {
+      clearTimeout(timeout);
     }
-
-    const data = (await response.json()) as GeminiResponse;
-    return data.candidates?.[0]?.content?.parts?.[0]?.text ?? null;
   } catch {
     return null;
   }

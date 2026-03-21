@@ -43,6 +43,8 @@
 | F3-5 | XP 1회 적용 | local applied set + 서버 application 저장 | P0 | 구현 |
 | F3-6 | 결과 하이라이트 | 승리 팀 핵심 메시지와 XP 변화 표시 | P1 | 구현 |
 | F3-7 | 결과 재방문 복구 | battleId 기준 outcome/report 재조회 | P1 | 구현 |
+| F3-8 | 0초 자동 결과 이동 | waiting countdown이 0초가 되면 `/result` 자동 이동 | P1 | 구현 |
+| F3-9 | 정산 결과 선표시 | 승패, 변화율, XP를 먼저 보여주고 report는 후행 생성 | P1 | 구현 |
 
 ## F4. 데이터 수집과 캐시
 

@@ -31,7 +31,9 @@ export async function POST(request: Request) {
   const body = (await request.json()) as {
     userBattle?: UserBattle;
     messages?: DebateMessage[];
+    mode?: "settlement" | "full";
   };
+  const mode = body.mode === "settlement" ? "settlement" : "full";
 
   if (!body.userBattle) {
     return NextResponse.json({ error: "missing_payload" }, { status: 400 });
@@ -91,6 +93,89 @@ export async function POST(request: Request) {
       });
     }
 
+    if (existingOutcomeSeed && existingPlayerDecisionSeed && mode === "settlement") {
+      await applicationRepository.markApplied({
+        battleId,
+        userId,
+        appliedAt: new Date().toISOString(),
+      });
+
+      return NextResponse.json({
+        ok: true,
+        battleOutcomeSeed: existingOutcomeSeed,
+        characterMemorySeeds: existingCharacterMemorySeeds,
+        playerDecisionSeed: existingPlayerDecisionSeed,
+        report: existingReport,
+        reportSource: existingReport?.reportSource ?? null,
+        recovered: true,
+        reportPending: !existingReport,
+      });
+    }
+
+    if (existingOutcomeSeed && existingPlayerDecisionSeed && !existingReport) {
+      const report = sanitizeBattleReport(
+        await generateBattleReport({
+          battleOutcomeSeed: existingOutcomeSeed,
+          characterMemorySeeds: existingCharacterMemorySeeds,
+          playerDecisionSeed: existingPlayerDecisionSeed,
+        }),
+        existingOutcomeSeed,
+        existingCharacterMemorySeeds,
+      );
+
+      const synthesizedLessons = await synthesizeBattleLessonsWithGemini({
+        battleOutcomeSeed: existingOutcomeSeed,
+        characterMemorySeeds: existingCharacterMemorySeeds,
+        playerDecisionSeed: existingPlayerDecisionSeed,
+        report: report.report,
+      });
+
+      const reusableMemo = sanitizeReusableBattleMemo(
+        buildReusableBattleMemo({
+          battleOutcomeSeed: existingOutcomeSeed,
+          characterMemorySeeds: existingCharacterMemorySeeds,
+          report,
+          synthesizedLessons,
+        }),
+      );
+
+      try {
+        await reportRepository.saveReport(report);
+        await reportRepository.saveReusableMemo(reusableMemo);
+
+        if (user) {
+          await persistAuthenticatedBattleOutcome(supabase, user, {
+            userBattle,
+            battleOutcomeSeed: existingOutcomeSeed,
+            playerDecisionSeed: existingPlayerDecisionSeed,
+            characterMemorySeeds: existingCharacterMemorySeeds,
+            report,
+          });
+        }
+      } catch {
+        return NextResponse.json(
+          { error: "outcome_persist_failed", retryable: true },
+          { status: 500 },
+        );
+      }
+
+      await applicationRepository.markApplied({
+        battleId,
+        userId,
+        appliedAt: new Date().toISOString(),
+      });
+
+      return NextResponse.json({
+        ok: true,
+        battleOutcomeSeed: existingOutcomeSeed,
+        characterMemorySeeds: existingCharacterMemorySeeds,
+        playerDecisionSeed: existingPlayerDecisionSeed,
+        report,
+        reportSource: report.reportSource ?? "fallback",
+        recovered: true,
+      });
+    }
+
     const snapshot = userBattle.snapshotId
       ? await snapshotRepository.getSnapshotForUser(userBattle.snapshotId, userId)
       : null;
@@ -138,38 +223,11 @@ export async function POST(request: Request) {
     });
 
     const characterMemorySeeds = sanitizeCharacterMemorySeeds(rawCharacterMemorySeeds);
-    const report = sanitizeBattleReport(
-      await generateBattleReport({
-        battleOutcomeSeed,
-        characterMemorySeeds,
-        playerDecisionSeed,
-      }),
-      battleOutcomeSeed,
-      characterMemorySeeds,
-    );
-
-    const synthesizedLessons = await synthesizeBattleLessonsWithGemini({
-      battleOutcomeSeed,
-      characterMemorySeeds,
-      playerDecisionSeed,
-      report: report.report,
-    });
-
-    const reusableMemo = sanitizeReusableBattleMemo(
-      buildReusableBattleMemo({
-        battleOutcomeSeed,
-        characterMemorySeeds,
-        report,
-        synthesizedLessons,
-      }),
-    );
 
     try {
       await seedRepository.saveBattleOutcomeSeed(battleOutcomeSeed);
       await seedRepository.saveCharacterMemorySeeds(characterMemorySeeds);
       await seedRepository.savePlayerDecisionSeed(playerDecisionSeed);
-      await reportRepository.saveReport(report);
-      await reportRepository.saveReusableMemo(reusableMemo);
 
       await eventLog.append({
         id: `event:battle_start:${battleOutcomeSeed.battleId}`,
@@ -237,6 +295,63 @@ export async function POST(request: Request) {
           battleOutcomeSeed,
           playerDecisionSeed,
           characterMemorySeeds,
+        });
+      }
+    } catch {
+      return NextResponse.json(
+        { error: "outcome_persist_failed", retryable: true },
+        { status: 500 },
+      );
+    }
+
+    if (mode === "settlement") {
+      return NextResponse.json({
+        ok: true,
+        battleOutcomeSeed,
+        characterMemorySeeds,
+        playerDecisionSeed,
+        report: null,
+        reportSource: null,
+        reportPending: true,
+      });
+    }
+
+    const report = sanitizeBattleReport(
+      await generateBattleReport({
+        battleOutcomeSeed,
+        characterMemorySeeds,
+        playerDecisionSeed,
+      }),
+      battleOutcomeSeed,
+      characterMemorySeeds,
+    );
+
+    const synthesizedLessons = await synthesizeBattleLessonsWithGemini({
+      battleOutcomeSeed,
+      characterMemorySeeds,
+      playerDecisionSeed,
+      report: report.report,
+    });
+
+    const reusableMemo = sanitizeReusableBattleMemo(
+      buildReusableBattleMemo({
+        battleOutcomeSeed,
+        characterMemorySeeds,
+        report,
+        synthesizedLessons,
+      }),
+    );
+
+    try {
+      await reportRepository.saveReport(report);
+      await reportRepository.saveReusableMemo(reusableMemo);
+
+      if (user) {
+        await persistAuthenticatedBattleOutcome(supabase, user, {
+          userBattle,
+          battleOutcomeSeed,
+          playerDecisionSeed,
+          characterMemorySeeds,
           report,
         });
       }
@@ -290,6 +405,7 @@ export async function GET(request: Request) {
     characterMemorySeeds,
     playerDecisionSeed,
     report,
-    reportSource: report?.reportSource ?? "fallback",
+    reportSource: report?.reportSource ?? null,
+    reportPending: !report,
   });
 }

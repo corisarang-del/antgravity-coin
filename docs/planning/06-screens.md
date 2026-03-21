@@ -113,6 +113,8 @@
 - 현재 상태
   - timeframe label과 countdown 표시
   - `MyPickSummary`로 선택 팀, 코인, timeframe 표시
+  - countdown 10초 전부터 result route와 settlement outcome 계산 선행 준비
+  - countdown이 0초가 되면 `/result`로 자동 이동
   - 결과 화면 이동 CTA 제공
   - 선택 정보가 없으면 pick 화면으로 복귀 링크 표시
 
@@ -124,9 +126,11 @@
   - `settlementAt` 이전이면 pending 화면과 countdown 노출
   - 이후에는
     1. `GET /api/battle/outcome?battleId=...` 조회
-    2. 없으면 `POST /api/battle/outcome` 계산
+    2. 없으면 `POST /api/battle/outcome` settlement 모드로 승패/XP 우선 계산
+    3. report가 없으면 같은 route full 모드로 후행 생성
   - `VerdictBanner`, `UserLevelChange`, `CharacterLevelChange`, `WinnerHighlight` 표시
-  - report가 있으면 본문 출력
+  - report가 아직 없으면 `리포트 정리 중` 단계 표시
+  - report가 준비되면 본문 출력
   - XP는 local applied set으로 1회 반영
 
 ## `/characters`
