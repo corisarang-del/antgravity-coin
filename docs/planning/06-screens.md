@@ -1,6 +1,6 @@
 # 화면 명세
 
-- 작성시각: 2026-03-21 03:01 KST
+- 작성시각: 2026-03-21 14:50 KST
 - 기준: 현재 App Router 화면 구현
 
 ## 전체 흐름
@@ -34,6 +34,18 @@
 - 현재 상태
   - 서버 렌더 중심
   - `LandingEnterOverlay`, `LandingCharacterRail`, preview modal만 클라이언트 아일랜드
+  - 입장 전 오버레이 CTA
+    - 흰 배경 pill
+    - 텍스트는 `landing-hero-ink`
+    - 최소 높이 `48px`
+  - 히어로 CTA 2종
+    - 주 CTA: `바로 배틀 시작`
+      - 흰 배경
+      - `landing-hero-ink` 전경색
+      - 최소 높이 `48px`
+    - 보조 CTA: `트레이더 먼저 보기`
+      - 반투명 배경 + 흰색 텍스트
+  - 상단 우측 `배틀 입장`은 primary filled CTA 규칙 사용
 
 ## `/home`
 
@@ -44,6 +56,15 @@
 - 현재 상태
   - 서버에서 top coins와 초기 user snapshot 병렬 준비
   - `SearchBar`, `TopCoinsGrid`, `RecentCoinsList` 조합
+  - 공통 헤더 행동 요소
+    - `로그인`은 primary filled CTA
+    - `계정 상태 게스트` pill은 action 버튼 옆에서도 읽히도록 라벨 대비 유지
+  - Top 코인 카드 CTA
+    - 라벨: `배틀 입장`
+    - 최소 높이 `44px`
+    - 최소 너비 `108px`
+    - 글자 크기 `14px`, 두께 `700`
+    - 네이비 filled + 밝은 foreground 유지
 
 ## `/battle/[coinId]`
 

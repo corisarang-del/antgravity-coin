@@ -1,6 +1,6 @@
 # 디자인 토큰 리뷰
 
-작성시각: 2026-03-14 14:33 KST
+작성시각: 2026-03-21 14:50 KST
 대상 파일: `src/styles/tokens.css`
 
 ## passed checks
@@ -25,7 +25,17 @@
 
 - 결과 배너에는 `--xp`와 `--accent`를 같이 쓰지 말고 하나만 대표색으로 쓴다
 - 배틀 로그 행 단위 컴포넌트에는 `muted` 계열을 우선 적용하고, 선택 상태에서만 `accent`를 올린다
+- 핵심 CTA는 토큰 값만 선언하는 걸로 끝내지 말고 실제 렌더에서 foreground가 덮이지 않게 규칙을 강제해야 한다
+- 랜딩 히어로의 흰 CTA는 `background` 배경 + `landing-hero-ink` 텍스트 조합을 고정해야 한다
+- 홈/헤더 CTA는 최소 `44px`, 랜딩 흰 CTA는 최소 `48px`, 카드 CTA는 `108px` 이상 폭을 권장한다
+
+## runtime validation
+
+- `localhost:3000` 브라우저 실측 기준 확인
+  - `로그인`: 밝은 foreground on 네이비, `44px`, `14px`
+  - 홈 카드 `배틀 입장`: 밝은 foreground on 네이비, `44px`, `108px`, `14px`
+  - 랜딩 `바로 배틀 시작`: `landing-hero-ink` on 밝은 배경, `48px`, `14px`
 
 ## final status
 
-`pass with fixes`
+`pass with validated CTA rules`
