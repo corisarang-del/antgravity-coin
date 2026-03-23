@@ -273,11 +273,18 @@ export function useBattleStream({ coinId }: UseBattleStreamOptions) {
 
     return () => {
       cancelled = true;
-      controller.abort();
       if (persistHandle !== null) {
         cancelBackgroundWrite(persistHandle);
       }
-      void reader?.cancel();
+
+      if (reader) {
+        void reader.cancel().catch(() => undefined);
+        return;
+      }
+
+      if (!controller.signal.aborted) {
+        controller.abort();
+      }
     };
   }, [coinId]);
 

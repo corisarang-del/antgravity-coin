@@ -71,7 +71,7 @@ export const characterDebateProfiles: Record<string, CharacterDebateProfile> = {
     modelRoute: {
       tier: "balanced",
       provider: "openrouter",
-      model: "stepfun/step-3.5-flash:free",
+      model: "arcee-ai/trinity-mini",
       fallbackProvider: "openrouter",
       fallbackModel: "qwen/qwen3.5-9b",
       timeoutMs: 9000,
@@ -297,7 +297,7 @@ export const characterDebateProfiles: Record<string, CharacterDebateProfile> = {
     modelRoute: {
       tier: "balanced",
       provider: "openrouter",
-      model: "stepfun/step-3.5-flash:free",
+      model: "google/gemma-3-12b-it",
       fallbackProvider: "openrouter",
       fallbackModel: "qwen/qwen3.5-9b",
       timeoutMs: 9000,
