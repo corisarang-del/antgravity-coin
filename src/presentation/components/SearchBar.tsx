@@ -147,12 +147,12 @@ export function SearchBar({ initialCoins, debounceMs = 300 }: SearchBarProps) {
   const showSuggestions = isOpen && (results.length > 0 || showEmptyState);
 
   return (
-    <section className="rounded-[28px] border border-border bg-[linear-gradient(180deg,hsl(var(--card))_0%,hsl(var(--surface-3))_100%)] p-5 shadow-[0_18px_44px_rgba(17,29,61,0.08)]">
+    <section className="min-w-0 rounded-[28px] border border-border bg-[linear-gradient(180deg,hsl(var(--card))_0%,hsl(var(--surface-3))_100%)] p-5 shadow-[0_18px_44px_rgba(17,29,61,0.08)]">
       <div className="mb-4 flex flex-col gap-2">
-        <p className="font-display text-[28px] font-bold leading-none tracking-[-0.05em]">
-          어떤 코인으로 붙어볼지 골라줘
+        <p className="max-w-full font-display whitespace-nowrap text-[clamp(1.35rem,3.5vw,1.85rem)] font-bold leading-none tracking-[-0.06em]">
+          어떤 코인으로 붙을지 골라줘
         </p>
-        <p className="text-sm leading-6 text-muted-foreground">
+        <p className="ag-body-copy ag-body-copy-strong">
           코인을 찾으면 불리시와 베어리시 8명 토론을 바로 시작할 수 있어.
         </p>
       </div>
@@ -181,7 +181,7 @@ export function SearchBar({ initialCoins, debounceMs = 300 }: SearchBarProps) {
         role="combobox"
         value={query}
       />
-      <p className="mt-2 text-xs text-muted-foreground">
+      <p className="ag-body-copy ag-body-copy-strong mt-2">
         처음에는 검색창만 보여주고, 입력하거나 포커스하면 추천 코인과 자동완성을 열어줘.
       </p>
 
@@ -224,13 +224,13 @@ export function SearchBar({ initialCoins, debounceMs = 300 }: SearchBarProps) {
             </li>
           ))}
           {showEmptyState ? (
-            <li className="rounded-[18px] bg-card px-4 py-4 text-sm text-muted-foreground" role="status">
+            <li className="ag-body-copy ag-body-copy-strong rounded-[18px] bg-card px-4 py-4" role="status">
               검색 결과가 없어. 다른 심볼이나 이름으로 다시 찾아줘.
             </li>
           ) : null}
         </ul>
       ) : (
-        <div className="mt-4 rounded-[20px] border border-dashed border-border/80 bg-[hsl(var(--surface-2)/0.45)] px-4 py-4 text-sm text-muted-foreground">
+        <div className="ag-body-copy ag-body-copy-strong mt-4 rounded-[20px] border border-dashed border-border/80 bg-[hsl(var(--surface-2)/0.45)] px-4 py-4">
           검색을 시작하면 추천 코인과 자동완성 결과를 바로 보여줄게.
         </div>
       )}

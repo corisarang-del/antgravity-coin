@@ -77,17 +77,17 @@ export function CharacterDetailModal({ character, onClose }: CharacterDetailModa
               닫기
             </button>
           </div>
-          <p className="mt-4 text-sm leading-6 text-muted-foreground" id={descriptionId}>
+          <p className="ag-body-copy ag-body-copy-strong mt-4" id={descriptionId}>
             {character.specialty}
           </p>
           <div className="mt-5 space-y-4">
             <div>
               <p className="text-sm font-semibold">성격</p>
-              <p className="mt-2 text-sm leading-6 text-muted-foreground">{character.personality}</p>
+              <p className="ag-body-copy ag-body-copy-strong mt-2">{character.personality}</p>
             </div>
             <div>
               <p className="text-sm font-semibold">고른 이유</p>
-              <p className="mt-2 text-sm leading-6 text-muted-foreground">{character.selectionReason}</p>
+              <p className="ag-body-copy ag-body-copy-strong mt-2">{character.selectionReason}</p>
             </div>
           </div>
         </div>

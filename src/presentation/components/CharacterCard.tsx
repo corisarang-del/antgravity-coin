@@ -44,7 +44,7 @@ export function CharacterCard({
             <p className="text-sm text-muted-foreground">{character.role}</p>
           </div>
         </div>
-        <p className="mt-4 text-sm leading-6 text-muted-foreground">{character.specialty}</p>
+        <p className="ag-body-copy ag-body-copy-strong mt-4">{character.specialty}</p>
       </div>
     </button>
   );

@@ -304,7 +304,7 @@ export function ResultPageClient({
             <h1 className="font-display text-3xl font-bold tracking-[-0.05em]">
               결과를 계산할 라운드가 없어
             </h1>
-            <p className="mt-3 text-sm leading-6 text-muted-foreground">
+            <p className="ag-body-copy mt-3 text-muted-foreground">
               차트 결과를 만들려면 먼저 팀과 차트 구간을 골라야 해.
             </p>
             <Link
@@ -328,7 +328,7 @@ export function ResultPageClient({
         <main className="mx-auto max-w-4xl space-y-6 px-4 py-6">
           <section className="rounded-[28px] border border-border bg-[linear-gradient(180deg,hsl(var(--card))_0%,hsl(var(--surface-3))_100%)] p-5 shadow-[0_18px_44px_rgba(17,29,61,0.08)]">
             <h1 className="font-display text-4xl font-bold tracking-[-0.05em]">실캔들 정산 대기 중</h1>
-            <p className="mt-3 text-sm leading-6 text-muted-foreground">
+            <p className="ag-body-copy mt-3 text-muted-foreground">
               {timeframeMeta.label} 라운드가 아직 끝나지 않았어. 0초가 되면 바로 정산 계산을 시작해.
             </p>
           </section>
@@ -340,7 +340,7 @@ export function ResultPageClient({
           <MyPickSummary userBattle={userBattle} />
           <section className="rounded-[24px] border border-border bg-card p-5">
             <h2 className="font-display text-2xl font-bold tracking-[-0.04em]">결과 페이지 준비 중</h2>
-            <p className="mt-3 text-sm leading-6 text-muted-foreground">
+            <p className="ag-body-copy mt-3 text-muted-foreground">
               방금 누른 버튼은 결과를 즉시 확정하는 버튼이 아니라 결과 페이지로 먼저 들어오는 버튼이야.
               정산 시각 전에는 카운트다운과 준비 상태를 먼저 보여주고, 시간이 되면 같은 화면에서 결과 카드가
               채워져.
@@ -356,7 +356,7 @@ export function ResultPageClient({
                 </div>
               ))}
             </div>
-            <p className="mt-4 text-sm text-muted-foreground">
+            <p className="ag-body-copy mt-4 text-muted-foreground">
               현재까지 저장된 발언: {(snapshot?.messages?.length ?? 0)}/8
             </p>
           </section>
@@ -375,7 +375,7 @@ export function ResultPageClient({
         <main className="mx-auto max-w-4xl space-y-6 px-4 py-6">
           <section className="rounded-[28px] border border-border bg-card p-5 shadow-[0_18px_40px_rgba(17,29,61,0.08)]">
             <h1 className="font-display text-3xl font-bold tracking-[-0.05em]">{stageCopy.title}</h1>
-            <p className="mt-3 text-sm leading-6 text-muted-foreground">{stageCopy.description}</p>
+            <p className="ag-body-copy mt-3 text-muted-foreground">{stageCopy.description}</p>
             <div className="mt-4 grid gap-2 sm:grid-cols-3">
               {[
                 {
@@ -422,7 +422,7 @@ export function ResultPageClient({
       <AppHeader initialCurrentUserSnapshot={initialCurrentUserSnapshot} />
       <main className="mx-auto max-w-4xl space-y-6 px-4 py-6">
         {isUserLoading ? (
-          <p className="rounded-[20px] border border-border bg-[hsl(var(--surface-2))] px-4 py-3 text-sm text-muted-foreground">
+          <p className="ag-body-copy rounded-[20px] border border-border bg-[hsl(var(--surface-2))] px-4 py-3 text-muted-foreground">
             사용자 레벨을 불러오는 중이야.
           </p>
         ) : null}
@@ -432,7 +432,7 @@ export function ResultPageClient({
           <p className="mt-2 font-display text-3xl font-bold tracking-[-0.05em]">
             {timeframeMeta.label} 실캔들 브리핑
           </p>
-          <p className="mt-2 text-sm text-muted-foreground">
+          <p className="ag-body-copy mt-2 text-muted-foreground">
             {userBattle.marketSymbol} {userBattle.priceSource} 기준으로 정산된 실제 캔들 종가를 사용했어.
           </p>
         </section>
@@ -447,18 +447,18 @@ export function ResultPageClient({
         {battleReport ? (
           <section className="rounded-[24px] border border-border bg-card p-5">
             <h2 className="font-display text-2xl font-bold tracking-[-0.04em]">차트 해설 리포트</h2>
-            <pre className="mt-4 whitespace-pre-wrap text-sm leading-6 text-muted-foreground">
+            <pre className="ag-body-copy mt-4 whitespace-pre-wrap text-muted-foreground">
               {battleReport}
             </pre>
           </section>
         ) : (
           <section className="rounded-[24px] border border-border bg-card p-5">
             <h2 className="font-display text-2xl font-bold tracking-[-0.04em]">리포트 정리 중</h2>
-            <p className="mt-3 text-sm leading-6 text-muted-foreground">
+            <p className="ag-body-copy mt-3 text-muted-foreground">
               승패와 XP는 먼저 보여주고 있어. 차트 해설 리포트는 뒤에서 정리해서 붙이는 중이야.
             </p>
             {reportError ? (
-              <p className="mt-3 rounded-[18px] border border-border bg-[hsl(var(--surface-2))] px-4 py-3 text-sm text-muted-foreground">
+              <p className="ag-body-copy mt-3 rounded-[18px] border border-border bg-[hsl(var(--surface-2))] px-4 py-3 text-muted-foreground">
                 {reportError}
               </p>
             ) : (

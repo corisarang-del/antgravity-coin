@@ -94,7 +94,7 @@ export function WaitingPageClient({
             <h1 className="font-display text-3xl font-bold tracking-[-0.05em]">
               선택한 라운드가 없어
             </h1>
-            <p className="mt-3 text-sm leading-6 text-muted-foreground">
+            <p className="ag-body-copy mt-3 text-muted-foreground">
               먼저 어떤 팀과 어떤 차트 구간으로 볼지 정해야 다음 단계로 갈 수 있어.
             </p>
             <Link
@@ -119,7 +119,7 @@ export function WaitingPageClient({
           <h1 className="font-display text-4xl font-bold tracking-[-0.05em]">
             실캔들 정산 대기 중
           </h1>
-          <p className="mt-3 text-sm leading-6 text-muted-foreground">
+          <p className="ag-body-copy mt-3 text-muted-foreground">
             {timeframeMeta.label} 라운드가 끝나면 Bybit 실캔들 기준으로 바로 승패를 계산할게.
           </p>
         </section>
@@ -136,7 +136,7 @@ export function WaitingPageClient({
           >
             결과 화면 열기
           </Link>
-          <p className="text-sm text-muted-foreground">
+          <p className="ag-body-copy text-muted-foreground">
             정산 10초 전부터 결과 화면과 outcome 계산을 미리 준비해.
           </p>
         </div>

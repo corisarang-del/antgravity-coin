@@ -24,8 +24,8 @@
 
 :root {
   color-scheme: light;
-  --font-body: "Plus Jakarta Sans", "Pretendard", "Noto Sans KR", sans-serif;
-  --font-display: "Space Grotesk", "Plus Jakarta Sans", "Pretendard", sans-serif;
+  --font-body: "Pretendard", "Noto Sans KR", "Segoe UI", sans-serif;
+  --font-display: "Space Grotesk", "Pretendard", "Noto Sans KR", sans-serif;
 }
 
 .dark {
@@ -48,6 +48,16 @@ body {
     linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--surface-2)) 100%);
   color: hsl(var(--foreground));
   font-family: var(--font-body);
+}
+
+.ag-body-copy {
+  font-size: 16px;
+  line-height: 1.75;
+  letter-spacing: -0.01em;
+}
+
+.ag-body-copy-strong {
+  color: hsl(var(--foreground) / 0.72);
 }
 
 a {

@@ -25,12 +25,12 @@ export function TeamSummaryCard({ title, points, team }: TeamSummaryCardProps) {
       <h2 className={`font-display text-2xl font-bold tracking-[-0.04em] ${team === "bull" ? "text-bull" : "text-bear"}`}>
         {title}
       </h2>
-      <p className="mt-2 text-sm text-muted-foreground">
+      <p className="ag-body-copy mt-2 text-muted-foreground">
         {team === "bull"
           ? "상승 근거가 더 설득력 있다고 느껴지면 불리시 팀을 골라."
           : "조정과 하락 리스크가 더 크다고 느껴지면 베어리시 팀을 골라."}
       </p>
-      <ul className="mt-4 grid gap-3 text-sm leading-6 text-muted-foreground">
+      <ul className="ag-body-copy mt-4 grid gap-3 text-muted-foreground">
         {visiblePoints.map((point) => (
           <li key={point} className="rounded-[16px] bg-[hsl(var(--surface-2))] px-4 py-3">
             {point}

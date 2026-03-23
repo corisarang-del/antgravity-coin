@@ -26,11 +26,11 @@ export function CharactersPageClient({ sourceNotice }: CharactersPageClientProps
     <>
       <section className="mb-6 rounded-[28px] border border-border bg-[linear-gradient(180deg,hsl(var(--card))_0%,hsl(var(--surface-3))_100%)] p-5 shadow-[0_18px_44px_rgba(17,29,61,0.06)]">
         <h1 className="font-display text-4xl font-bold tracking-[-0.05em]">캐릭터 도감</h1>
-        <p className="mt-3 text-sm leading-6 text-muted-foreground">
+        <p className="ag-body-copy ag-body-copy-strong mt-3">
           8명의 캐릭터가 각자 다른 분석 관점으로 참여해. 카드를 누르면 성격과 고른 이유까지 바로 확인할 수 있어.
         </p>
         {sourceNotice ? (
-          <p className="mt-4 rounded-[18px] border border-border bg-[hsl(var(--surface-2))] px-4 py-3 text-sm text-muted-foreground">
+          <p className="ag-body-copy ag-body-copy-strong mt-4 rounded-[18px] border border-border bg-[hsl(var(--surface-2))] px-4 py-3">
             {sourceNotice}
           </p>
         ) : null}

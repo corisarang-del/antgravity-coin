@@ -127,7 +127,7 @@ export function PickPageClient({ coinId, initialCurrentUserSnapshot }: PickPageC
           <h1 className="font-display text-4xl font-bold tracking-[-0.05em]">
             {coinId.toUpperCase()} 차트 라운드 선택
           </h1>
-          <p className="mt-3 text-sm leading-6 text-muted-foreground">
+          <p className="ag-body-copy mt-3 text-muted-foreground">
             토론은 끝났고 이제 어느 캔들 구간에서 네 판단이 더 강할지 고르는 단계야.
           </p>
         </section>
@@ -139,7 +139,7 @@ export function PickPageClient({ coinId, initialCurrentUserSnapshot }: PickPageC
 
         <section className="rounded-[24px] border border-border bg-card p-5 shadow-[0_16px_36px_rgba(17,29,61,0.06)]">
           <h2 className="font-display text-2xl font-bold tracking-[-0.04em]">포지션 선택</h2>
-          <p className="mt-2 text-sm leading-6 text-muted-foreground">
+          <p className="ag-body-copy mt-2 text-muted-foreground">
             짧은 봉일수록 반응 속도 싸움이고, 긴 봉일수록 방향 유지 싸움이야.
           </p>
           <div className="mt-4 grid gap-3 md:grid-cols-2">
@@ -159,7 +159,7 @@ export function PickPageClient({ coinId, initialCurrentUserSnapshot }: PickPageC
           <div className="mt-5">
             <p className="mb-3 text-sm font-semibold">결과를 볼 차트 구간</p>
             <TimeframeSelector value={timeframe} onChange={setTimeframe} />
-            <p className="mt-3 text-sm text-muted-foreground">
+            <p className="ag-body-copy mt-3 text-muted-foreground">
               현재 선택: {timeframeMeta.label} · {timeframeMeta.description}
             </p>
           </div>

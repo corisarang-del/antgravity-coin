@@ -24,10 +24,10 @@ describe("LoginPageClient", () => {
     searchParamsState.delete("error");
   });
 
-  it("Google 버튼 클릭 시 next=/me 기준 OAuth 로그인/가입을 시작한다", async () => {
+  it("Google 버튼 클릭 시 next=/me 기준 OAuth 로그인을 시작한다", async () => {
     render(<LoginPageClient />);
 
-    fireEvent.click(screen.getByRole("button", { name: /Google로 계속하기/i }));
+    fireEvent.click(screen.getByRole("button", { name: /Google로 시작/i }));
 
     await waitFor(() => {
       expect(signInWithOAuthMock).toHaveBeenCalledWith({
@@ -44,6 +44,6 @@ describe("LoginPageClient", () => {
 
     render(<LoginPageClient />);
 
-    expect(screen.getByText(/로그인 연결이 중간에 끊겼어/)).toBeInTheDocument();
+    expect(screen.getByText(/로그인 연결이 끊겼어/)).toBeInTheDocument();
   });
 });
