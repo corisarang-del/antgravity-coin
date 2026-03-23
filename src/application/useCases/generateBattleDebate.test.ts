@@ -91,6 +91,57 @@ describe("generateBattleDebate", () => {
     expect(messages[0]?.model).toBe("stepfun/step-3.5-flash:free");
   });
 
+  it("label 형식 응답도 파싱해서 fallback 없이 살린다", async () => {
+    const aira = getCharacterById("aira");
+
+    if (!aira) {
+      throw new Error("missing_aira");
+    }
+
+    vi.mocked(generateCharacterDebateChunk).mockResolvedValueOnce({
+      content: [
+        "summary: 내 눈엔 차트 구조가 아직 위쪽으로 열려 있어.",
+        "detail: 차트상 RSI랑 MACD 흐름을 같이 보면 기술적 방어가 아직 먼저 보여.",
+        "indicatorLabel: RSI",
+        "indicatorValue: 61.2",
+        "stance: bullish",
+      ].join("\n"),
+      provider: "openrouter",
+      model: "arcee-ai/trinity-mini",
+      fallbackUsed: false,
+    });
+
+    const message = await generateCharacterMessage(marketData, aira, []);
+
+    expect(message.fallbackUsed).toBe(false);
+    expect(message.summary).toContain("내 눈엔");
+    expect(message.model).toBe("arcee-ai/trinity-mini");
+  });
+
+  it("영문 금융 용어가 조금 섞여도 한국어로 정규화해서 살린다", async () => {
+    const ledger = getCharacterById("ledger");
+
+    if (!ledger) {
+      throw new Error("missing_ledger");
+    }
+
+    vi.mocked(generateCharacterDebateChunk).mockResolvedValueOnce({
+      content:
+        '{"summary":"숫자상 on-chain liquidity는 아직 완전히 무너지지 않았어","detail":"구조적으로 보면 open interest와 funding rate가 같이 흔들려도 바로 붕괴로 볼 단계는 아니야","indicatorLabel":"open interest","indicatorValue":"128M","stance":"bearish"}',
+      provider: "openrouter",
+      model: "google/gemma-3-12b-it",
+      fallbackUsed: false,
+    });
+
+    const message = await generateCharacterMessage(marketData, ledger, []);
+
+    expect(message.fallbackUsed).toBe(false);
+    expect(message.summary).toContain("온체인");
+    expect(message.summary).not.toContain("on-chain");
+    expect(message.detail).not.toContain("open interest");
+    expect(message.detail).not.toContain("funding rate");
+  });
+
   it("llm 호출이 예외를 던져도 8명 발언을 모두 유지한다", async () => {
     vi.mocked(generateCharacterDebateChunk)
       .mockRejectedValueOnce(new Error("boom"))

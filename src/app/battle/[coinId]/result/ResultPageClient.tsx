@@ -9,6 +9,7 @@ import type { CurrentUserSnapshot } from "@/presentation/hooks/currentUserStore"
 import { AppHeader } from "@/presentation/components/AppHeader";
 import { CharacterLevelChange } from "@/presentation/components/CharacterLevelChange";
 import { CountdownTimer } from "@/presentation/components/CountdownTimer";
+import { MyPickSummary } from "@/presentation/components/MyPickSummary";
 import { RiskDisclaimer } from "@/presentation/components/RiskDisclaimer";
 import { UserLevelChange } from "@/presentation/components/UserLevelChange";
 import { VerdictBanner } from "@/presentation/components/VerdictBanner";
@@ -336,6 +337,29 @@ export function ResultPageClient({
             label={`${timeframeMeta.label} 정산까지`}
             seconds={remainingSeconds}
           />
+          <MyPickSummary userBattle={userBattle} />
+          <section className="rounded-[24px] border border-border bg-card p-5">
+            <h2 className="font-display text-2xl font-bold tracking-[-0.04em]">결과 페이지 준비 중</h2>
+            <p className="mt-3 text-sm leading-6 text-muted-foreground">
+              방금 누른 버튼은 결과를 즉시 확정하는 버튼이 아니라 결과 페이지로 먼저 들어오는 버튼이야.
+              정산 시각 전에는 카운트다운과 준비 상태를 먼저 보여주고, 시간이 되면 같은 화면에서 결과 카드가
+              채워져.
+            </p>
+            <div className="mt-4 grid gap-2 sm:grid-cols-3">
+              {["차트 마감 대기", "승패와 XP 계산", "리포트와 요약 정리"].map((item) => (
+                <div
+                  key={item}
+                  className="rounded-[16px] border border-border/80 bg-[hsl(var(--surface-2))] px-3 py-3 text-xs"
+                >
+                  <p className="font-semibold text-foreground">{item}</p>
+                  <p className="mt-1 text-muted-foreground">{remainingSeconds > 0 ? "대기 중" : "곧 시작"}</p>
+                </div>
+              ))}
+            </div>
+            <p className="mt-4 text-sm text-muted-foreground">
+              현재까지 저장된 발언: {(snapshot?.messages?.length ?? 0)}/8
+            </p>
+          </section>
           <RiskDisclaimer />
         </main>
       </div>

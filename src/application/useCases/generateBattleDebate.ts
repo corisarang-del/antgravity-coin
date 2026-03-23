@@ -119,6 +119,144 @@ function extractJsonBlock(rawText: string) {
   return candidate.slice(start, end + 1);
 }
 
+interface ParsedDebatePayload {
+  summary: string;
+  detail: string;
+  indicatorLabel: string;
+  indicatorValue: string;
+  stance: "bullish" | "bearish";
+}
+
+function replaceKnownMarketTerms(text: string) {
+  return text
+    .replace(/\bon[\s-]?chain\b/gi, "온체인")
+    .replace(/\boff[\s-]?chain\b/gi, "오프체인")
+    .replace(/\bopen interest\b/gi, "미결제약정")
+    .replace(/\blong[\s/-]?short\b/gi, "롱숏")
+    .replace(/\bfunding rate\b/gi, "펀딩비")
+    .replace(/\bfunding\b/gi, "펀딩")
+    .replace(/\bliquidity\b/gi, "유동성")
+    .replace(/\bvolume\b/gi, "거래량")
+    .replace(/\bwhale\b/gi, "고래")
+    .replace(/\bflow\b/gi, "흐름")
+    .replace(/\bstructure\b/gi, "구조")
+    .replace(/\bmomentum\b/gi, "모멘텀")
+    .replace(/\btrend\b/gi, "추세")
+    .replace(/\bchart\b/gi, "차트")
+    .replace(/\bbreakout\b/gi, "돌파")
+    .replace(/\bsupport\b/gi, "지지")
+    .replace(/\bresistance\b/gi, "저항")
+    .replace(/\bbullish\b/gi, "강세")
+    .replace(/\bbearish\b/gi, "약세")
+    .replace(/\bneutral\b/gi, "중립")
+    .replace(/\brisk\b/gi, "리스크");
+}
+
+function sanitizeDebateField(text: string) {
+  return replaceKnownMarketTerms(text).replace(/\s+/g, " ").trim();
+}
+
+function tryParseDebateJson(candidate: string): ParsedDebatePayload | null {
+  const normalized = candidate
+    .trim()
+    .replace(/[“”]/g, '"')
+    .replace(/[‘’]/g, "'")
+    .replace(/,\s*([}\]])/g, "$1");
+
+  try {
+    const parsed = JSON.parse(normalized) as Partial<ParsedDebatePayload>;
+    if (
+      typeof parsed.summary !== "string" ||
+      typeof parsed.detail !== "string" ||
+      typeof parsed.indicatorLabel !== "string" ||
+      typeof parsed.indicatorValue !== "string" ||
+      (parsed.stance !== "bullish" && parsed.stance !== "bearish")
+    ) {
+      return null;
+    }
+
+    return {
+      summary: parsed.summary,
+      detail: parsed.detail,
+      indicatorLabel: parsed.indicatorLabel,
+      indicatorValue: parsed.indicatorValue,
+      stance: parsed.stance,
+    };
+  } catch {
+    return null;
+  }
+}
+
+function escapeRegex(text: string) {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function extractLabeledValue(rawText: string, labels: string[], nextLabels: string[]) {
+  for (const label of labels) {
+    const boundary = nextLabels.map((nextLabel) => escapeRegex(nextLabel)).join("|");
+    const pattern = new RegExp(
+      `${escapeRegex(label)}\\s*[:：=]\\s*["']?([\\s\\S]*?)["']?(?=\\n\\s*(?:${boundary})\\s*[:：=]|$)`,
+      "i",
+    );
+    const match = rawText.match(pattern);
+    const value = match?.[1]?.trim();
+    if (value) {
+      return value;
+    }
+  }
+
+  return null;
+}
+
+function parseDebatePayload(rawText: string): ParsedDebatePayload | null {
+  const jsonCandidate = extractJsonBlock(rawText);
+  if (jsonCandidate) {
+    const parsedJson = tryParseDebateJson(jsonCandidate);
+    if (parsedJson) {
+      return parsedJson;
+    }
+  }
+
+  const normalized = rawText
+    .replace(/```json/gi, "")
+    .replace(/```/g, "")
+    .trim();
+
+  const summary = extractLabeledValue(
+    normalized,
+    ["summary", "요약"],
+    ["detail", "설명", "indicatorLabel", "indicatorValue", "stance"],
+  );
+  const detail = extractLabeledValue(
+    normalized,
+    ["detail", "설명"],
+    ["indicatorLabel", "indicatorValue", "stance"],
+  );
+  const indicatorLabel = extractLabeledValue(
+    normalized,
+    ["indicatorLabel", "지표", "indicator"],
+    ["indicatorValue", "stance"],
+  );
+  const indicatorValue = extractLabeledValue(
+    normalized,
+    ["indicatorValue", "지표값", "value"],
+    ["stance"],
+  );
+  const stance = extractLabeledValue(normalized, ["stance"], []);
+
+  if (!summary || !detail || !indicatorLabel || !indicatorValue) {
+    return null;
+  }
+
+  return {
+    summary,
+    detail,
+    indicatorLabel,
+    indicatorValue,
+    stance: stance === "bearish" ? "bearish" : "bullish",
+  };
+}
+
 function isKoreanDebateContent(summary: string, detail: string) {
   return summary.trim().length > 0 && detail.trim().length > 0;
 }
@@ -409,21 +547,13 @@ export async function generateCharacterMessage(
 
     if (aiResult?.content) {
       try {
-        const normalizedJson = extractJsonBlock(aiResult.content);
-        if (!normalizedJson) {
-          throw new Error("json_block_not_found");
+        const parsed = parseDebatePayload(aiResult.content);
+        if (!parsed) {
+          throw new Error("debate_payload_parse_failed");
         }
 
-        const parsed = JSON.parse(normalizedJson) as {
-          summary: string;
-          detail: string;
-          indicatorLabel: string;
-          indicatorValue: string;
-          stance: "bullish" | "bearish";
-        };
-
-        const sanitizedSummary = sanitizeKoreanText(parsed.summary, "");
-        const sanitizedDetail = sanitizeKoreanText(parsed.detail, "");
+        const sanitizedSummary = sanitizeKoreanText(sanitizeDebateField(parsed.summary), "");
+        const sanitizedDetail = sanitizeKoreanText(sanitizeDebateField(parsed.detail), "");
 
         if (!isKoreanDebateContent(sanitizedSummary, sanitizedDetail)) {
           console.warn(
@@ -440,8 +570,8 @@ export async function generateCharacterMessage(
           stance: parsed.stance,
           summary: sanitizedSummary,
           detail: sanitizedDetail,
-          indicatorLabel: sanitizeDisplayText(parsed.indicatorLabel, "핵심 지표"),
-          indicatorValue: sanitizeDisplayText(parsed.indicatorValue, "값 없음"),
+          indicatorLabel: sanitizeDisplayText(sanitizeDebateField(parsed.indicatorLabel), "핵심 지표"),
+          indicatorValue: sanitizeDisplayText(sanitizeDebateField(parsed.indicatorValue), "값 없음"),
           provider: aiResult.provider,
           model: aiResult.model,
           fallbackUsed: aiResult.fallbackUsed,

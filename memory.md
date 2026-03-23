@@ -242,4 +242,155 @@
 - OpenRouter free 모델 tail latency는 recovery 풀 축소만으로도 꽤 줄지만, 여전히 live 편차가 큼
 - 결과적으로 사용자가 느끼는 속도는 `첫 발언`보다 `선택 가능 시점`이 더 중요함
 
+## 2026-03-23 20:21 KST 추가 기록
+
+### CTA 복구와 브랜치 판단
+
+- CTA 가독성 수정은 예전에 작업됐지만 현재 `master`에는 없었고, 스냅샷 브랜치에만 남아 있었음
+  - `codex/local-archive-20260323`
+  - `codex/push-safe-20260323`
+- 원인은 코드 롤백이라기보다 스냅샷 브랜치에만 남고 `master`에 합쳐지지 않은 상태에 가까웠음
+- 아래 7개 파일만 스냅샷 기준으로 `master`에 선별 복구했음
+  - `src/app/globals.css`
+  - `src/presentation/components/AppHeader.tsx`
+  - `src/presentation/components/TopCoinsGrid.tsx`
+  - `src/app/page.tsx`
+  - `src/app/LandingPageClient.tsx`
+  - `src/app/battle/[coinId]/BattlePageClient.tsx`
+  - `src/app/battle/[coinId]/pick/PickPageClient.tsx`
+- 관련 커밋
+  - `618c411`
+  - `fix: restore CTA readability and audit supabase RLS`
+
+### Supabase 배포 전 점검 결과
+
+- `supabase/migrations/20260320150000_add_auth_user_battle_tables.sql` 기준으로 아래 8개 테이블에 RLS가 켜져 있음
+  - `user_profiles`
+  - `user_progress`
+  - `battle_snapshots`
+  - `battle_sessions`
+  - `battle_outcomes`
+  - `character_memory_seeds`
+  - `player_decision_seeds`
+  - `user_recent_coins`
+- 코드와 `.env*` 기준으로 현재는 publishable key만 사용 중이고 `service_role` 키 사용 흔적은 못 찾았음
+- live anon 테스트 결과
+  - `select`: 주요 8개 테이블 모두 `200 []`
+  - `insert`: 주요 8개 테이블 모두 `401` + `row-level security policy` 위반
+- 결론
+  - 적어도 anon 기준으로 전체 테이블이 그냥 열려 있는 상태는 아니었음
+
+### stream cleanup noisy abort 완화
+
+- `BodyStreamBuffer was aborted`가 `useBattleStream` cleanup의 `controller.abort()` 근처에서 noisy하게 보이는 문제를 줄였음
+- `src/presentation/hooks/useBattleStream.ts`
+  - reader가 이미 열린 뒤에는 `AbortController`보다 `reader.cancel()`로만 정리하게 변경
+  - response body reader가 아직 없을 때만 `controller.abort()` 사용
+- `src/presentation/hooks/useBattleStream.test.tsx`
+  - unmount 시 `reader.cancel()`은 호출되고 `abort()`는 호출되지 않는 테스트 추가
+- 관련 커밋
+  - `83a98bb`
+  - `fix: rebalance battle primaries and harden stream cleanup`
+
+### Aira / Ledger primary 분산
+
+- 예전에는 `aira`, `ledger`가 둘 다 `stepfun/step-3.5-flash:free`를 primary로 써서 동시 429/timeout 리스크가 컸음
+- 현재 라우팅
+  - `aira`: `arcee-ai/trinity-mini`
+  - `ledger`: `google/gemma-3-12b-it`
+  - 두 캐릭터 fallback은 계속 `qwen/qwen3.5-9b`
+- `/api/providers/routes`로 런타임 반영 확인함
+- `/battle/bitcoin` 실측 결과
+  - 첫 발언 도착 약 `11.3초`
+  - 약 `25초` 안에 `5/8 발언` + pick-ready CTA 확인
+  - 추가 대기 후 `6/8 발언`까지 확인
+- 이번 실측에선 예전처럼 `aira`, `ledger`가 동시에 `stepfun` 429/timeout을 맞는 패턴은 안 보였음
+- 다만 완전 안정화는 아님
+  - `aira`: `message_parse_failed`
+  - `ledger`: `non_korean_response`
+  - 다른 캐릭터도 일부 `message_parse_failed`, `non_korean_response`가 남음
+- 판단
+  - 병목이 `stepfun` 동시 장애에서 모델별 출력 품질 편차 쪽으로 옮겨간 상태
+
+### Aira / Ledger용 prompt + parser 보강
+
+- 목적
+  - `aira`의 `message_parse_failed`를 줄이기
+  - `ledger`의 `non_korean_response`를 줄이기
+- `src/application/prompts/characterPrompts.ts`
+  - 공통으로 JSON 하나만, 코드펜스 금지, 영어 단어 금지, 줄바꿈 금지 규칙 강화
+  - `aira`는 형식 안정성 우선 규칙 추가
+  - `ledger`는 `on-chain`, `liquidity`, `open interest`, `funding rate` 같은 영어 finance 용어를 한국어로 바꿔 쓰게 명시
+- `src/application/useCases/generateBattleDebate.ts`
+  - JSON 파싱 실패 시 `summary: ...` 라벨 형식 응답도 다시 파싱해서 살릴 수 있게 확장
+  - 영문 금융 용어는 파싱 직전에 한국어 용어로 정규화
+- `src/application/useCases/generateBattleDebate.test.ts`
+  - label 형식 응답 파싱 테스트 추가
+  - 영문 금융 용어 정규화 테스트 추가
+- 검증
+  - `pnpm.cmd typecheck` 통과
+  - 대상 파일 eslint 통과
+  - `node_modules\\.bin\\vitest.cmd run src/application/useCases/generateBattleDebate.test.ts` 통과
+- 중요
+  - 이 변경은 아직 커밋 안 됨
+
+### result pending UX 보강
+
+- 기존 문제
+  - `waiting`에서 `결과 화면 열기`를 누르면 실제론 `/result`로 이동하지만 정산 전이면 카운트다운만 보여서 버튼이 그냥 사라진 것처럼 느껴졌음
+- 현재 구조 판단
+  - `waiting`의 버튼은 즉시 정산 버튼이 아니라 결과 페이지 선진입 링크
+  - `result`도 `remainingSeconds > 0`이면 pending 화면만 렌더
+- `src/app/battle/[coinId]/result/ResultPageClient.tsx`
+  - `settlementPending` 상태에서도 `MyPickSummary`를 함께 보여주도록 수정
+  - `결과 페이지 준비 중` 설명 섹션 추가
+  - 아래 3단계 문맥 표시 추가
+    - `차트 마감 대기`
+    - `승패와 XP 계산`
+    - `리포트와 요약 정리`
+  - 현재 저장된 발언 수 `n/8` 표시 추가
+- 검증
+  - `pnpm.cmd typecheck` 통과
+  - 대상 파일 eslint 통과
+- 중요
+  - 이 변경도 아직 커밋 안 됨
+
+### 지금 워크트리에서 의도적으로 구분해야 할 것
+
+- 커밋된 것
+  - `618c411` CTA 복구 + Supabase RLS audit
+  - `83a98bb` primary 분산 + stream cleanup fix
+- 아직 비커밋으로 남은 핵심 코드
+  - `src/application/prompts/characterPrompts.ts`
+  - `src/application/useCases/generateBattleDebate.ts`
+  - `src/application/useCases/generateBattleDebate.test.ts`
+  - `src/app/battle/[coinId]/result/ResultPageClient.tsx`
+- 런타임 데이터와 산출물 변경도 여전히 많이 남아 있음
+  - `database/data/*.json`
+  - `tmp/*`
+  - `out/*`
+  - 이미지/로그 산출물
+
+### 새 세션에서 가장 먼저 보면 좋은 파일
+
+- `src/application/prompts/characterPrompts.ts`
+- `src/application/useCases/generateBattleDebate.ts`
+- `src/application/useCases/generateBattleDebate.test.ts`
+- `src/app/battle/[coinId]/result/ResultPageClient.tsx`
+- `src/shared/constants/characterDebateProfiles.ts`
+- `src/presentation/hooks/useBattleStream.ts`
+- `memory.md`
+- `research.md`
+
+### 새 세션 시작 시 추천 순서
+
+1. `git status`로 비커밋 코드 4개와 런타임 산출물을 분리해서 보기
+2. prompt/parser 보강과 result pending UI를 먼저 커밋할지 결정
+3. `/battle/bitcoin` 다시 실측해서
+   - `aira`의 `message_parse_failed`
+   - `ledger`의 `non_korean_response`
+   - result pending UI 체감
+   를 재확인
+4. 필요하면 `결과 화면 열기` 버튼 라벨도 `결과 페이지 미리 열기` 같은 문구로 맞추기
+
 
