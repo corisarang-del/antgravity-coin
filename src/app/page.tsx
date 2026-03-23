@@ -25,7 +25,7 @@ export default function LandingPage() {
               <p className="text-xs text-muted-foreground">코인 시즌 트레이더 배틀</p>
             </div>
             <Link
-              className="inline-flex min-h-11 items-center rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground"
+              className="ag-primary-cta ag-primary-cta-text inline-flex min-h-11 items-center rounded-full px-5 py-3 text-sm font-semibold"
               href="/home"
             >
               배틀 입장
@@ -72,7 +72,7 @@ export default function LandingPage() {
               </p>
               <div className="mt-7 flex flex-wrap gap-3">
                 <Link
-                  className="inline-flex min-h-12 items-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-[hsl(var(--landing-hero-ink))]"
+                  className="ag-light-cta ag-light-cta-text rounded-full px-6"
                   href="/home"
                 >
                   바로 배틀 시작
@@ -135,7 +135,7 @@ export default function LandingPage() {
               </div>
               <div className="flex flex-col gap-3">
                 <Link
-                  className="inline-flex min-h-12 items-center justify-center rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground"
+                  className="ag-primary-cta ag-primary-cta-text inline-flex min-h-12 items-center justify-center rounded-full px-5 py-3 text-sm font-semibold"
                   href="/home"
                 >
                   지금 배틀 시작하기

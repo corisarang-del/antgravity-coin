@@ -97,7 +97,7 @@ export function AppHeader({ initialCurrentUserSnapshot }: AppHeaderProps) {
             </>
           ) : (
             <Link
-              className="rounded-full border border-primary/30 bg-primary px-3 py-2 text-xs font-semibold text-primary-foreground shadow-[0_8px_24px_rgba(17,29,61,0.10)] transition hover:opacity-95"
+              className="ag-primary-cta ag-primary-cta-text rounded-full px-4 transition hover:opacity-95"
               href="/login"
             >
               로그인
@@ -106,7 +106,7 @@ export function AppHeader({ initialCurrentUserSnapshot }: AppHeaderProps) {
 
           <div
             aria-live="polite"
-            className="rounded-full border border-border/80 bg-[hsl(var(--surface-2))] px-3 py-2 text-xs font-semibold text-muted-foreground shadow-[0_8px_24px_rgba(17,29,61,0.06)]"
+            className="ag-muted-pill rounded-full border border-border/80 bg-[hsl(var(--surface-2))] px-3 py-2 text-xs font-semibold shadow-[0_8px_24px_rgba(17,29,61,0.06)]"
           >
             계정 상태{" "}
             <span className="text-foreground">

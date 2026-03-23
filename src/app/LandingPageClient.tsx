@@ -522,7 +522,7 @@ export function LandingPageClient() {
             <p className="text-xs text-muted-foreground">코인 시즌 트레이더 배틀</p>
           </div>
           <button
-            className="inline-flex min-h-11 items-center rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground"
+            className="ag-primary-cta ag-primary-cta-text inline-flex min-h-11 items-center rounded-full px-5 py-3 text-sm font-semibold"
             onClick={navigateToHome}
             type="button"
           >
@@ -570,7 +570,7 @@ export function LandingPageClient() {
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
               <button
-                className="inline-flex min-h-12 items-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-[hsl(var(--landing-hero-ink))]"
+                className="ag-light-cta ag-light-cta-text rounded-full px-6"
                 onClick={navigateToHome}
                 type="button"
               >
@@ -646,7 +646,7 @@ export function LandingPageClient() {
             </div>
             <div className="flex flex-col gap-3">
               <button
-                className="inline-flex min-h-12 items-center justify-center rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground"
+                className="ag-primary-cta ag-primary-cta-text inline-flex min-h-12 items-center justify-center rounded-full px-5 py-3 text-sm font-semibold"
                 onClick={navigateToHome}
                 type="button"
               >

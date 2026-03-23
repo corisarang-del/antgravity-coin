@@ -25,7 +25,7 @@ export function TopCoinsGrid({ coins }: TopCoinsGridProps) {
           <div className="flex items-center justify-between text-xs text-muted-foreground">
             <span>시가총액 {coin.marketCap}</span>
             <Link
-              className="rounded-full bg-primary px-3 py-2 font-semibold text-primary-foreground transition-opacity hover:opacity-90"
+              className="ag-primary-cta ag-primary-cta-text min-w-[108px] rounded-full px-4 transition-opacity hover:opacity-90"
               href={`/battle/${coin.id}`}
             >
               배틀 입장

@@ -136,7 +136,7 @@ export function BattlePageClient({ coinId, initialCurrentUserSnapshot }: BattleP
             <div className="mt-4 rounded-[20px] border border-border/80 bg-[hsl(var(--surface-2))] px-4 py-4">
               <p className="text-sm font-semibold text-foreground">{preMessageHeadline}</p>
               <p className="mt-2 text-xs text-muted-foreground">
-                첫 발언은 보통 10~20초 안에 도착해. 지표가 많거나 외부 응답이 느리면 조금 더 걸릴 수 있어.
+                첫 발언은 보통 20~30초 안에 도착해. 지표가 많거나 외부 응답이 느리면 조금 더 걸릴 수 있어.
               </p>
               <div className="mt-4 grid gap-2 sm:grid-cols-3">
                 {preMessageSteps.map((step) => (
@@ -259,7 +259,7 @@ export function BattlePageClient({ coinId, initialCurrentUserSnapshot }: BattleP
               {isComplete ? "8명 발언이 모두 끝났어." : "양 팀 핵심 논거가 먼저 모였어."}
             </p>
             <Link
-              className="mt-4 inline-flex min-h-12 items-center rounded-[18px] bg-primary px-4 py-3 font-semibold text-primary-foreground shadow-[0_12px_24px_rgba(17,29,61,0.14)]"
+              className="ag-primary-cta ag-primary-cta-text mt-4 rounded-[18px] px-4"
               href={`/battle/${coinId}/pick`}
             >
               {isComplete ? "이제 내 선택하러 가기" : "핵심 논거 먼저 보고 팀 선택하러 가기"}

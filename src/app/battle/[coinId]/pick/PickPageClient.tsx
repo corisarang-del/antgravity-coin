@@ -164,7 +164,7 @@ export function PickPageClient({ coinId, initialCurrentUserSnapshot }: PickPageC
             </p>
           </div>
           <button
-            className="mt-5 inline-flex min-h-12 items-center justify-center rounded-[18px] bg-primary px-4 py-3 font-semibold text-primary-foreground shadow-[0_12px_24px_rgba(17,29,61,0.16)] transition hover:opacity-95 focus-visible:ring-2 focus-visible:ring-primary/30"
+            className="ag-primary-cta ag-primary-cta-text mt-5 rounded-[18px] px-4 transition hover:opacity-95 focus-visible:ring-2 focus-visible:ring-primary/30"
             onClick={handleConfirm}
             type="button"
           >
