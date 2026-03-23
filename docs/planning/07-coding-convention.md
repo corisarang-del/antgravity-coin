@@ -130,3 +130,13 @@ pnpm test
 - 구현과 planning 문서 차이를 오래 방치하지 않는다.
 - 작업 단위마다 `docs/개발일지`, `docs/prompt` 기록을 남긴다.
 - AGENTS 기준 문서 경로가 실제 저장소와 다르면 드리프트를 문서에 명시한다.
+
+## 2026-03-23 UI 타이포 / 설명문 규칙 append
+
+- body 기본 폰트는 `Pretendard`, `Noto Sans KR`, `Segoe UI`, `sans-serif` 순으로 유지한다.
+- display headline은 `Space Grotesk` 중심을 유지한다.
+- 설명문을 키울 땐 전역 전체를 바꾸지 말고 `ag-body-copy` 같은 공통 규칙으로 선택 적용한다.
+- 설명문 대비를 더 올릴 땐 전역 `muted` 토큰보다 `ag-body-copy-strong` 같은 선택 클래스 기준으로 조정한다.
+- `whitespace-nowrap` headline을 넣을 땐 반드시 레이아웃도 같이 조정한다.
+  - grid 컬럼은 `minmax(0, fr)`
+  - 필요한 칸엔 `min-w-0`

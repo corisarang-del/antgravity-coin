@@ -207,3 +207,22 @@
 3. `pnpm lint`
 4. `pnpm typecheck`
 5. 필요 시 브라우저 실측
+
+## 2026-03-23 UI 소스 동기화 append
+
+### T7. 홈 hero / 검색 카드 레이아웃 안정화
+
+- hero grid 최소폭을 `minmax(0, fr)` 기준으로 조정
+- 좌우 칸 `min-w-0` 적용
+- 한 줄 headline 유지 상태에서 검색 카드 overflow 방지
+
+### T8. 설명문 가독성 규칙 적용
+
+- body font 기본값 `Pretendard`
+- 설명문 공통 규칙 `ag-body-copy`
+- 강화 대비 규칙 `ag-body-copy-strong`
+- 홈, 검색, 로그인, waiting, pick, result, 캐릭터도감 설명문에 선택 적용
+
+### T9. 추천 코인 목록 정리
+
+- 홈 추천 코인 목록에 `AVAX` 포함

@@ -56,6 +56,8 @@ function mapFallbackSearch(query: string) {
     }));
 }
 
+const curatedTopCoinIds = topCoins.map((coin) => coin.id).join(",");
+
 export class CoinGeckoRepository implements CoinRepository {
   async searchCoins(query: string): Promise<SearchCoinResult[]> {
     try {
@@ -77,19 +79,27 @@ export class CoinGeckoRepository implements CoinRepository {
   async fetchTopCoins(): Promise<CoinSummary[]> {
     try {
       const response = await coinGeckoFetch<CoinGeckoMarketCoin[]>(
-        "/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=10&page=1&sparkline=false",
+        `/coins/markets?vs_currency=usd&ids=${curatedTopCoinIds}&order=market_cap_desc&sparkline=false`,
       );
 
-      return response.map((coin) => ({
-        id: coin.id,
-        symbol: coin.symbol.toUpperCase(),
-        name: coin.name,
-        price: formatCurrency(coin.current_price),
-        change24h: coin.price_change_percentage_24h ?? 0,
-        marketCap: formatMarketCap(coin.market_cap),
-        thesis: "실시간 시장 데이터 기반 요약은 다음 단계에서 추가된다.",
-        thumb: coin.symbol.slice(0, 1).toUpperCase(),
-      }));
+      const liveCoinMap = new Map(response.map((coin) => [coin.id, coin]));
+
+      return topCoins.map((fallbackCoin) => {
+        const liveCoin = liveCoinMap.get(fallbackCoin.id);
+
+        if (!liveCoin) {
+          return fallbackCoin;
+        }
+
+        return {
+          ...fallbackCoin,
+          symbol: liveCoin.symbol.toUpperCase(),
+          name: liveCoin.name,
+          price: formatCurrency(liveCoin.current_price),
+          change24h: liveCoin.price_change_percentage_24h ?? 0,
+          marketCap: formatMarketCap(liveCoin.market_cap),
+        };
+      });
     } catch {
       return topCoins;
     }

@@ -474,3 +474,49 @@
   - 기존에 이미 쌓여 있던 과거 미추적 파일
 
 
+
+## 2026-03-23 22:55 KST 추가 기록
+
+### 홈 / 검색 / 로그인 / 캐릭터도감 UI 가독성 정리
+
+- body font 기본값을 `Pretendard`로 정리했고, display는 계속 `Space Grotesk`를 유지함
+- 설명문 공통 규칙
+  - `ag-body-copy`
+  - `ag-body-copy-strong`
+- 적용 범위
+  - 홈
+  - 검색 카드
+  - 로그인
+  - waiting
+  - pick
+  - result
+  - 캐릭터도감 카드 / 모달
+
+### 홈 hero overflow 수정
+
+- `불리시팀 vs 베어리시팀` 한 줄 headline과 오른쪽 검색 카드가 같이 있을 때 검색 카드가 외곽으로 밀리는 문제를 수정함
+- 현재 구조
+  - hero grid는 `minmax(0, 1.5fr)` / `minmax(0, 1fr)`
+  - 좌우 칸 `min-w-0`
+  - 검색 카드 headline은 `어떤 코인으로 붙을지 골라줘`
+
+### 추천 코인 구성 메모
+
+- 홈 추천 코인 목록은 현재 `AVAX`를 포함함
+- 사용자가 언급한 `FIGR_HELOC`는 현재 소스의 추천 코인 상수에는 없음
+
+### 추천 코인 실제 소스 경로 메모
+
+- 홈 추천 코인 목록은 `mockCoins.ts`만 바꾸면 끝나는 구조가 아니었음
+- 실제 화면은 `CoinGeckoRepository.fetchTopCoins()`가 CoinGecko 성공 응답을 우선 사용하고 있었음
+- 그래서 `FIGR_HELOC`처럼 의도하지 않은 코인이 계속 보였던 원인은
+  - 상수 fallback은 바뀌었지만
+  - live top markets 응답이 그대로 화면에 들어오고 있었기 때문이었음
+- 현재는 `topCoins`에 정의한 curated id 목록만 `ids=`로 조회하고
+  - live 데이터가 오면 가격 / 변동률 / 시총만 덮고
+  - 코인 구성 / 순서 / thesis는 curated 목록 기준으로 유지하게 수정함
+- 다음 세션에서 추천 코인 구성이 어긋나 보이면
+  1. `src/infrastructure/db/coinGeckoRepository.ts`
+  2. `src/shared/constants/mockCoins.ts`
+  3. dev 서버 재기동 여부
+  순서로 보면 됨

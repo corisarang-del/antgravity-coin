@@ -142,3 +142,9 @@
 - 이후 로그인 클릭 시 `@supabase/ssr`의 URL / publishable key 에러가 보였음
 - 하지만 실제 `.env`, `.env.local`에는 `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`가 존재함
 - 따라서 현재 우선순위는 코드보다 dev 서버 재기동과 env 로딩 상태 재확인이다
+
+## 2026-03-23 로그인 화면 현재 구현 append
+
+- 로그인 화면 headline은 현재 `바로시작` 한 줄 카피를 기준으로 운영된다.
+- Google / Kakao 버튼은 보조 설명을 줄여 버튼 선택 자체가 먼저 보이게 정리됐다.
+- 상단 설명문, 에러 안내, 하단 보조 카피는 확대된 설명문 규칙을 적용받는다.
