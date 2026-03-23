@@ -1,0 +1,60 @@
+import type { DebateMessage } from "@/domain/models/DebateMessage";
+import type { UserBattle } from "@/domain/models/UserBattle";
+import type { BattleOutcomeSeed } from "@/domain/models/BattleOutcomeSeed";
+import type { BattleSettlementSnapshot } from "@/domain/models/BattleSettlementSnapshot";
+import { resolveBattle } from "@/application/useCases/resolveBattle";
+
+function pickWinningArgument(messages: DebateMessage[], winningTeam: "bull" | "bear" | "draw") {
+  if (winningTeam === "draw") {
+    return "무승부라서 특정 승리 논거를 고르지 않았어.";
+  }
+
+  return (
+    messages.find((message) => message.team === winningTeam)?.summary ??
+    "승리 팀 핵심 논거를 아직 추출하지 못했어."
+  );
+}
+
+function pickLosingArgument(messages: DebateMessage[], winningTeam: "bull" | "bear" | "draw") {
+  if (winningTeam === "draw") {
+    return "무승부라서 특정 패배 논거를 고르지 않았어.";
+  }
+
+  const losingTeam = winningTeam === "bull" ? "bear" : "bull";
+  return (
+    messages.find((message) => message.team === losingTeam)?.summary ??
+    "패배 팀 핵심 논거를 아직 추출하지 못했어."
+  );
+}
+
+export function buildBattleOutcomeSeed(input: {
+  userBattle: UserBattle;
+  messages: DebateMessage[];
+  settlementSnapshot: BattleSettlementSnapshot;
+}): BattleOutcomeSeed {
+  const result = resolveBattle(input.userBattle, input.settlementSnapshot);
+
+  if (input.settlementSnapshot.status !== "settled" || input.settlementSnapshot.settledPrice === null) {
+    throw new Error("battle_settlement_not_ready");
+  }
+
+  return {
+    id: `outcome:${input.userBattle.battleId}`,
+    battleId: input.userBattle.battleId,
+    coinId: input.userBattle.coinId,
+    coinSymbol: input.userBattle.coinSymbol,
+    timeframe: input.userBattle.timeframe,
+    settlementAt: input.settlementSnapshot.settlementAt,
+    priceSource: input.settlementSnapshot.priceSource,
+    marketSymbol: input.settlementSnapshot.marketSymbol,
+    settledPrice: input.settlementSnapshot.settledPrice,
+    winningTeam: result.winningTeam,
+    priceChangePercent: result.priceChangePercent,
+    userSelectedTeam: input.userBattle.selectedTeam,
+    userWon: result.userWon,
+    strongestWinningArgument: pickWinningArgument(input.messages, result.winningTeam),
+    weakestLosingArgument: pickLosingArgument(input.messages, result.winningTeam),
+    ruleVersion: result.ruleVersion,
+    createdAt: new Date().toISOString(),
+  };
+}

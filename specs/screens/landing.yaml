@@ -1,0 +1,53 @@
+version: "2.0"
+
+screen:
+  name: 랜딩
+  route: /
+  layout: single-column
+  description: 입장 게이트와 브랜드 톤을 보여주는 첫 화면
+
+data_requirements:
+  - resource: character
+    needs: [id, name, role, team, specialty, imageSrc, posterSrc, accentTone]
+    source: static
+    label: characters
+
+components:
+  - id: entry_gate
+    type: hero_gate
+    position: initial
+    function: 입장 버튼 클릭 전까지 보이는 첫 진입 게이트
+
+  - id: landing_hero
+    type: hero_section
+    position: top
+    function: 브랜드 카피와 홈 진입 CTA
+
+  - id: character_slider
+    type: horizontal_slider
+    position: main
+    function: 캐릭터 카드 슬라이더
+    actions:
+      - on: card_click
+        action: open_character_preview_modal
+      - on: card_hover
+        action: show_hover_video_preview
+
+  - id: hover_preview
+    type: floating_preview
+    position: overlay
+    function: mp4 프리뷰와 오디오 재생
+
+  - id: character_preview_modal
+    type: modal
+    position: overlay
+    function: 선택 캐릭터의 대형 미리보기와 이동 CTA
+
+tests:
+  - name: 첫 진입
+    when: / 접속
+    then: [입장 버튼 표시]
+
+  - name: 입장 후 홈 CTA
+    when: 입장 버튼 클릭
+    then: [랜딩 본문 표시, /home 이동 CTA 표시]

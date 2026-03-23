@@ -1,0 +1,53 @@
+version: "2.0"
+
+screen:
+  name: 팀 선택
+  route: /battle/[coinId]/pick
+  layout: single-column
+  description: 토론을 본 사용자가 최종 팀과 기간을 선택하는 화면
+
+params:
+  coinId: string
+
+data_requirements:
+  - resource: debateMessage
+    needs: [characterId, characterName, team, summary]
+    source: localstorage
+    key: ant_gravity_battle_snapshot
+    label: debateMessages
+
+  - resource: marketData
+    needs: [symbol, currentPrice]
+    source: localstorage
+    key: ant_gravity_battle_snapshot
+    label: marketData
+
+components:
+  - id: page_intro
+    type: summary_card
+    position: top
+    function: 현재 코인 기준 선택 안내
+
+  - id: team_summary_cards
+    type: two_column_cards
+    position: main_top
+    function: bull/bear 메시지 요약
+
+  - id: pick_buttons
+    type: large_button_pair
+    position: main_mid
+    function: bull / bear 선택
+
+  - id: timeframe_selector
+    type: segmented_control
+    position: main_bottom
+    function: 24h / 7d 선택
+
+events:
+  - trigger: pick_confirm
+    action: save_to_localstorage + navigate_to_waiting
+
+tests:
+  - name: 팀 선택 완료
+    when: 선택 확정 클릭
+    then: [userBattle 저장, /waiting 이동]

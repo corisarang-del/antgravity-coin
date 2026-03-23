@@ -1,0 +1,70 @@
+version: "2.0"
+
+screen:
+  name: 결과 공개
+  route: /battle/[coinId]/result
+  layout: single-column
+  description: 승패와 XP 변화를 공개하는 결과 화면
+
+params:
+  coinId: string
+
+data_requirements:
+  - resource: userBattle
+    needs: [battleId, coinId, coinSymbol, selectedTeam, timeframe, selectedPrice]
+    source: localstorage
+    key: ant_gravity_user_battle
+    label: myPick
+
+  - resource: marketData
+    needs: [coinId, currentPrice, priceChange24h, priceChange7d]
+    source: localstorage
+    key: ant_gravity_battle_snapshot
+    label: marketData
+
+  - resource: debateMessage
+    needs: [id, characterName, team, summary]
+    source: localstorage
+    key: ant_gravity_battle_snapshot
+    label: debateMessages
+
+  - resource: userLevel
+    needs: [level, title, xp, wins, losses]
+    source: localstorage
+    key: ant_gravity_user_level:[userId]
+    label: userLevel
+
+components:
+  - id: verdict_banner
+    type: hero_banner
+    position: top
+    function: 승리 팀과 가격 변동 표시
+
+  - id: user_level_change
+    type: level_change_card
+    position: main_top
+    function: XP 변화와 현재 타이틀 노출
+
+  - id: character_level_change
+    type: team_bonus_cards
+    position: main_mid
+    function: 승리 팀 캐릭터 보너스 표시
+
+  - id: winner_highlight
+    type: quote_list
+    position: main_content
+    function: 승리 팀 메시지 2개 표시
+
+  - id: risk_disclaimer
+    type: alert_box
+    position: bottom
+    function: 투자 조언 아님 고지
+
+events:
+  - trigger: page_mount
+    action: calculate_result + apply_xp_once
+
+tests:
+  - name: 결과 로드
+    when: 결과 페이지 접속
+    then: [승패 배너 표시, XP 변화 표시]

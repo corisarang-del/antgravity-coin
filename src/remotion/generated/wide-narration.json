@@ -1,0 +1,23 @@
+{
+  "durationMs": 7000,
+  "segments": [
+    {
+      "index": 0,
+      "text": "망설이면 늦는다.",
+      "startMs": 0,
+      "endMs": 1112
+    },
+    {
+      "index": 1,
+      "text": "앤트그래비티는 AI 여덟 명을 같은 코인 위에 올려붙인다.",
+      "startMs": 1239,
+      "endMs": 4148
+    },
+    {
+      "index": 2,
+      "text": "실시간 토론이 터지고, 마지막 선택은 네가 끝낸다.",
+      "startMs": 4275,
+      "endMs": 7000
+    }
+  ]
+}

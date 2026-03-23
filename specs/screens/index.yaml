@@ -1,0 +1,37 @@
+version: "2.0"
+
+screens:
+  - id: landing
+    name: 랜딩
+    route: /
+    file: landing.yaml
+
+  - id: home
+    name: 홈
+    route: /home
+    file: home.yaml
+
+  - id: battle
+    name: 배틀
+    route: /battle/[coinId]
+    file: battle.yaml
+
+  - id: pick
+    name: 팀 선택
+    route: /battle/[coinId]/pick
+    file: pick.yaml
+
+  - id: waiting
+    name: 결과 대기
+    route: /battle/[coinId]/waiting
+    file: waiting.yaml
+
+  - id: result
+    name: 결과 공개
+    route: /battle/[coinId]/result
+    file: result.yaml
+
+  - id: characters
+    name: 캐릭터 도감
+    route: /characters
+    file: characters.yaml

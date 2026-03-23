@@ -1,0 +1,108 @@
+:root {
+  --background: 36 44% 97%;
+  --foreground: 224 34% 14%;
+  --card: 0 0% 100%;
+  --card-foreground: 224 34% 14%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 224 34% 14%;
+  --primary: 224 40% 20%;
+  --primary-foreground: 36 44% 97%;
+  --secondary: 347 60% 94%;
+  --secondary-foreground: 224 34% 18%;
+  --muted: 34 28% 92%;
+  --muted-foreground: 222 16% 38%;
+  --accent: 8 84% 58%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 78% 56%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 220 18% 84%;
+  --input: 220 18% 84%;
+  --ring: 8 84% 58%;
+  --radius: 1rem;
+
+  --chart-1: 152 57% 41%;
+  --chart-2: 8 84% 58%;
+  --chart-3: 224 40% 20%;
+  --chart-4: 47 96% 58%;
+  --chart-5: 280 42% 58%;
+
+  --sidebar: 0 0% 100%;
+  --sidebar-foreground: 224 34% 14%;
+  --sidebar-primary: 224 40% 20%;
+  --sidebar-primary-foreground: 36 44% 97%;
+  --sidebar-accent: 34 28% 92%;
+  --sidebar-accent-foreground: 224 34% 18%;
+  --sidebar-border: 220 18% 84%;
+  --sidebar-ring: 8 84% 58%;
+
+  --bull: 152 57% 41%;
+  --bull-foreground: 0 0% 100%;
+  --bear: 8 84% 58%;
+  --bear-foreground: 0 0% 100%;
+  --xp: 47 96% 58%;
+  --xp-foreground: 224 34% 14%;
+  --surface-2: 30 33% 94%;
+  --surface-3: 347 44% 96%;
+  --highlight-soft: 12 100% 96%;
+  --landing-hero-ink: 224 40% 18%;
+  --landing-hero-deep: 213 56% 63%;
+  --landing-hero-blush: 345 78% 90%;
+  --landing-card-rose: 336 88% 92%;
+  --landing-card-cream: 40 100% 96%;
+  --landing-card-butter: 49 97% 79%;
+  --landing-line: 8 70% 66%;
+}
+
+.dark {
+  --background: 228 27% 10%;
+  --foreground: 34 38% 94%;
+  --card: 226 24% 13%;
+  --card-foreground: 34 38% 94%;
+  --popover: 226 24% 13%;
+  --popover-foreground: 34 38% 94%;
+  --primary: 34 38% 94%;
+  --primary-foreground: 228 27% 10%;
+  --secondary: 226 18% 19%;
+  --secondary-foreground: 34 38% 94%;
+  --muted: 224 15% 18%;
+  --muted-foreground: 220 10% 70%;
+  --accent: 8 88% 64%;
+  --accent-foreground: 228 27% 10%;
+  --destructive: 0 82% 63%;
+  --destructive-foreground: 228 27% 10%;
+  --border: 224 14% 24%;
+  --input: 224 14% 24%;
+  --ring: 8 88% 64%;
+
+  --chart-1: 152 52% 53%;
+  --chart-2: 8 88% 64%;
+  --chart-3: 47 90% 61%;
+  --chart-4: 204 70% 62%;
+  --chart-5: 280 58% 68%;
+
+  --sidebar: 228 27% 12%;
+  --sidebar-foreground: 34 38% 94%;
+  --sidebar-primary: 8 88% 64%;
+  --sidebar-primary-foreground: 228 27% 10%;
+  --sidebar-accent: 224 15% 18%;
+  --sidebar-accent-foreground: 34 38% 94%;
+  --sidebar-border: 224 14% 24%;
+  --sidebar-ring: 8 88% 64%;
+
+  --bull: 152 52% 53%;
+  --bull-foreground: 228 27% 10%;
+  --bear: 8 88% 64%;
+  --bear-foreground: 228 27% 10%;
+  --xp: 47 90% 61%;
+  --xp-foreground: 228 27% 10%;
+  --surface-2: 226 18% 16%;
+  --surface-3: 226 18% 20%;
+  --highlight-soft: 14 78% 20%;
+  --landing-hero-ink: 228 27% 10%;
+  --landing-hero-deep: 226 24% 18%;
+  --landing-hero-blush: 342 42% 32%;
+  --landing-card-rose: 341 32% 28%;
+  --landing-card-cream: 230 18% 19%;
+  --landing-card-butter: 40 42% 30%;
+  --landing-line: 347 50% 66%;
+}

@@ -1,0 +1,60 @@
+{
+  "name": "ant-gravity-coin",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev:clean": "powershell -ExecutionPolicy Bypass -File ./scripts/kill-dev-port.ps1 -Port 3001",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "typecheck": "tsc -p tsconfig.typecheck.json --noEmit",
+    "test": "vitest run",
+    "test:live-apis": "vitest run src/infrastructure/api/liveApiSources.live.test.ts",
+    "video:studio": "remotion studio src/remotion/index.ts",
+    "video:render": "remotion render src/remotion/index.ts AntGravityPromo out/ant-gravity-promo.mp4",
+    "video:render:shorts": "remotion render src/remotion/index.ts AntGravityPromoShorts out/ant-gravity-promo-shorts.mp4",
+    "video:render:extended": "remotion render src/remotion/index.ts AntGravityPromoExtended out/ant-gravity-promo-extended.mp4",
+    "tts:gemini:wide": "python scripts/generate_gemini_tts.py --split-lines --input-file scripts/tts/wide.txt --out public/audio/ant-gravity-narration-wide.wav --timings-out src/remotion/generated/wide-narration.json",
+    "tts:gemini:shorts": "python scripts/generate_gemini_tts.py --split-lines --input-file scripts/tts/shorts.txt --out public/audio/ant-gravity-narration-shorts.wav --timings-out src/remotion/generated/shorts-narration.json",
+    "tts:gemini:extended": "python scripts/generate_gemini_tts.py --split-lines --input-file scripts/tts/extended.txt --out public/audio/ant-gravity-narration-extended.wav --timings-out src/remotion/generated/extended-narration.json"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.78.0",
+    "@remotion/cli": "^4.0.436",
+    "@remotion/media": "^4.0.436",
+    "@supabase/ssr": "^0.9.0",
+    "@supabase/supabase-js": "^2.99.3",
+    "clsx": "^2.1.1",
+    "next": "16.1.7",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "recharts": "^3.8.0",
+    "remotion": "^4.0.436",
+    "tailwind-merge": "^3.5.0",
+    "zod": "^4.3.6",
+    "zustand": "^5.0.11"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.2.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/node": "^20.19.37",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.1.0",
+    "eslint": "^9.39.1",
+    "eslint-config-next": "16.1.6",
+    "jsdom": "^27.0.1",
+    "pptxgenjs": "^4.0.1",
+    "tailwindcss": "^4.2.1",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.4"
+  },
+  "pnpm": {
+    "overrides": {
+      "flatted": "3.4.2"
+    }
+  }
+}

@@ -1,0 +1,399 @@
+@import "./tokens.css";
+
+:root {
+  color-scheme: light;
+  font-family: "Pretendard", "Noto Sans KR", "Segoe UI", sans-serif;
+  --font-display: "Space Grotesk", "Pretendard", "Noto Sans KR", sans-serif;
+  --font-body: "Pretendard", "Noto Sans KR", "Segoe UI", sans-serif;
+
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 18px;
+  --radius-xl: 24px;
+
+  --shadow-sm: 0 2px 10px rgba(18, 27, 48, 0.06);
+  --shadow-md: 0 12px 30px rgba(18, 27, 48, 0.1);
+  --shadow-lg: 0 18px 40px rgba(18, 27, 48, 0.14);
+}
+
+.dark {
+  color-scheme: dark;
+  --shadow-sm: 0 2px 12px rgba(0, 0, 0, 0.28);
+  --shadow-md: 0 12px 30px rgba(0, 0, 0, 0.34);
+  --shadow-lg: 0 18px 44px rgba(0, 0, 0, 0.42);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top left, hsl(var(--highlight-soft)) 0, transparent 24rem),
+    linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--surface-2)) 100%);
+  color: hsl(var(--foreground));
+  font-family: var(--font-body);
+  line-height: 1.5;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+.ds-shell {
+  width: min(1120px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 32px 0 64px;
+}
+
+.ds-header {
+  display: grid;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.ds-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid hsl(var(--border));
+  border-radius: 999px;
+  background: hsla(var(--card), 0.88);
+  color: hsl(var(--muted-foreground));
+  font-size: 14px;
+}
+
+.ds-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(32px, 5vw, 56px);
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+.ds-subtitle {
+  max-width: 720px;
+  margin: 0;
+  color: hsl(var(--muted-foreground));
+  font-size: 16px;
+}
+
+.ds-grid {
+  display: grid;
+  gap: 20px;
+}
+
+.ds-grid.cols-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.ds-card {
+  background: hsla(var(--card), 0.92);
+  color: hsl(var(--card-foreground));
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: 20px;
+}
+
+.ds-card.strong {
+  background:
+    linear-gradient(180deg, hsla(var(--card), 0.98), hsla(var(--surface-3), 0.98));
+  box-shadow: var(--shadow-md);
+}
+
+.ds-section-title {
+  margin: 0 0 16px;
+  font-family: var(--font-display);
+  font-size: 22px;
+  line-height: 1.2;
+}
+
+.ds-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.ds-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 48px;
+  padding: 0 18px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background-color 180ms ease, color 180ms ease, border-color 180ms ease, transform 180ms ease, box-shadow 180ms ease;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.ds-button:hover {
+  transform: translateY(-1px);
+}
+
+.ds-button:focus-visible,
+.ds-input:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px hsla(var(--ring), 0.3);
+}
+
+.ds-button.primary {
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  box-shadow: var(--shadow-sm);
+}
+
+.ds-button.secondary {
+  background: hsl(var(--secondary));
+  color: hsl(var(--secondary-foreground));
+}
+
+.ds-button.accent {
+  background: hsl(var(--accent));
+  color: hsl(var(--accent-foreground));
+}
+
+.ds-button.outline {
+  background: transparent;
+  color: hsl(var(--foreground));
+  border-color: hsl(var(--border));
+}
+
+.ds-button.ghost {
+  background: hsla(var(--muted), 0.8);
+  color: hsl(var(--muted-foreground));
+}
+
+.ds-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 0 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.ds-badge.default {
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+}
+
+.ds-badge.bull {
+  background: hsl(var(--bull));
+  color: hsl(var(--bull-foreground));
+}
+
+.ds-badge.bear {
+  background: hsl(var(--bear));
+  color: hsl(var(--bear-foreground));
+}
+
+.ds-badge.xp {
+  background: hsl(var(--xp));
+  color: hsl(var(--xp-foreground));
+}
+
+.ds-badge.muted {
+  background: hsl(var(--muted));
+  color: hsl(var(--muted-foreground));
+}
+
+.ds-input {
+  width: 100%;
+  min-height: 48px;
+  padding: 0 14px;
+  border: 1px solid hsl(var(--input));
+  border-radius: var(--radius-md);
+  background: hsl(var(--card));
+  color: hsl(var(--foreground));
+  transition: border-color 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
+}
+
+.ds-input::placeholder {
+  color: hsl(var(--muted-foreground));
+}
+
+.ds-field {
+  display: grid;
+  gap: 8px;
+}
+
+.ds-label {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.ds-help {
+  color: hsl(var(--muted-foreground));
+  font-size: 13px;
+}
+
+.ds-palette {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.ds-swatch {
+  display: grid;
+  gap: 10px;
+}
+
+.ds-swatch-chip {
+  height: 96px;
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius-md);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.24);
+}
+
+.ds-swatch-meta {
+  display: grid;
+  gap: 2px;
+  font-size: 13px;
+}
+
+.ds-type-scale {
+  display: grid;
+  gap: 14px;
+}
+
+.ds-type-item {
+  display: flex;
+  gap: 16px;
+  align-items: baseline;
+  flex-wrap: wrap;
+  padding-bottom: 12px;
+  border-bottom: 1px dashed hsl(var(--border));
+}
+
+.ds-type-label {
+  min-width: 72px;
+  color: hsl(var(--muted-foreground));
+  font-size: 13px;
+}
+
+.ds-display {
+  font-family: var(--font-display);
+  font-size: 40px;
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+.ds-h1 {
+  font-family: var(--font-display);
+  font-size: 32px;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+}
+
+.ds-h2 {
+  font-family: var(--font-display);
+  font-size: 24px;
+  line-height: 1.2;
+}
+
+.ds-h3 {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.ds-body {
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.ds-small {
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.ds-micro {
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.ds-spacing-scale {
+  display: grid;
+  gap: 12px;
+}
+
+.ds-space-item {
+  display: grid;
+  grid-template-columns: 80px 1fr auto;
+  gap: 12px;
+  align-items: center;
+}
+
+.ds-space-bar {
+  height: 14px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, hsl(var(--primary)), hsl(var(--accent)));
+}
+
+.ds-radius-scale,
+.ds-shadow-scale {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 14px;
+}
+
+.ds-radius-box,
+.ds-shadow-box {
+  min-height: 88px;
+  padding: 16px;
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+}
+
+.ds-surface-stack {
+  display: grid;
+  gap: 12px;
+}
+
+.ds-surface {
+  min-height: 72px;
+  border-radius: var(--radius-md);
+  border: 1px solid hsl(var(--border));
+  padding: 16px;
+}
+
+.theme-toggle {
+  position: sticky;
+  top: 12px;
+  z-index: 10;
+  width: fit-content;
+  margin-left: auto;
+  margin-bottom: 16px;
+}
+
+@media (max-width: 768px) {
+  .ds-shell {
+    width: min(100% - 24px, 720px);
+    padding-top: 24px;
+  }
+
+  .ds-grid.cols-2 {
+    grid-template-columns: 1fr;
+  }
+
+  .ds-space-item {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,70 @@
+version: "2.0"
+
+screen:
+  name: 홈
+  route: /home
+  layout: single-column
+  description: 코인 검색 또는 인기 종목 선택으로 배틀 시작
+
+data_requirements:
+  - resource: coin
+    needs: [id, symbol, name, thumb]
+    filters: { limit: 10 }
+    label: topCoins
+
+  - resource: coin
+    needs: [id, symbol, name, thumb]
+    source: localstorage
+    key: ant_gravity_recent_coins
+    label: recentCoins
+
+components:
+  - id: hero_summary
+    type: section
+    position: top
+    function: 팀 수와 XP 루프를 보여주는 요약 히어로
+
+  - id: search_bar
+    type: search_input
+    position: main
+    function: 코인 티커/이름 검색 + 자동완성 드롭다운
+    data_source:
+      endpoint: GET /api/coins/search?q=...
+    actions:
+      - on: select_autocomplete
+        navigate: /battle/[coinId]
+      - on: enter_key
+        navigate: /battle/[coinId]
+
+  - id: top_coins_grid
+    type: grid
+    position: main
+    function: 인기 코인 카드 목록
+    data_source:
+      endpoint: GET /api/coins/top
+    actions:
+      - on: card_click
+        navigate: /battle/[coinId]
+
+  - id: recent_coins_list
+    type: list
+    position: side
+    function: 최근 본 코인 목록
+
+  - id: risk_disclaimer
+    type: alert_box
+    position: side_bottom
+    function: 투자 조언 아님 고지
+
+tests:
+  - name: 홈 초기 로드
+    when: /home 접속
+    then: [Top 코인 표시, 검색 입력 가능]
+
+  - name: 코인 검색
+    when: 검색바에 "BTC" 입력
+    then: [자동완성 목록 표시]
+
+  - name: 인기 코인 클릭
+    when: BTC 카드 클릭
+    then: [/battle/bitcoin 으로 이동]

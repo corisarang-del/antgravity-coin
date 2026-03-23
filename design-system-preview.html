@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ant Battle Log Design System Preview</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./src/styles/globals.css" />
+  </head>
+  <body>
+    <main class="ds-shell">
+      <div class="theme-toggle">
+        <button class="ds-button outline" id="theme-toggle" type="button">다크 모드</button>
+      </div>
+
+      <header class="ds-header">
+        <span class="ds-kicker">Ant Battle Log · Token Preview</span>
+        <h1 class="ds-title">배틀 로그 제품 전용 디자인 토큰 프리뷰</h1>
+        <p class="ds-subtitle">
+          따뜻한 전시감은 유지하되, 금융형 정보 밀도와 모바일 가독성에 맞게 재구성한
+          `shadcn/ui` 호환 토큰 세트다. 아래 샘플은 Button, Card, Badge, Input과 light/dark
+          상태를 같이 본다.
+        </p>
+      </header>
+
+      <section class="ds-grid cols-2">
+        <article class="ds-card strong">
+          <h2 class="ds-section-title">버튼</h2>
+          <div class="ds-row">
+            <button class="ds-button primary" type="button">배틀 시작</button>
+            <button class="ds-button secondary" type="button">요약 보기</button>
+            <button class="ds-button accent" type="button">XP 받기</button>
+            <button class="ds-button outline" type="button">보류</button>
+            <button class="ds-button ghost" type="button">취소</button>
+          </div>
+        </article>
+
+        <article class="ds-card">
+          <h2 class="ds-section-title">배지</h2>
+          <div class="ds-row">
+            <span class="ds-badge default">ACTIVE</span>
+            <span class="ds-badge bull">BULL</span>
+            <span class="ds-badge bear">BEAR</span>
+            <span class="ds-badge xp">+120 XP</span>
+            <span class="ds-badge muted">WAITING</span>
+          </div>
+        </article>
+      </section>
+
+      <section class="ds-grid cols-2" style="margin-top: 20px;">
+        <article class="ds-card strong">
+          <h2 class="ds-section-title">입력 필드</h2>
+          <div class="ds-field">
+            <label class="ds-label" for="coin">코인 검색</label>
+            <input class="ds-input" id="coin" placeholder="BTC, ETH, SOL" />
+            <span class="ds-help">최소 44px 터치 타깃과 선명한 포커스 링을 유지한다.</span>
+          </div>
+        </article>
+
+        <article class="ds-card">
+          <h2 class="ds-section-title">카드</h2>
+          <div class="ds-surface-stack">
+            <div class="ds-surface" style="background: hsl(var(--card));">
+              <strong>기본 카드</strong>
+              <p class="ds-help">일반 정보 카드와 리스트 셀에 사용</p>
+            </div>
+            <div class="ds-surface" style="background: hsl(var(--surface-2));">
+              <strong>보조 서피스</strong>
+              <p class="ds-help">요약 영역, 선택 전 패널, 라이트 배경 구획</p>
+            </div>
+            <div class="ds-surface" style="background: hsl(var(--surface-3));">
+              <strong>강조 서피스</strong>
+              <p class="ds-help">캐릭터 카드, 아카이브형 전시 블록, 결과 하이라이트</p>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="ds-card strong" style="margin-top: 20px;">
+        <h2 class="ds-section-title">컬러 팔레트</h2>
+        <div class="ds-palette">
+          <div class="ds-swatch">
+            <div class="ds-swatch-chip" style="background: hsl(var(--background));"></div>
+            <div class="ds-swatch-meta"><strong>background</strong><span>따뜻한 크림 캔버스</span></div>
+          </div>
+          <div class="ds-swatch">
+            <div class="ds-swatch-chip" style="background: hsl(var(--primary));"></div>
+            <div class="ds-swatch-meta"><strong>primary</strong><span>신뢰감 있는 잉크 네이비</span></div>
+          </div>
+          <div class="ds-swatch">
+            <div class="ds-swatch-chip" style="background: hsl(var(--accent));"></div>
+            <div class="ds-swatch-meta"><strong>accent</strong><span>결과/행동 강조 코랄</span></div>
+          </div>
+          <div class="ds-swatch">
+            <div class="ds-swatch-chip" style="background: hsl(var(--bull));"></div>
+            <div class="ds-swatch-meta"><strong>bull</strong><span>상승 진영 상태색</span></div>
+          </div>
+          <div class="ds-swatch">
+            <div class="ds-swatch-chip" style="background: hsl(var(--bear));"></div>
+            <div class="ds-swatch-meta"><strong>bear</strong><span>하락 진영 상태색</span></div>
+          </div>
+          <div class="ds-swatch">
+            <div class="ds-swatch-chip" style="background: hsl(var(--xp));"></div>
+            <div class="ds-swatch-meta"><strong>xp</strong><span>보상/성취 상태색</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="ds-grid cols-2" style="margin-top: 20px;">
+        <article class="ds-card">
+          <h2 class="ds-section-title">타이포그래피</h2>
+          <div class="ds-type-scale">
+            <div class="ds-type-item"><span class="ds-type-label">display</span><span class="ds-display">BTC 배틀 결과</span></div>
+            <div class="ds-type-item"><span class="ds-type-label">h1</span><span class="ds-h1">상승 진영 승리</span></div>
+            <div class="ds-type-item"><span class="ds-type-label">h2</span><span class="ds-h2">오늘의 핵심 지표</span></div>
+            <div class="ds-type-item"><span class="ds-type-label">h3</span><span class="ds-h3">대표 논거 요약</span></div>
+            <div class="ds-type-item"><span class="ds-type-label">body</span><span class="ds-body">배틀 로그는 짧고 명확한 설명을 우선한다.</span></div>
+            <div class="ds-type-item"><span class="ds-type-label">small</span><span class="ds-small">최근 24시간 기준</span></div>
+            <div class="ds-type-item"><span class="ds-type-label">micro</span><span class="ds-micro">updated 2m ago</span></div>
+          </div>
+        </article>
+
+        <article class="ds-card">
+          <h2 class="ds-section-title">간격 스케일</h2>
+          <div class="ds-spacing-scale">
+            <div class="ds-space-item"><strong>4px</strong><div class="ds-space-bar" style="width: 4px;"></div><span>space-1</span></div>
+            <div class="ds-space-item"><strong>8px</strong><div class="ds-space-bar" style="width: 8px;"></div><span>space-2</span></div>
+            <div class="ds-space-item"><strong>12px</strong><div class="ds-space-bar" style="width: 12px;"></div><span>space-3</span></div>
+            <div class="ds-space-item"><strong>16px</strong><div class="ds-space-bar" style="width: 16px;"></div><span>space-4</span></div>
+            <div class="ds-space-item"><strong>24px</strong><div class="ds-space-bar" style="width: 24px;"></div><span>space-6</span></div>
+            <div class="ds-space-item"><strong>32px</strong><div class="ds-space-bar" style="width: 32px;"></div><span>space-8</span></div>
+          </div>
+        </article>
+      </section>
+
+      <section class="ds-grid cols-2" style="margin-top: 20px;">
+        <article class="ds-card">
+          <h2 class="ds-section-title">반경</h2>
+          <div class="ds-radius-scale">
+            <div class="ds-radius-box" style="border-radius: var(--radius-sm);">radius-sm</div>
+            <div class="ds-radius-box" style="border-radius: var(--radius-md);">radius-md</div>
+            <div class="ds-radius-box" style="border-radius: var(--radius-lg);">radius-lg</div>
+            <div class="ds-radius-box" style="border-radius: var(--radius-xl);">radius-xl</div>
+          </div>
+        </article>
+
+        <article class="ds-card">
+          <h2 class="ds-section-title">그림자</h2>
+          <div class="ds-shadow-scale">
+            <div class="ds-shadow-box" style="box-shadow: var(--shadow-sm);">shadow-sm</div>
+            <div class="ds-shadow-box" style="box-shadow: var(--shadow-md);">shadow-md</div>
+            <div class="ds-shadow-box" style="box-shadow: var(--shadow-lg);">shadow-lg</div>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <script>
+      const root = document.documentElement;
+      const button = document.getElementById("theme-toggle");
+
+      button.addEventListener("click", () => {
+        root.classList.toggle("dark");
+        button.textContent = root.classList.contains("dark") ? "라이트 모드" : "다크 모드";
+      });
+    </script>
+  </body>
+</html>
