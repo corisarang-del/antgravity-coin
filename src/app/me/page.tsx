@@ -27,6 +27,18 @@ function firstOrNull<T>(value: T | T[] | null | undefined) {
   return Array.isArray(value) ? (value[0] ?? null) : (value ?? null);
 }
 
+function getProviderLabel(provider: string) {
+  if (provider === "google") {
+    return "Google";
+  }
+
+  if (provider === "kakao") {
+    return "Kakao";
+  }
+
+  return provider;
+}
+
 export default async function MePage({ searchParams }: MePageProps) {
   const params = await searchParams;
   const selectedBattleId = params?.battleId ?? null;
@@ -66,7 +78,7 @@ export default async function MePage({ searchParams }: MePageProps) {
         )
         .eq("owner_user_id", user.id)
         .order("selected_at", { ascending: false })
-        .limit(12),
+        .limit(5),
       selectedBattleId
         ? supabase
             .from("battle_sessions")
@@ -108,14 +120,22 @@ export default async function MePage({ searchParams }: MePageProps) {
   const selectedMessages = Array.isArray(selectedSnapshot?.messages_json)
     ? (selectedSnapshot.messages_json as DebateMessage[])
     : [];
+  const level = progress?.level ?? 1;
+  const xp = progress?.xp ?? 0;
+  const wins = progress?.wins ?? 0;
+  const losses = progress?.losses ?? 0;
+  const title = progress?.title ?? "개미";
+  const totalBattles = wins + losses;
+  const providerLabel =
+    providerHints.length > 0 ? providerHints.map(getProviderLabel).join(" · ") : "email";
 
   return (
     <div className="min-h-screen bg-background text-foreground">
       <AppHeader initialCurrentUserSnapshot={initialCurrentUserSnapshot} />
       <MergeLocalStateClient />
-      <main className="mx-auto flex max-w-5xl flex-col gap-6 px-4 py-6">
-        <section className="grid gap-4 rounded-[28px] border border-border bg-[linear-gradient(180deg,hsl(var(--card))_0%,hsl(var(--surface-3))_100%)] p-5 shadow-[0_22px_50px_rgba(17,29,61,0.08)] md:grid-cols-[1.2fr_0.8fr]">
-          <div className="space-y-4">
+      <main className="mx-auto flex max-w-5xl flex-col gap-5 px-4 py-6">
+        <section className="grid gap-4 rounded-[28px] border border-border bg-[linear-gradient(180deg,hsl(var(--card))_0%,hsl(var(--surface-3))_100%)] p-5 shadow-[0_22px_50px_rgba(17,29,61,0.08)] lg:grid-cols-[1.1fr_0.9fr]">
+          <div className="space-y-5">
             <span className="inline-flex rounded-full border border-border/80 bg-[hsl(var(--surface-2))] px-3 py-2 text-xs font-semibold text-muted-foreground">
               내 계정
             </span>
@@ -138,30 +158,38 @@ export default async function MePage({ searchParams }: MePageProps) {
                   {displayName}
                 </h1>
                 <p className="text-sm text-muted-foreground">{user.email}</p>
-                <p className="text-sm text-muted-foreground">
-                  연결 계정: {providerHints.length > 0 ? providerHints.join(", ") : "email"}
-                </p>
+                <p className="text-sm text-muted-foreground">연결 계정: {providerLabel}</p>
               </div>
             </div>
+            <div className="rounded-[22px] border border-border/80 bg-[hsl(var(--surface-2))] p-4 text-sm leading-6 text-muted-foreground">
+              내 페이지 첫 화면에서는 지금 상태를 먼저 보고, 자세한 배틀 복기는 아래 기록에서 필요할 때만 열어보면 돼.
+            </div>
           </div>
-          <div className="grid gap-3 sm:grid-cols-3 md:grid-cols-1">
+          <div className="grid gap-3 sm:grid-cols-2">
             <div className="rounded-[22px] border border-border/80 bg-[hsl(var(--surface-2))] p-4">
               <p className="text-xs font-semibold text-muted-foreground">현재 레벨</p>
               <p className="mt-2 font-display text-3xl font-bold tracking-[-0.05em]">
-                Lv.{progress?.level ?? 1}
+                Lv.{level}
+              </p>
+            </div>
+            <div className="rounded-[22px] border border-[hsl(var(--xp)/0.25)] bg-[hsl(var(--secondary))] p-4">
+              <p className="text-xs font-semibold text-muted-foreground">현재 등급</p>
+              <p className="mt-2 font-display text-3xl font-bold tracking-[-0.05em] text-xp">
+                {title}
               </p>
             </div>
             <div className="rounded-[22px] border border-border/80 bg-[hsl(var(--surface-2))] p-4">
               <p className="text-xs font-semibold text-muted-foreground">누적 XP</p>
               <p className="mt-2 font-display text-3xl font-bold tracking-[-0.05em]">
-                {progress?.xp ?? 0}
+                {xp}
               </p>
             </div>
             <div className="rounded-[22px] border border-border/80 bg-[hsl(var(--surface-2))] p-4">
               <p className="text-xs font-semibold text-muted-foreground">전적</p>
               <p className="mt-2 text-sm font-semibold text-foreground">
-                {progress?.wins ?? 0}승 {progress?.losses ?? 0}패
+                {wins}승 {losses}패
               </p>
+              <p className="mt-1 text-xs text-muted-foreground">누적 라운드 {totalBattles}회</p>
             </div>
           </div>
         </section>
@@ -171,7 +199,7 @@ export default async function MePage({ searchParams }: MePageProps) {
             <div>
               <h2 className="font-display text-2xl font-bold tracking-[-0.04em]">내 배틀 기록</h2>
               <p className="text-sm text-muted-foreground">
-                최근 정산된 라운드와 진행 중인 라운드를 같이 보여줘.
+                최근 5개만 먼저 보여주고, 더 자세한 복기는 항목을 눌러서 이어봐.
               </p>
             </div>
           </div>
@@ -207,6 +235,16 @@ export default async function MePage({ searchParams }: MePageProps) {
                         </p>
                       </div>
                     </div>
+                    <div className="mt-3 flex items-center justify-between gap-3 text-xs text-muted-foreground">
+                      <span>
+                        {outcome?.user_won == null
+                          ? "결과 대기 중"
+                          : outcome.user_won
+                            ? "이번 라운드 적중"
+                            : "이번 라운드 미적중"}
+                      </span>
+                      <span>상세 보기</span>
+                    </div>
                   </Link>
                 );
               })
@@ -227,7 +265,7 @@ export default async function MePage({ searchParams }: MePageProps) {
                 className="rounded-full border border-border/80 bg-[hsl(var(--surface-2))] px-3 py-2 text-xs font-semibold text-muted-foreground transition hover:bg-card hover:text-foreground"
                 href="/me"
               >
-                상세 닫기
+                요약으로 돌아가기
               </Link>
             </div>
 

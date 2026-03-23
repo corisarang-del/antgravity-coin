@@ -393,4 +393,84 @@
    를 재확인
 4. 필요하면 `결과 화면 열기` 버튼 라벨도 `결과 페이지 미리 열기` 같은 문구로 맞추기
 
+## 2026-03-23 21:56 KST 추가 기록
+
+### planning 문서 업데이트 반영
+
+- 로그인/회원가입 통합 OAuth와 `/me` 요약 대시보드 방향을 아래 planning 문서에 append로 반영했음
+  - `docs/planning/01-prd.md`
+  - `docs/planning/02-user-stories.md`
+  - `docs/planning/03-feature-list.md`
+  - `docs/planning/06-screens.md`
+  - `docs/planning/06-tasks.md`
+  - `docs/planning/12-auth-user-flow.md`
+- `task.md`는 따로 만들지 않았고, `docs/planning/06-tasks.md`에 `T5`, `T6` 작업 묶음을 추가함
+
+### 로그인 / 내 페이지 실제 구현 진행
+
+- `src/app/login/LoginPageClient.tsx`
+  - 로그인/회원가입 통합 카피 반영
+  - `Google`, `Kakao` OAuth 진입 버튼 유지
+  - `error=oauth_callback_failed` 안내 문구 추가
+  - 이후 디자인 리프레시까지 반영해서 2패널 구조로 정리함
+- `src/app/me/page.tsx`
+  - 요약 대시보드 강조 방향 반영
+  - 프로필, XP, 등급, 승패를 상단에서 먼저 보이게 정리
+  - 최근 battle 기록은 5개 기준으로 압축
+  - 상세는 계속 선택 시 확장 구조로 유지
+- `src/presentation/components/AppHeader.tsx`
+  - 비로그인 CTA를 `로그인/회원가입`으로 조정
+  - 이후 헤더 버튼군과 더 자연스럽게 섞이도록 카드형 CTA 스타일로 손봄
+- `src/app/login/LoginPageClient.test.tsx`
+  - OAuth 진입과 callback 실패 문구 테스트 추가
+
+### 현재 검증 상태
+
+- 통과
+  - `pnpm.cmd typecheck`
+  - `node_modules\\.bin\\eslint.cmd src/app/login/LoginPageClient.tsx src/presentation/components/AppHeader.tsx`
+  - `node_modules\\.bin\\eslint.cmd src/app/login/LoginPageClient.tsx src/app/login/LoginPageClient.test.tsx src/app/me/page.tsx src/presentation/components/AppHeader.tsx`
+- 막힘
+  - `pnpm.cmd test -- src/app/login/LoginPageClient.test.tsx`
+    - 이 환경에선 `spawn EPERM`으로 Vitest 시작 자체가 막힘
+  - `pnpm.cmd lint`
+    - 이번 변경 때문이 아니라 `tmp/` 아래 생성 산출물의 `require()` 사용 때문에 전체 lint가 깨짐
+
+### 런타임 이슈 메모
+
+- `localhost:3000`이 전부 404를 주는 꼬인 dev 프로세스가 떠 있었음
+  - 3000 점유 PID `46120` 강제 종료
+  - `.next/dev/lock` 제거
+- 이후 로그인 버튼 클릭 시 아래 런타임 에러를 확인함
+  - `@supabase/ssr: Your project's URL and API key are required...`
+- 하지만 실제 파일 기준으로는 env가 비어 있지 않았음
+  - `.env`
+  - `.env.local`
+  - 둘 다 `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` 존재
+- 따라서 현재 판단은 코드보다 dev 서버가 env를 제대로 못 물고 뜬 상태에 더 가깝다.
+- 새 세션에서 우선할 실행 순서
+  1. 기존 dev 서버 완전 종료
+  2. 필요하면 `.next` 삭제
+  3. `pnpm.cmd run dev` 재기동
+  4. `http://localhost:3000/login`에서 Supabase env 에러 재현 여부 확인
+
+### 이번 커밋에 같이 묶어야 할 범위
+
+- 코드
+  - `src/app/login/LoginPageClient.tsx`
+  - `src/app/login/LoginPageClient.test.tsx`
+  - `src/app/me/page.tsx`
+  - `src/presentation/components/AppHeader.tsx`
+- 문서
+  - `memory.md`
+  - `research.md`
+  - 위 planning 6개 문서
+  - 이번 세션에서 추가한 `docs/prompt/*`, `docs/개발일지/*` 기록 파일
+- 제외
+  - `database/data/*`
+  - `tmp/*`
+  - `out/*`
+  - `error.png`
+  - 기존에 이미 쌓여 있던 과거 미추적 파일
+
 
