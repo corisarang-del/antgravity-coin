@@ -23,7 +23,7 @@ export default async function HomePage() {
           <div className="flex flex-col justify-between gap-5">
             <div className="space-y-4">
               <span className="inline-flex w-fit rounded-full border border-border/80 bg-[hsl(var(--surface-2))] px-3 py-2 text-xs font-semibold text-muted-foreground">
-                모바일 375px 우선 · 데이터 가독성 중심
+                원하는 팀으로 골라봐
               </span>
               <h1 className="font-display text-[clamp(2.25rem,6vw,4.5rem)] leading-none tracking-[-0.06em]">
                 불리시팀 vs 베어리시팀
