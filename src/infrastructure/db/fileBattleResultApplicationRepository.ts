@@ -1,9 +1,9 @@
-import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import type {
   BattleResultApplication,
   BattleResultApplicationRepository,
 } from "@/application/ports/BattleResultApplicationRepository";
+import { loadJsonFileStore, saveJsonFileStore } from "@/infrastructure/db/jsonFileStore";
 import { runSerializedByKey } from "@/shared/utils/keyedSerialExecutor";
 
 interface StoredApplications {
@@ -14,20 +14,11 @@ const DATA_DIR = path.join(process.cwd(), "database", "data");
 const DATA_FILE = path.join(DATA_DIR, "battle_result_applications.json");
 
 async function ensureStore(): Promise<StoredApplications> {
-  await mkdir(DATA_DIR, { recursive: true });
-
-  try {
-    const rawValue = await readFile(DATA_FILE, "utf8");
-    return JSON.parse(rawValue) as StoredApplications;
-  } catch {
-    const initialValue: StoredApplications = { items: [] };
-    await writeFile(DATA_FILE, JSON.stringify(initialValue, null, 2), "utf8");
-    return initialValue;
-  }
+  return loadJsonFileStore(DATA_FILE, { items: [] } satisfies StoredApplications);
 }
 
 async function saveStore(store: StoredApplications) {
-  await writeFile(DATA_FILE, JSON.stringify(store, null, 2), "utf8");
+  await saveJsonFileStore(DATA_FILE, store);
 }
 
 export class FileBattleResultApplicationRepository

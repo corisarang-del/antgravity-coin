@@ -1,6 +1,6 @@
-import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import type { PreparedBattleContext } from "@/application/useCases/preparedBattleContext";
+import { loadJsonFileStore, saveJsonFileStore } from "@/infrastructure/db/jsonFileStore";
 import { runSerializedByKey } from "@/shared/utils/keyedSerialExecutor";
 
 interface PreparedBattleContextStore {
@@ -12,28 +12,19 @@ const DATA_DIR = path.join(process.cwd(), "database", "data");
 const DATA_FILE = path.join(DATA_DIR, "battle_prep_cache.json");
 
 async function ensureStore(): Promise<PreparedBattleContextStore> {
-  await mkdir(DATA_DIR, { recursive: true });
+  const parsed = await loadJsonFileStore(DATA_FILE, {
+    version: 1,
+    items: [],
+  } satisfies PreparedBattleContextStore);
 
-  try {
-    const rawValue = await readFile(DATA_FILE, "utf8");
-    const parsed = JSON.parse(rawValue) as Partial<PreparedBattleContextStore>;
-
-    return {
-      version: 1,
-      items: parsed.items ?? [],
-    };
-  } catch {
-    const initialValue: PreparedBattleContextStore = {
-      version: 1,
-      items: [],
-    };
-    await writeFile(DATA_FILE, JSON.stringify(initialValue, null, 2), "utf8");
-    return initialValue;
-  }
+  return {
+    version: 1,
+    items: parsed.items ?? [],
+  };
 }
 
 async function saveStore(store: PreparedBattleContextStore) {
-  await writeFile(DATA_FILE, JSON.stringify(store, null, 2), "utf8");
+  await saveJsonFileStore(DATA_FILE, store);
 }
 
 export class FilePreparedBattleContextRepository {

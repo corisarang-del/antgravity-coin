@@ -1,6 +1,6 @@
-import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import type { CacheTtlPolicy } from "@/shared/constants/cachePolicy";
+import { loadJsonFileStore, saveJsonFileStore } from "@/infrastructure/db/jsonFileStore";
 
 export interface CachedMarketSeed {
   coinId: string;
@@ -52,26 +52,17 @@ const DATA_DIR = path.join(process.cwd(), "database", "data");
 const DATA_FILE = path.join(DATA_DIR, "source_cache.json");
 
 async function ensureStore(): Promise<DataSourceCacheStore> {
-  await mkdir(DATA_DIR, { recursive: true });
-
-  try {
-    const rawValue = await readFile(DATA_FILE, "utf8");
-    return JSON.parse(rawValue) as DataSourceCacheStore;
-  } catch {
-    const initialValue: DataSourceCacheStore = {
-      version: 1,
-      marketSeeds: [],
-      newsSentiments: [],
-      derivatives: [],
-      fearGreed: null,
-    };
-    await writeFile(DATA_FILE, JSON.stringify(initialValue, null, 2), "utf8");
-    return initialValue;
-  }
+  return loadJsonFileStore(DATA_FILE, {
+    version: 1,
+    marketSeeds: [],
+    newsSentiments: [],
+    derivatives: [],
+    fearGreed: null,
+  } satisfies DataSourceCacheStore);
 }
 
 async function saveStore(store: DataSourceCacheStore) {
-  await writeFile(DATA_FILE, JSON.stringify(store, null, 2), "utf8");
+  await saveJsonFileStore(DATA_FILE, store);
 }
 
 function createEntry<TValue>(key: string, value: TValue, policy: CacheTtlPolicy): CacheEntry<TValue> {

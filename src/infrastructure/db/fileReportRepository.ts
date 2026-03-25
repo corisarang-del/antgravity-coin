@@ -1,8 +1,8 @@
-import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import type { ReportRepository } from "@/application/ports/ReportRepository";
 import type { BattleReport } from "@/domain/models/BattleReport";
 import type { ReusableBattleMemo } from "@/domain/models/ReusableBattleMemo";
+import { loadJsonFileStore, saveJsonFileStore } from "@/infrastructure/db/jsonFileStore";
 import { runSerializedByKey } from "@/shared/utils/keyedSerialExecutor";
 
 interface ReportStore {
@@ -14,25 +14,19 @@ const DATA_DIR = path.join(process.cwd(), "database", "data");
 const DATA_FILE = path.join(DATA_DIR, "report_store.json");
 
 async function ensureStore(): Promise<ReportStore> {
-  await mkdir(DATA_DIR, { recursive: true });
+  const parsed = await loadJsonFileStore(DATA_FILE, {
+    reports: [],
+    reusableMemos: [],
+  } satisfies ReportStore);
 
-  try {
-    const rawValue = await readFile(DATA_FILE, "utf8");
-    const parsed = JSON.parse(rawValue) as Partial<ReportStore>;
-
-    return {
-      reports: parsed.reports ?? [],
-      reusableMemos: parsed.reusableMemos ?? [],
-    };
-  } catch {
-    const initialValue: ReportStore = { reports: [], reusableMemos: [] };
-    await writeFile(DATA_FILE, JSON.stringify(initialValue, null, 2), "utf8");
-    return initialValue;
-  }
+  return {
+    reports: parsed.reports ?? [],
+    reusableMemos: parsed.reusableMemos ?? [],
+  };
 }
 
 async function saveStore(store: ReportStore) {
-  await writeFile(DATA_FILE, JSON.stringify(store, null, 2), "utf8");
+  await saveJsonFileStore(DATA_FILE, store);
 }
 
 export class FileReportRepository implements ReportRepository {

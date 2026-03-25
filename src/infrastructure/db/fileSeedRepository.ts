@@ -1,9 +1,9 @@
-import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import type { SeedRepository } from "@/application/ports/SeedRepository";
 import type { BattleOutcomeSeed } from "@/domain/models/BattleOutcomeSeed";
 import type { CharacterMemorySeed } from "@/domain/models/CharacterMemorySeed";
 import type { PlayerDecisionSeed } from "@/domain/models/PlayerDecisionSeed";
+import { loadJsonFileStore, saveJsonFileStore } from "@/infrastructure/db/jsonFileStore";
 import { runSerializedByKey } from "@/shared/utils/keyedSerialExecutor";
 
 interface SeedStore {
@@ -16,24 +16,15 @@ const DATA_DIR = path.join(process.cwd(), "database", "data");
 const DATA_FILE = path.join(DATA_DIR, "seed_store.json");
 
 async function ensureStore(): Promise<SeedStore> {
-  await mkdir(DATA_DIR, { recursive: true });
-
-  try {
-    const rawValue = await readFile(DATA_FILE, "utf8");
-    return JSON.parse(rawValue) as SeedStore;
-  } catch {
-    const initialValue: SeedStore = {
-      battleOutcomeSeeds: [],
-      characterMemorySeeds: [],
-      playerDecisionSeeds: [],
-    };
-    await writeFile(DATA_FILE, JSON.stringify(initialValue, null, 2), "utf8");
-    return initialValue;
-  }
+  return loadJsonFileStore(DATA_FILE, {
+    battleOutcomeSeeds: [],
+    characterMemorySeeds: [],
+    playerDecisionSeeds: [],
+  } satisfies SeedStore);
 }
 
 async function saveStore(store: SeedStore) {
-  await writeFile(DATA_FILE, JSON.stringify(store, null, 2), "utf8");
+  await saveJsonFileStore(DATA_FILE, store);
 }
 
 export class FileSeedRepository implements SeedRepository {

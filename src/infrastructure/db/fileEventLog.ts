@@ -1,6 +1,6 @@
-import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import type { EventLog, EventLogEntry } from "@/application/ports/EventLog";
+import { loadJsonFileStore, saveJsonFileStore } from "@/infrastructure/db/jsonFileStore";
 import { runSerializedByKey } from "@/shared/utils/keyedSerialExecutor";
 
 interface StoredEventLog {
@@ -11,20 +11,11 @@ const DATA_DIR = path.join(process.cwd(), "database", "data");
 const DATA_FILE = path.join(DATA_DIR, "event_log.json");
 
 async function ensureStore(): Promise<StoredEventLog> {
-  await mkdir(DATA_DIR, { recursive: true });
-
-  try {
-    const rawValue = await readFile(DATA_FILE, "utf8");
-    return JSON.parse(rawValue) as StoredEventLog;
-  } catch {
-    const initialValue: StoredEventLog = { items: [] };
-    await writeFile(DATA_FILE, JSON.stringify(initialValue, null, 2), "utf8");
-    return initialValue;
-  }
+  return loadJsonFileStore(DATA_FILE, { items: [] } satisfies StoredEventLog);
 }
 
 async function saveStore(store: StoredEventLog) {
-  await writeFile(DATA_FILE, JSON.stringify(store, null, 2), "utf8");
+  await saveJsonFileStore(DATA_FILE, store);
 }
 
 export class FileEventLog implements EventLog {
