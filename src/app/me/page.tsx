@@ -1,7 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { getInitialCurrentUserSnapshot } from "@/infrastructure/auth/getInitialCurrentUserSnapshot";
+import { createCurrentUserSnapshot } from "@/infrastructure/auth/getInitialCurrentUserSnapshot";
+import { getGuestUserId } from "@/infrastructure/auth/guestSession";
 import { AppHeader } from "@/presentation/components/AppHeader";
 import { MergeLocalStateClient } from "@/app/me/MergeLocalStateClient";
 import type { DebateMessage } from "@/domain/models/DebateMessage";
@@ -42,9 +43,9 @@ function getProviderLabel(provider: string) {
 export default async function MePage({ searchParams }: MePageProps) {
   const params = await searchParams;
   const selectedBattleId = params?.battleId ?? null;
-  const [supabase, initialCurrentUserSnapshot] = await Promise.all([
+  const [supabase, guestUserId] = await Promise.all([
     createSupabaseServerClient(),
-    getInitialCurrentUserSnapshot(),
+    getGuestUserId(),
   ]);
   const {
     data: { user },
@@ -53,6 +54,11 @@ export default async function MePage({ searchParams }: MePageProps) {
   if (!user) {
     redirect("/login?next=/me");
   }
+
+  const initialCurrentUserSnapshot = createCurrentUserSnapshot({
+    user,
+    guestUserId,
+  });
 
   const [{ data: profile }, { data: progress }, { data: battles }, { data: selectedBattle }] =
     await Promise.all([

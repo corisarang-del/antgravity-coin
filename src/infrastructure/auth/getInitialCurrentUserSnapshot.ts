@@ -1,13 +1,13 @@
-import { createSupabaseServerClient } from "@/infrastructure/auth/supabaseServerClient";
+import type { User } from "@supabase/supabase-js";
 import { getGuestUserId } from "@/infrastructure/auth/guestSession";
+import { createSupabaseServerClient } from "@/infrastructure/auth/supabaseServerClient";
 import type { CurrentUserSnapshot } from "@/presentation/hooks/currentUserStore";
 
-export async function getInitialCurrentUserSnapshot(): Promise<CurrentUserSnapshot> {
-  const guestUserId = await getGuestUserId();
-  const supabase = await createSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+export function createCurrentUserSnapshot(input: {
+  user: User | null;
+  guestUserId: string | null;
+}): CurrentUserSnapshot {
+  const { user, guestUserId } = input;
 
   if (!user) {
     return {
@@ -43,4 +43,16 @@ export async function getInitialCurrentUserSnapshot(): Promise<CurrentUserSnapsh
     isAuthenticated: true,
     isLoading: false,
   };
+}
+
+export async function getInitialCurrentUserSnapshot(): Promise<CurrentUserSnapshot> {
+  const [guestUserId, supabase] = await Promise.all([
+    getGuestUserId(),
+    createSupabaseServerClient(),
+  ]);
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  return createCurrentUserSnapshot({ user, guestUserId });
 }
