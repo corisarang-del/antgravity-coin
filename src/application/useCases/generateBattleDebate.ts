@@ -310,7 +310,8 @@ function buildRoleEvidence(
     };
   }
 
-  let hasMissingRequiredEvidence = false;
+  let marketEvidenceCount = 0;
+  let availableMarketEvidenceCount = 0;
 
   const items = profile.evidenceSources.map((evidenceSource) => {
     if (evidenceSource.kind === "previous_messages") {
@@ -331,9 +332,12 @@ function buildRoleEvidence(
     const rawValue = marketData[evidenceSource.field];
     const isMissingArray = Array.isArray(rawValue) && rawValue.length === 0;
     const isMissingString = typeof rawValue === "string" && rawValue.trim().length === 0;
+    const isMissingValue = rawValue == null || isMissingArray || isMissingString;
 
-    if (rawValue == null || isMissingArray || isMissingString) {
-      hasMissingRequiredEvidence = true;
+    marketEvidenceCount += 1;
+
+    if (!isMissingValue) {
+      availableMarketEvidenceCount += 1;
     }
 
     return `[원소스: ${evidenceSource.source}] ${evidenceSource.label}: ${formatMarketEvidenceValue(
@@ -344,7 +348,8 @@ function buildRoleEvidence(
 
   return {
     items,
-    hasMissingRequiredEvidence,
+    hasMissingRequiredEvidence:
+      marketEvidenceCount > 0 && availableMarketEvidenceCount === 0,
   };
 }
 

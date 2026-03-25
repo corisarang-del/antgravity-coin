@@ -435,6 +435,7 @@ describe("generateBattleDebate", () => {
       ...marketData,
       openInterest: null,
       whaleScore: null,
+      whaleFlowSummary: null,
     };
 
     const message = await generateCharacterMessage(partialMarketData, vela, []);
