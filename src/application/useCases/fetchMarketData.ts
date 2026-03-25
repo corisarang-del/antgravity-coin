@@ -55,6 +55,10 @@ function formatUsdCompact(value: number) {
   return `$${Math.round(value).toLocaleString("en-US")}`;
 }
 
+function isAvailableNumber(value: number | null | undefined): value is number {
+  return typeof value === "number" && Number.isFinite(value);
+}
+
 function buildCommunitySentimentSummary(input: {
   fearGreed: CachedFearGreedValue | null;
   sentiment: CachedNewsSentimentValue | null;
@@ -121,18 +125,71 @@ function buildMarketStructureSummary(input: {
     marketSeed.priceChange7d >= 0
       ? `7일은 ${marketSeed.priceChange7d.toFixed(2)}% 상승`
       : `7일은 ${Math.abs(marketSeed.priceChange7d).toFixed(2)}% 하락`;
-  const oiText = derivatives
+  const oiText = derivatives && derivatives.openInterest != null
     ? `미결제약정은 ${formatUsdCompact(derivatives.openInterest)} 수준`
     : "미결제약정 데이터는 비어 있음";
 
   const structureTone =
-    derivatives && derivatives.openInterest > marketSeed.volume24h * 0.45
+    derivatives && derivatives.openInterest != null && derivatives.openInterest > marketSeed.volume24h * 0.45
       ? "파생 체력이 강해서 구조가 가볍지 않아."
       : marketSeed.volume24h >= 10_000_000_000
         ? "현물 거래 강도는 충분해서 구조가 쉽게 비지 않아."
         : "거래 구조 체력은 평이해서 쉽게 흔들릴 수 있어.";
 
   return `CoinGecko 기준 거래대금은 ${formatUsdCompact(marketSeed.volume24h)}이고, ${trendText}, ${weeklyText} 상태야. ${oiText}라서 ${structureTone}`;
+}
+
+function buildWhaleFlowSummaryWithPartial(input: CachedDerivativesValue | null) {
+  if (!input) {
+    return null;
+  }
+
+  const hasLongShortRatio = isAvailableNumber(input.longShortRatio);
+  const hasOpenInterest = isAvailableNumber(input.openInterest);
+  const hasFundingRate = isAvailableNumber(input.fundingRate);
+  const hasWhaleScore = isAvailableNumber(input.whaleScore);
+
+  if (!hasLongShortRatio && !hasOpenInterest && !hasFundingRate && !hasWhaleScore) {
+    return null;
+  }
+
+  if (hasLongShortRatio && hasOpenInterest && hasFundingRate && hasWhaleScore) {
+    return buildWhaleFlowSummary(input);
+  }
+
+  const leverageTone =
+    hasLongShortRatio && input.longShortRatio >= 1.2
+      ? "濡??ъ????좊┝??媛뺥빐."
+      : hasLongShortRatio && input.longShortRatio <= 0.85
+        ? "???ъ????곗쐞媛 蹂댁뿬."
+        : hasLongShortRatio
+          ? "濡깆닆 洹좏삎? ?꾩쭅 ?ш쾶 移섏슦移섏? ?딆븯??"
+          : "濡깆닆 諛⑺뼢 ?곗씠?곕뒗 鍮꾩뼱 ?덉뼱.";
+  const whaleTone =
+    hasWhaleScore && input.whaleScore >= 70
+      ? "???먭툑??媛쒖엯???붿쟻??鍮꾧탳???먮졆??"
+      : hasWhaleScore && input.whaleScore <= 45
+        ? "怨좊옒???먭툑 ?먮쫫? ?꾩쭅 ?좊챸?섏? ?딆븘."
+        : hasWhaleScore
+          ? "怨좊옒 ?붿쟻? ?덉?留?諛⑺뼢 ?뺤떊源뚯? 以??뺣룄???꾨땲??"
+          : "怨좊옒 ?붿쟻 ?곗씠?곕뒗 鍮꾩뼱 ?덉뼱.";
+
+  return `${hasLongShortRatio ? `Bybit 濡깆닆鍮꾩쑉? ${input.longShortRatio.toFixed(2)}?닿퀬, ` : "Bybit 濡깆닆鍮꾩쑉 ?곗씠?곕뒗 鍮꾩뼱 ?덉뼱. "}${hasOpenInterest ? `Hyperliquid 誘멸껐?쒖빟?뺤? ${formatUsdCompact(input.openInterest)} ?섏??댁빞. ` : "Hyperliquid 誘멸껐?쒖빟??곗씠?곕뒗 鍮꾩뼱 ?덉뼱. "}${hasFundingRate ? `??⑸퉬??${input.fundingRate.toFixed(4)}%?쇱꽌 ` : "??⑸퉬 ?곗씠?곕뒗 鍮꾩뼱 ?덉뼱. "}${leverageTone} ${whaleTone}`;
+}
+
+function buildMarketStructureSummaryWithPartial(input: {
+  marketSeed: CachedMarketSeed;
+  derivatives: CachedDerivativesValue | null;
+}) {
+  const nextInput = {
+    ...input,
+    derivatives:
+      input.derivatives && isAvailableNumber(input.derivatives.openInterest)
+        ? input.derivatives
+        : null,
+  };
+
+  return buildMarketStructureSummary(nextInput);
 }
 
 async function fetchMarketSeedFromSource(coinId: string): Promise<CachedMarketSeed> {
@@ -252,16 +309,30 @@ async function getCachedDerivatives(symbol: string) {
   }
 
   const fetchFresh = async () => {
-    const [longShortRatio, hyperliquid] = await Promise.all([
+    const [longShortRatioResult, hyperliquidResult] = await Promise.allSettled([
       fetchBybitLongShortRatio(symbol),
       fetchHyperliquidPerpetualMetrics(symbol),
     ]);
 
+    if (longShortRatioResult.status === "rejected" && hyperliquidResult.status === "rejected") {
+      throw new Error(
+        `derivatives unavailable: ${
+          longShortRatioResult.reason instanceof Error ? longShortRatioResult.reason.message : "unknown_error"
+        } | ${
+          hyperliquidResult.reason instanceof Error ? hyperliquidResult.reason.message : "unknown_error"
+        }`,
+      );
+    }
+
     return {
-      longShortRatio,
-      openInterest: hyperliquid.openInterest,
-      fundingRate: hyperliquid.fundingRate,
-      whaleScore: hyperliquid.whaleScore,
+      longShortRatio:
+        longShortRatioResult.status === "fulfilled" ? longShortRatioResult.value : Number.NaN,
+      openInterest:
+        hyperliquidResult.status === "fulfilled" ? hyperliquidResult.value.openInterest : Number.NaN,
+      fundingRate:
+        hyperliquidResult.status === "fulfilled" ? hyperliquidResult.value.fundingRate : Number.NaN,
+      whaleScore:
+        hyperliquidResult.status === "fulfilled" ? hyperliquidResult.value.whaleScore : Number.NaN,
     } satisfies CachedDerivativesValue;
   };
 
@@ -289,6 +360,10 @@ export async function fetchMarketData(coinId: string): Promise<MarketData> {
   const fearGreed = fearGreedResult.status === "fulfilled" ? fearGreedResult.value : null;
   const sentiment = sentimentResult.status === "fulfilled" ? sentimentResult.value : null;
   const derivatives = derivativesResult.status === "fulfilled" ? derivativesResult.value : null;
+  const longShortRatio = derivatives?.longShortRatio;
+  const openInterest = derivatives?.openInterest;
+  const fundingRate = derivatives?.fundingRate;
+  const whaleScore = derivatives?.whaleScore;
 
   if (
     fearGreedResult.status === "rejected" ||
@@ -323,12 +398,12 @@ export async function fetchMarketData(coinId: string): Promise<MarketData> {
       fearGreed,
       sentiment,
     }),
-    longShortRatio: derivatives?.longShortRatio ?? null,
-    openInterest: derivatives?.openInterest ?? null,
-    fundingRate: derivatives?.fundingRate ?? null,
-    whaleScore: derivatives?.whaleScore ?? null,
-    whaleFlowSummary: buildWhaleFlowSummary(derivatives),
-    marketStructureSummary: buildMarketStructureSummary({
+    longShortRatio: isAvailableNumber(longShortRatio) ? longShortRatio : null,
+    openInterest: isAvailableNumber(openInterest) ? openInterest : null,
+    fundingRate: isAvailableNumber(fundingRate) ? fundingRate : null,
+    whaleScore: isAvailableNumber(whaleScore) ? whaleScore : null,
+    whaleFlowSummary: buildWhaleFlowSummaryWithPartial(derivatives),
+    marketStructureSummary: buildMarketStructureSummaryWithPartial({
       marketSeed,
       derivatives,
     }),

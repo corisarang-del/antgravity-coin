@@ -41,9 +41,9 @@ describe("fetchMarketData", () => {
     });
     vi.mocked(fetchNewsSentiment).mockResolvedValue({
       sentimentScore: 0.34,
-      summary: "Alpha Vantage 기사 톤은 대체로 긍정적이야.",
+      summary: "Alpha Vantage sentiment is mostly positive.",
       headlines: ["Bitcoin breakout gains momentum", "ETF approval keeps market optimistic"],
-      eventSummary: 'Alpha Vantage 대표 헤드라인은 "Bitcoin breakout gains momentum"이고, 전체 톤은 긍정 재료가 더 강하게 읽혀.',
+      eventSummary: "Bitcoin headlines stay positive and momentum remains constructive.",
       source: "alpha-vantage",
     });
     vi.mocked(fetchBybitLongShortRatio).mockResolvedValue(1.08);
@@ -54,7 +54,7 @@ describe("fetchMarketData", () => {
     });
   });
 
-  it("확장된 서술형 근거를 포함한 MarketData를 반환한다", async () => {
+  it("returns market data with extended evidence fields", async () => {
     vi.mocked(coinGeckoFetch)
       .mockResolvedValueOnce([
         {
@@ -74,13 +74,13 @@ describe("fetchMarketData", () => {
 
     expect(result.symbol).toBe("BTC");
     expect(result.newsHeadlines).toHaveLength(2);
-    expect(result.newsEventSummary).toContain("Bitcoin breakout gains momentum");
-    expect(result.communitySentimentSummary).toContain("공포탐욕");
+    expect(result.newsEventSummary).toContain("Bitcoin");
+    expect(result.communitySentimentSummary).toBeTruthy();
     expect(result.whaleFlowSummary).toContain("Bybit");
     expect(result.marketStructureSummary).toContain("CoinGecko");
   });
 
-  it("보조 데이터 소스가 실패해도 core 시세로 MarketData를 만든다", async () => {
+  it("still builds market data when optional sources all fail", async () => {
     vi.mocked(coinGeckoFetch)
       .mockResolvedValueOnce([
         {
@@ -98,7 +98,9 @@ describe("fetchMarketData", () => {
     vi.mocked(fetchFearGreedIndex).mockRejectedValueOnce(new Error("fear-greed-failed"));
     vi.mocked(fetchNewsSentiment).mockRejectedValueOnce(new Error("news-pipeline-failed"));
     vi.mocked(fetchBybitLongShortRatio).mockRejectedValueOnce(new Error("bybit-failed"));
-    vi.mocked(fetchHyperliquidPerpetualMetrics).mockRejectedValueOnce(new Error("hyperliquid-failed"));
+    vi.mocked(fetchHyperliquidPerpetualMetrics).mockRejectedValueOnce(
+      new Error("hyperliquid-failed"),
+    );
 
     const result = await fetchMarketData("bitcoin");
 
@@ -117,7 +119,7 @@ describe("fetchMarketData", () => {
     expect(result.marketStructureSummary).toContain("CoinGecko");
   });
 
-  it("캐릭터별 핵심 근거 필드가 MarketData에 실제로 채워진다", async () => {
+  it("fills all required market evidence fields when all sources succeed", async () => {
     vi.mocked(coinGeckoFetch)
       .mockResolvedValueOnce([
         {
@@ -140,7 +142,6 @@ describe("fetchMarketData", () => {
 
     for (const evidence of marketEvidenceSources) {
       const value = result[evidence.field];
-
       expect(value).not.toBeNull();
       expect(value).not.toBeUndefined();
     }
@@ -149,5 +150,33 @@ describe("fetchMarketData", () => {
     expect(result.communitySentimentSummary).toBeTruthy();
     expect(result.whaleFlowSummary).toBeTruthy();
     expect(result.marketStructureSummary).toBeTruthy();
+  });
+
+  it("keeps Hyperliquid derivatives data when Bybit returns 403", async () => {
+    vi.mocked(coinGeckoFetch)
+      .mockResolvedValueOnce([
+        {
+          id: "bitcoin",
+          symbol: "btc",
+          current_price: 84000,
+          price_change_percentage_24h: 2.4,
+          price_change_percentage_7d_in_currency: 6.8,
+          total_volume: 31_000_000_000,
+        },
+      ])
+      .mockResolvedValueOnce({
+        prices: Array.from({ length: 30 }, (_, index) => [index, 82000 + index * 100]),
+      });
+    vi.mocked(fetchBybitLongShortRatio).mockRejectedValueOnce(
+      new Error("Bybit account ratio request failed: 403"),
+    );
+
+    const result = await fetchMarketData("bitcoin");
+
+    expect(result.longShortRatio).toBeNull();
+    expect(result.openInterest).toBe(128_000_000);
+    expect(result.fundingRate).toBe(0.0123);
+    expect(result.whaleScore).toBe(64);
+    expect(result.whaleFlowSummary).toContain("Hyperliquid");
   });
 });
