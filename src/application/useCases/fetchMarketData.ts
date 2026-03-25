@@ -27,6 +27,14 @@ interface CoinGeckoMarketChartResponse {
   prices: Array<[number, number]>;
 }
 
+function getSettledErrorReason(result: PromiseSettledResult<unknown>) {
+  if (result.status === "fulfilled") {
+    return null;
+  }
+
+  return result.reason instanceof Error ? result.reason.message : "unknown_error";
+}
+
 function isSoftFresh(expiresAt: string) {
   return new Date(expiresAt).getTime() > Date.now();
 }
@@ -281,6 +289,20 @@ export async function fetchMarketData(coinId: string): Promise<MarketData> {
   const fearGreed = fearGreedResult.status === "fulfilled" ? fearGreedResult.value : null;
   const sentiment = sentimentResult.status === "fulfilled" ? sentimentResult.value : null;
   const derivatives = derivativesResult.status === "fulfilled" ? derivativesResult.value : null;
+
+  if (
+    fearGreedResult.status === "rejected" ||
+    sentimentResult.status === "rejected" ||
+    derivativesResult.status === "rejected"
+  ) {
+    console.warn(
+      `[market-data:optional-sources] coin=${coinId} symbol=${marketSeed.symbol} fearGreed=${
+        fearGreedResult.status === "fulfilled" ? "ok" : getSettledErrorReason(fearGreedResult)
+      } news=${sentimentResult.status === "fulfilled" ? "ok" : getSettledErrorReason(sentimentResult)} derivatives=${
+        derivativesResult.status === "fulfilled" ? "ok" : getSettledErrorReason(derivativesResult)
+      }`,
+    );
+  }
 
   return {
     coinId: marketSeed.coinId,

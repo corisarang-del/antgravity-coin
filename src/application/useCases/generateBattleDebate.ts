@@ -307,11 +307,13 @@ function buildRoleEvidence(
     return {
       items: [] as string[],
       hasMissingRequiredEvidence: false,
+      missingEvidenceLabels: [] as string[],
     };
   }
 
   let marketEvidenceCount = 0;
   let availableMarketEvidenceCount = 0;
+  const missingEvidenceLabels: string[] = [];
 
   const items = profile.evidenceSources.map((evidenceSource) => {
     if (evidenceSource.kind === "previous_messages") {
@@ -338,6 +340,8 @@ function buildRoleEvidence(
 
     if (!isMissingValue) {
       availableMarketEvidenceCount += 1;
+    } else {
+      missingEvidenceLabels.push(evidenceSource.label);
     }
 
     return `[원소스: ${evidenceSource.source}] ${evidenceSource.label}: ${formatMarketEvidenceValue(
@@ -350,6 +354,7 @@ function buildRoleEvidence(
     items,
     hasMissingRequiredEvidence:
       marketEvidenceCount > 0 && availableMarketEvidenceCount === 0,
+    missingEvidenceLabels,
   };
 }
 
@@ -519,6 +524,9 @@ export async function generateCharacterMessage(
   );
 
   if (roleEvidence.hasMissingRequiredEvidence) {
+    console.warn(
+      `[battle-evidence:missing] character=${character.id} labels=${roleEvidence.missingEvidenceLabels.join("|") || "none"}`,
+    );
     return buildUnavailableEvidenceMessage(character);
   }
 
