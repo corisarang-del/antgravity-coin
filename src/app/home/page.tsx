@@ -63,7 +63,7 @@ export default async function HomePage() {
             <div className="flex items-end justify-between">
               <div>
                 <h2 className="font-display text-2xl font-bold tracking-[-0.04em]">지금 배틀하기</h2>
-                <p className="ag-body-copy ag-body-copy-strong">문서 기준 MVP용 추천 코인 목록</p>
+                <p className="ag-body-copy ag-body-copy-strong">오늘의 배틀 코인 목록</p>
               </div>
             </div>
             <TopCoinsGrid coins={topCoins} />

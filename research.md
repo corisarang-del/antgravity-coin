@@ -1,55 +1,63 @@
 # Ant Gravity Coin 리서치 정리
 
-- 작성시각: 2026-03-23 23:15 KST
-- 기준 경로: `C:\Users\khc\Desktop\fastcampus\ant_gravity_coin`
-- 이번 갱신의 기준 소스:
-  - `memory.md`
-  - `docs/planning/*`
-  - 현재 워크트리에서 확인 가능한 `src/`, `database/`, `supabase/`
+- 작성시각: 2026-03-25 18:01 KST
+- 기준 경로: `memory.md`, `SECURITY_AUDIT.md`, `docs/planning/*`
+- 목적: `memory.md`에 축적된 운영 메모를 현재 프로젝트 구조, 최근 판단, 다음 우선순위 기준으로 다시 정리한 작업 메모
 
 ## 1. 이 문서의 역할
 
-`memory.md`는 최근 세션의 의사결정, 실측 결과, 남은 리스크, 다음 우선순위를 이어받기 위한 운영 메모다.
-이 `research.md`는 그 메모를 바탕으로 프로젝트의 현재 구조와 핵심 판단을 한 번에 파악할 수 있게 정리한 문서다.
+`memory.md`는 세션 단위의 운영 메모에 가깝고, `research.md`는 그 메모를 바탕으로 프로젝트를 빠르게 재이해하기 위한 구조화 문서다.
 
-즉 정리 기준은 아래다.
+이 문서는 특히 아래 질문에 바로 답하도록 정리한다.
 
-- 제품 아이디어 요약보다 현재 구현과 운영 판단을 우선한다.
-- 예전 계획보다 최근 실측과 최근 코드 변경 내용을 더 신뢰한다.
-- 다음 세션에서 바로 이어받을 수 있게 "지금 중요한 것" 위주로 적는다.
+- 이 서비스가 지금 정확히 무엇을 하는가
+- 체감 속도 병목이 어디로 이동했는가
+- 최근 수정이 어디까지 반영됐는가
+- 아직 남은 리스크가 무엇인가
+- 다음 세션에서 무엇부터 봐야 하는가
 
 ## 2. 프로젝트 한 줄 정의
 
-이 프로젝트는 8명의 AI 캐릭터가 코인에 대해 bull / bear 토론을 벌이고, 사용자가 시간 프레임과 포지션을 선택한 뒤 실제 Bybit 캔들 결과로 승패와 XP를 확인하는 모바일 우선 코인 배틀 서비스다.
+이 프로젝트는 8명의 AI 캐릭터가 코인 방향성에 대해 bull / bear 토론을 벌이고, 사용자가 시간 프레임과 포지션을 선택한 뒤 실제 Bybit 캔들 결과로 승패와 XP를 확인하는 모바일 우선 코인 배틀 서비스다.
+
+핵심은 단순 채팅이 아니라 아래 흐름을 연결하는 데 있다.
+
+- 코인 선택
+- 실시간 토론 스트림
+- 충분한 논거가 모였을 때 빠른 선택 CTA 오픈
+- waiting 상태 유지
+- 결과 정산
+- 리포트 / 요약 / 메모 누적
+- guest 상태를 auth 계정으로 자연스럽게 병합
 
 ## 3. 현재 사용자 흐름
 
-현재 핵심 흐름은 아래로 이해하면 된다.
+현재 이해해야 할 화면 흐름은 아래와 같다.
 
 ```text
 랜딩 (/)
   -> 홈 (/home)
   -> 배틀 (/battle/[coinId])
-  -> 픽 선택 (/battle/[coinId]/pick)
+  -> 선택 (/battle/[coinId]/pick)
   -> 대기 (/battle/[coinId]/waiting)
   -> 결과 (/battle/[coinId]/result)
-  -> 캐릭터 소개 (/characters)
+  -> 캐릭터도감 (/characters)
   -> 로그인 (/login)
   -> 내 정보 (/me)
-  -> 관리자 전투 기록 (/admin/battles)
+  -> 관리자 배틀 기록 (/admin/battles)
   -> 관리자 메모 (/admin/memos)
 ```
 
-추가로 기억할 사용자 경험 포인트는 아래다.
+부가적으로 기억해야 할 사용자 경험 포인트는 아래다.
 
-- 시간 프레임은 `5m`, `30m`, `1h`, `4h`, `24h`, `7d` 여섯 개다.
-- 결과는 가상 점수 계산이 아니라 Bybit entry / settlement candle close 기준으로 정산한다.
-- `/me`는 단순 마이페이지가 아니라 guest 상태를 auth 계정으로 병합하는 허브다.
-- `/result`는 정산 전에도 먼저 들어갈 수 있고, 지금은 pending 상태 설명과 `MyPickSummary`를 함께 보여주는 방향으로 보강돼 있다.
+- 시간 프레임은 `5m`, `30m`, `1h`, `4h`, `24h`, `7d`를 사용한다.
+- 결과는 단순 점수 계산이 아니라 Bybit entry / settlement 캔들 close 기준으로 정산한다.
+- `/me`는 단순 마이페이지가 아니라 guest 상태를 auth 상태로 병합하는 허브다.
+- `/result`는 정산 전에도 미리 진입할 수 있고, pending 상태를 설명하는 보조 화면 역할을 수행한다.
 
 ## 4. 코드 구조
 
-현재 저장소는 Next.js App Router 기반이고, 레이어를 나눠서 관리하고 있다.
+현재 저장소는 Next.js App Router 기반이고, 책임 분리는 아래 식으로 읽으면 된다.
 
 - `src/app`
   - 페이지와 API route
@@ -66,69 +74,168 @@
 - `src/shared`
   - 상수, 공용 타입, 캐시 정책, 공용 유틸
 
-이 프로젝트는 단순 프론트엔드가 아니라 아래를 함께 갖고 있다.
+즉 이 프로젝트는 화면만 있는 프론트엔드가 아니라 아래 운영 축을 같이 갖고 있다.
 
 - 배틀 생성 / 스트리밍
 - 결과 정산
-- 시드와 메모 재사용
+- 시드 / 메모 / 리포트 누적
 - 인증 병합
 - 관리자 조회
+- 보안 정책과 rate limit
 
-## 5. 배틀 실행 구조
+## 5. 배틀 체감 속도 구조
 
-현재 배틀 체감 속도는 "8명 발언 완료"보다 "언제 pick 가능해지느냐"가 더 중요하다는 판단 위에서 설계돼 있다.
+최근 메모를 기준으로 가장 중요한 이해 포인트는, 체감 속도 지표가 이제 `전체 토론 완료`보다 `언제 선택 가능해지는가`로 이동했다는 점이다.
 
 ### 5-1. 4라운드 병렬 구조
 
-현재 토론 순서는 완전 직렬이 아니라 아래 4라운드 병렬이다.
+예전 완전 직렬보다 현재는 아래 4라운드 병렬 구조가 핵심이다.
 
 - `Aira + Ledger`
 - `Judy + Shade`
 - `Clover + Vela`
 - `Blaze + Flip`
 
-이 구조 덕분에 과거 긴 직렬 대기보다 체감 시간이 크게 줄었다.
+이 구조 덕분에 전체 직렬 대기보다 체감 속도가 크게 줄었다.
 
 ### 5-2. `battle_pick_ready` 중심 UX
 
-- bull 측 핵심 메시지 2개와 bear 측 핵심 메시지 2개가 모이면 `battle_pick_ready`를 열어 선택 CTA를 먼저 노출한다.
-- 사용자는 8명 전체 완료 전에도 pick 단계로 갈 수 있다.
-- 그래서 현재 속도 지표의 핵심은 `battle_complete`보다 `pickReadyAt`이다.
+현재는 bull 핵심 메시지 2개와 bear 핵심 메시지 2개가 모이면 `battle_pick_ready`를 먼저 열어 선택 CTA를 보여준다.
+
+이 판단은 중요하다.
+
+- 사용자는 8명 전체 발언보다 선택 가능 시점을 더 민감하게 느낀다.
+- 그래서 속도 최적화의 핵심 지표는 `battle_complete`보다 `pickReadyAt`이다.
 
 ### 5-3. prepared context / prewarm
 
-속도 개선의 핵심은 prepared context와 prewarm이다.
+속도 개선의 중심은 prepared context와 prewarm이다.
 
-- `getPreparedBattleContext()`는 대략 아래 요소를 만든다.
-  - `marketData`
-  - `summary`
-  - `reusableDebateContext`
-  - `preparedEvidence`
-  - `firstTurnDrafts`
-- opening round인 `Aira`, `Ledger` 초안을 먼저 준비한다.
-- 결과는 `database/data/battle_prep_cache.json`에 coinId 기준으로 캐시된다.
+- `getPreparedBattleContext()`는 `marketData`, `summary`, `reusableDebateContext`, `preparedEvidence`, `firstTurnDrafts`를 만든다.
+- opening round의 `Aira`, `Ledger` 초안을 먼저 prewarm한다.
+- 결과는 `database/data/battle_prep_cache.json`에 코인별로 캐시된다.
 
-현재 기억해야 할 캐시 판단은 아래다.
+현재 기억해야 할 캐시 정책은 아래다.
 
 - soft TTL: 2분
 - hard TTL: 10분
 - 기본 prewarm 코인: `bitcoin`, `ethereum`, `xrp`, `solana`
 - 동시 prewarm 수: 2
 
-판단은 분명하다.
+결론은 분명하다.
 
-- warm battle은 이미 꽤 빨라졌다.
-- 남은 병목은 fresh prewarm wall-clock과 무료 모델 편차다.
+- warm battle은 많이 빨라졌다.
+- 하지만 fresh prewarm wall-clock은 여전히 무겁다.
+- 지금은 prewarm 자체 단축과 pick-ready 조기 개방을 같이 봐야 한다.
 
-## 6. 인증과 owner 규칙
+## 6. 최근 실측에서 확정된 성능 판단
 
-owner 규칙은 단순 guest local 저장이 아니다.
+`memory.md` 최신 내용까지 포함하면 아래 흐름으로 이해하는 게 맞다.
+
+- 과거 한때 `/api/battle`는 서버 로그 기준 `7.7분`까지도 걸렸다.
+- 구조 변경 후에는 서버 로그 기준 `4.2초` 기록이 확인됐다.
+- fresh 브라우저 기준 `/battle/bitcoin`
+  - 첫 발언 약 `15.2초`
+  - 약 `35초 이내` pick-ready CTA 확인
+- 2026-03-23 추가 실측
+  - 첫 발언 약 `11.3초`
+  - 약 `25초` 안에 `5/8 발언` + pick-ready CTA 확인
+
+그래서 지금의 핵심 결론은 아래다.
+
+1. 첫 발언 자체는 이미 많이 개선됐다.
+2. 다음 병목은 free 모델 tail latency와 pick-ready 개방 시점이다.
+3. `Aira + Ledger` 2명 prewarm은 비용 대비 효과가 좋다.
+
+## 7. 모델 라우팅과 실제 문제의 성격
+
+이 프로젝트의 현재 병목은 프롬프트 설계 그 자체보다 무료 OpenRouter 모델의 availability와 출력 안정성이다.
+
+반복 이슈는 아래 네 가지다.
+
+- `429 Rate limit exceeded`
+- `404` 죽은 모델 응답
+- `non_korean_response`
+- `message_parse_failed`
+
+즉 문제의 성격은 "토론을 더 그럴듯하게 쓰기"보다 "언제든 불안정해질 수 있는 무료 모델 조합을 얼마나 빨리 우회하느냐"에 더 가깝다.
+
+### 7-1. opening round 최신 판단
+
+최신 메모에서 명시적으로 갱신 확인된 opening round primary는 아래다.
+
+- `aira`: `arcee-ai/trinity-mini`
+- `ledger`: `google/gemma-3-12b-it`
+- 공통 fallback: `qwen/qwen3.5-9b`
+
+이전에는 `aira`, `ledger`가 둘 다 `stepfun/step-3.5-flash:free`를 써서 동시에 429/timeout을 맞는 위험이 컸다.
+
+지금은 병목이 "같은 모델 동시 장애"에서 "모델별 출력 품질 편차" 쪽으로 옮겨갔다고 봐야 한다.
+
+### 7-2. Vela 관련 판단
+
+Vela의 경우 성공률 자체보다, 실패 시 얼마나 빨리 fallback으로 넘기느냐가 더 중요하다는 결론이 이미 나왔다.
+
+실측 비교에서는 `trinity`가 실패를 가장 빨리 확정해서 전체 흐름을 덜 막았고, 그 기준으로는 `minimax`보다 유리했다.
+
+## 8. 프롬프트 / 파서 보강 방향
+
+최근 메모를 종합하면 프롬프트와 파서는 "문장 품질 향상"보다 "실패 유형 축소"가 목적이다.
+
+중요한 규칙은 아래다.
+
+- 실제 사람이 말하는 반말 한국어 유지
+- 번역투 금지
+- 이름표 제거
+- JSON 하나만 허용
+- 코드펜스 금지
+- 영어 단어 금지
+- 줄바꿈 금지
+
+캐릭터별 말투 차별화도 계속 유지된다.
+
+- `aira`: `내 눈엔`, `차트상`
+- `judy`: `헤드라인만 보면`, `지금 재료는`
+- `clover`: `분위기상`, `심리적으로 보면`
+- `blaze`: `지금은`, `이 구간은`
+- `ledger`: `숫자상`, `구조적으로 보면`
+- `shade`: `내 기준엔`, `리스크 쪽에선`
+- `vela`: `밑에서 보면`, `자금 흐름상`
+- `flip`: `근데 난`, `오히려 지금은`
+
+또 아래 파서 보강이 중요하다.
+
+- JSON 파싱 실패 시 `summary:` 라벨 형식 응답도 살린다.
+- 영문 금융 용어는 파싱 직전에 한국어로 정규화한다.
+
+여기서 핵심은 "더 멋진 답변"보다 `message_parse_failed`, `non_korean_response`를 줄이는 것이다.
+
+## 9. Gemini의 역할
+
+사용자는 토론 캐릭터 자체는 OpenRouter 무료 모델 중심을 원했고, Gemini는 최종 보고서와 교훈 합성 쪽으로 본다.
+
+중요한 건 Gemini 보고서 본문이 raw text로 토론 프롬프트에 직접 주입되지 않는다는 점이다.
+
+실제 경로는 아래다.
+
+- 결과 정산 후 `ReusableBattleMemo` 생성
+- `globalLessons`, `characterLessons` 축적
+- `synthesizeBattleLessonsWithGemini` 결과가 있으면 그 합성 교훈을 우선 사용
+- 없으면 fallback 교훈 사용
+
+즉 Gemini는 "토론 본문 직접 주입"이 아니라 "교훈 / 요약 seed 주입" 형태로만 영향 준다.
+
+## 10. auth / owner / `/me` 이해
+
+owner 규칙은 단순 localStorage 분기보다 조금 더 중요하다.
 
 - 로그인 상태면 Supabase auth user id를 owner로 사용한다.
 - 비로그인 상태면 `ant_gravity_user_id` guest 쿠키를 owner로 사용한다.
 - 공통 owner 판정은 `getRequestOwnerId()`를 통해 이뤄진다.
 
-`/me` 진입 시에는 `MergeLocalStateClient`가 아래 데이터를 guest -> auth로 병합하는 흐름이 핵심이다.
+`/me`에 들어갈 때는 `MergeLocalStateClient`가 guest 상태를 auth 상태로 병합한다.
+
+병합 대상은 아래다.
 
 - local user level
 - recent coins
@@ -136,11 +243,54 @@ owner 규칙은 단순 guest local 저장이 아니다.
 - 현재 `battleSnapshot`
 - guest owner 기준 파일 저장 battle 자산
 
-즉 `/me`는 프로필 화면이면서 상태 병합 허브다.
+그래서 `/me`는 단순 프로필 페이지가 아니라 상태 승격 허브로 봐야 한다.
 
-## 7. 저장 구조
+## 11. 결과 페이지와 waiting UX 이해
 
-### 7-1. localStorage
+최근 메모에서 결과 흐름은 꽤 중요하게 다뤄졌다.
+
+- `waiting`의 `결과 화면 열기`는 즉시 정산 버튼이 아니라 결과 페이지 선진입 링크다.
+- `result`는 settlement 전이면 pending 화면을 렌더한다.
+
+이 구조 때문에 예전에는 버튼이 그냥 사라진 것처럼 느껴지는 문제가 있었다.
+
+현재는 아래 보강이 반영된 상태로 이해하면 된다.
+
+- pending 상태에서도 `MyPickSummary` 노출
+- `결과 페이지 준비 중` 설명 섹션 추가
+- 3단계 문맥 제공
+  - `차트 마감 대기`
+  - `승패와 XP 계산`
+  - `리포트와 요약 정리`
+- 현재 저장된 발언 수 `n/8` 표시
+
+즉 `/result`는 정산 완료 후 결과만 보여주는 페이지가 아니라, 정산 전후 상태를 이어주는 가교 역할도 한다.
+
+## 12. 추천 코인과 홈 화면 이해
+
+홈 추천 코인은 단순 상수 하나만 바꾸면 끝나는 구조가 아니다.
+
+- 화면 구성 / 순서 / thesis는 curated 목록 기준
+- 가격 / 변동률 / 시총은 CoinGecko live 응답으로 덮는다
+
+즉 현재 구조는 "고정된 추천 코인 집합 + 실시간 시세 갱신" 조합이다.
+
+그래서 추천 코인 구성이 이상해 보이면 아래 순서로 봐야 한다.
+
+1. `src/infrastructure/db/coinGeckoRepository.ts`
+2. `src/shared/constants/mockCoins.ts`
+3. dev 서버 재기동 여부
+
+추가로 UI 쪽 최신 메모는 아래다.
+
+- body font 기본값은 `Pretendard`
+- display headline은 `Space Grotesk`
+- 설명문 공통 규칙은 `ag-body-copy`, `ag-body-copy-strong`
+- 홈 hero overflow는 `minmax(0, 1.5fr)` / `minmax(0, 1fr)`와 `min-w-0` 조합으로 정리됨
+
+## 13. 저장소와 상태 저장 위치
+
+### 13-1. localStorage
 
 - `ant_gravity_recent_coins`
 - `ant_gravity_battle_snapshot`
@@ -149,7 +299,7 @@ owner 규칙은 단순 guest local 저장이 아니다.
 - `ant_gravity_applied_battle_results`
 - `ant_gravity_battle_timing_metrics`
 
-### 7-2. 서버 파일 저장소
+### 13-2. 서버 파일 저장소
 
 - `database/data/source_cache.json`
 - `database/data/battle_prep_cache.json`
@@ -159,7 +309,7 @@ owner 규칙은 단순 guest local 저장이 아니다.
 - `database/data/event_log.json`
 - `database/data/battle_result_applications.json`
 
-### 7-3. Supabase 미러 저장
+### 13-3. Supabase 미러 테이블
 
 - `user_profiles`
 - `user_progress`
@@ -170,277 +320,132 @@ owner 규칙은 단순 guest local 저장이 아니다.
 - `player_decision_seeds`
 - `character_memory_seeds`
 
-추가로 `memory.md` 기준 점검 결과로는, 현재 마이그레이션 기준 주요 테이블의 RLS는 켜져 있고 anon insert는 막혀 있는 쪽으로 확인돼 있다.
+메모 기준 판단으로는 주요 테이블 RLS가 켜져 있고, anon insert는 막혀 있는 상태다.
 
-## 8. 현재 모델 라우팅 이해
+## 14. 보안 후속 수정의 현재 의미
 
-최근 메모까지 포함해서 보면, 프로젝트의 핵심 병목은 프롬프트 설계보다 무료 OpenRouter 모델의 availability와 출력 안정성이다.
+2026-03-25 최신 메모 기준으로, 지금 워크트리의 핵심 미커밋 주제는 보안 감사 후속 수정이다.
 
-### 8-1. 현재 기억해야 할 라우팅 상태
+핵심 포인트는 아래다.
 
-2026-03-23 최신 메모 기준으로 opening round 분산이 중요하다.
-
-- `aira`: primary `arcee-ai/trinity-mini`
-- `ledger`: primary `google/gemma-3-12b-it`
-- 두 캐릭터 fallback: `qwen/qwen3.5-9b`
-
-이전에는 `aira`, `ledger`가 둘 다 `stepfun/step-3.5-flash:free`를 써서 동시에 429 / timeout을 맞는 위험이 컸다.
-지금은 첫 라운드 병목을 분산시키는 쪽으로 조정됐다.
-
-### 8-2. 최근 실측에서 남은 문제
-
-최근 `/battle/bitcoin` 실측 기준으로는 아래 문제가 남아 있다.
-
-- `aira`: `message_parse_failed`
-- `ledger`: `non_korean_response`
-- 다른 캐릭터도 일부 `message_parse_failed`, `non_korean_response`가 남아 있음
-
-즉 병목이 "동시 Stepfun 장애"에서 "모델별 출력 품질 편차" 쪽으로 이동한 상태다.
-
-### 8-3. prompt / parser 보강 방향
-
-최근 비커밋 코드 기준으로 아래 보강이 들어가 있다.
-
-- `characterPrompts.ts`
-  - JSON 하나만 허용
-  - 코드펜스 금지
-  - 영어 단어 금지
-  - 줄바꿈 금지
-  - `aira`는 형식 안정성 강화
-  - `ledger`는 영어 금융 용어를 한국어로 바꿔 쓰도록 규칙 강화
-- `generateBattleDebate.ts`
-  - JSON 파싱 실패 시 `summary:` 라벨 형식 응답도 재파싱
-  - 영어 금융 용어를 파싱 직전에 한국어로 정규화
-
-이건 아직 커밋되지 않은 변경으로 메모돼 있다.
-
-## 9. 최근 실측과 사용자 체감
-
-`memory.md` 기준 최근 체감 속도 판단은 아래처럼 이해하면 된다.
-
-- 예전 한 번의 `/api/battle`는 서버 로그 기준 `7.7분`까지도 보였음
-- 구조 변경 후 서버 로그 기준 `4.2초` 사례가 확인됨
-- fresh 브라우저 기준 `/battle/bitcoin`
-  - 첫 발언 도착 약 `15.2초`
-  - 약 35초 이내 pick-ready CTA 확인 사례가 있었음
-- 2026-03-23 추가 실측
-  - 첫 발언 약 `11.3초`
-  - 약 `25초` 안에 `5/8 발언` + pick-ready CTA 확인
-
-중요한 결론은 아래다.
-
-1. 지금은 첫 발언 자체보다 pick 가능 시점이 더 중요하다.
-2. opening round `Aira + Ledger` prewarm은 비용 대비 효과가 좋다.
-3. tail latency와 품질 편차는 여전히 무료 모델 상태에 크게 흔들린다.
-
-## 10. 결과 화면과 대기 UX 이해
-
-최근 메모에서 결과 흐름 관련 핵심 판단도 중요하다.
-
-- `waiting`의 `결과 화면 열기`는 즉시 정산 버튼이 아니라 결과 페이지 선진입 링크다.
-- `result`는 settlement 전이면 pending 화면만 뜨기 쉬워서 사용자가 버튼이 사라진 것처럼 느낄 수 있었다.
-- 그래서 최근 비커밋 변경으로 아래 보강이 들어가 있다.
-  - pending 상태에서도 `MyPickSummary` 노출
-  - `결과 페이지 준비 중` 설명 섹션 추가
-  - 3단계 문맥 표시
-    - `차트 마감 대기`
-    - `승패와 XP 계산`
-    - `리포트와 요약 정리`
-  - 현재 저장된 발언 수 `n/8` 표시
-
-이 부분은 체감 개선 효과가 크고, 다음 세션에서 버튼 라벨 자체를 더 명확히 바꿀지 검토 예정으로 남아 있다.
-
-## 11. 현재 검증 상태와 환경 이슈
-
-최근 메모 기준 검증과 막힘은 같이 기억해야 한다.
-
-통과 확인:
-
-- `pnpm.cmd typecheck`
-- 대상 파일 eslint
-- 일부 Vitest 대상 테스트
-
-막힘 또는 주의:
-
-- `pnpm.cmd test -- src/app/login/LoginPageClient.test.tsx`
-  - 이 환경에선 `spawn EPERM`으로 Vitest 시작이 막힌 적이 있음
-- `pnpm.cmd lint`
-  - 이번 변경 때문이 아니라 `tmp/` 아래 생성 산출물의 `require()` 때문에 전체 lint가 깨진 적이 있음
-- dev 서버가 env를 못 물고 떠서 `@supabase/ssr` 관련 URL / API key 에러처럼 보인 사례가 있었음
-
-즉 에러가 보이더라도 코드 문제와 dev 서버 상태 문제를 분리해서 봐야 한다.
-
-## 12. 현재 워크트리 해석
-
-`memory.md`와 실제 워크트리 메모를 합치면, 지금은 코드와 런타임 산출물을 의도적으로 분리해서 봐야 한다.
-
-메모 기준 커밋된 변경:
-
-- `618c411`
-  - CTA 복구 + Supabase RLS audit
-- `83a98bb`
-  - primary 분산 + stream cleanup fix
-
-메모 기준 비커밋 핵심 코드:
-
-- `src/application/prompts/characterPrompts.ts`
-- `src/application/useCases/generateBattleDebate.ts`
-- `src/application/useCases/generateBattleDebate.test.ts`
-- `src/app/battle/[coinId]/result/ResultPageClient.tsx`
-
-추가로 현재 워크트리에는 아래처럼 런타임 데이터와 산출물이 많이 섞여 있다.
-
-- `database/data/*.json`
-- `tmp/*`
-- `out/*`
-- 이미지와 로그 산출물
-
-따라서 새 작업 전에는 반드시 코드 변경과 산출물 변경을 분리해서 읽어야 한다.
-
-## 13. 지금 남아 있는 핵심 리스크
-
-### 13-1. 무료 모델 가용성과 품질
-
-반복 이슈:
-
-- `429 Rate limit exceeded`
-- `404` 죽은 모델 응답
-- `non_korean_response`
-- `message_parse_failed`
-
-현재 가장 큰 불확실성이다.
-
-### 13-2. prewarm wall-clock
-
-- warm battle은 좋아졌지만
-- fresh prewarm 자체는 아직 무겁다
-
-### 13-3. UTF-8 / 문서 인코딩 흔적
-
-- 사용자 노출 화면은 많이 정리됐지만
-- 일부 문서와 문자열에는 깨짐 흔적이 남아 있다
-
-이번 `research.md` 재작성도 그 문제를 줄이기 위한 작업이다.
-
-### 13-4. 기준 문서 경로 불일치
-
-AGENTS에서는 기준 문서를 `docs/PRD.md`라고 적고 있지만, 현재 저장소에서는 `docs/planning/01-prd.md`가 실제 PRD 역할을 하고 있다.
-이 차이는 다음 작업에서 혼선을 만들 수 있으니 계속 의식해야 한다.
-
-## 14. 다음 세션 우선순위
-
-`memory.md` 기준으로 다음 우선순위는 아래처럼 정리된다.
-
-1. `/battle/bitcoin` 반복 실측으로 `firstMessageDisplayedAt`, `pickReadyAt`, 완료 시점 편차를 다시 본다.
-2. `pickReadyAt`를 timing metrics에 추가했는지 확인하고, 아직이면 넣는다.
-3. `aira`의 `message_parse_failed`, `ledger`의 `non_korean_response`를 다시 재현하고 prompt / parser 보강 효과를 본다.
-4. result pending UI 체감을 다시 확인하고, 필요하면 `결과 화면 열기` 라벨을 더 명확히 바꾼다.
-5. prewarm wall-clock과 남은 UTF-8 깨짐을 추가 정리한다.
-
-## 15. 지금 이해한 핵심 결론
-
-이 프로젝트의 현재 승부처는 기능 추가가 아니다.
-핵심은 아래 다섯 가지다.
-
-1. 무료 모델 조합의 불안정성을 어떻게 완충하느냐
-2. 사용자가 느끼는 선택 가능 시점을 얼마나 앞당기느냐
-3. opening round prewarm과 prepared context를 얼마나 가볍게 유지하느냐
-4. guest -> auth 병합과 결과 정산 흐름을 얼마나 자연스럽게 보여주느냐
-5. 더러운 워크트리와 깨진 문서를 어떻게 안전하게 관리하느냐
-
-즉 `memory.md`를 읽고 난 현재 이해는 이렇다.
-
-- battle 속도는 이미 많이 좋아졌지만 아직 안정화가 끝난 건 아니다.
-- 문제의 중심은 프롬프트보다 모델 availability와 출력 안정성이다.
-- `/me`와 `/result`는 단순 화면이 아니라 상태 전이의 핵심 허브다.
-- 문서 작업도 단순 기록이 아니라 다음 세션의 시행착오를 줄이는 운영 작업이다.
-
-## 16. 2026-03-23 UI 가독성 / 홈 레이아웃 추가 메모
-
-- body font 기본값은 현재 `Pretendard`다.
-- display headline은 계속 `Space Grotesk`를 사용한다.
-- 설명문 확대는 전역 전체가 아니라 선택된 설명문에만 `ag-body-copy` 규칙으로 적용됐다.
-- 홈, 검색, 로그인 설명문은 `ag-body-copy-strong`으로 대비가 한 단계 더 올라간 상태다.
-- 캐릭터도감도 같은 규칙을 따라 상단 소개, 카드 본문, 상세 모달 설명문까지 보강됐다.
-- 홈 상단 hero는 `불리시팀 vs 베어리시팀` 한 줄 headline과 오른쪽 검색 카드 조합을 유지하되, grid 최소폭을 `minmax(0, fr)`로 바꿔 overflow를 막았다.
-- 검색 카드 headline은 현재 `어떤 코인으로 붙을지 골라줘`다.
-- 추천 코인 목록은 현재 `AVAX`를 포함하는 쪽으로 정리됐다.
-- 추천 코인 목록은 현재 curated 상수와 CoinGecko live 데이터를 섞는 구조다.
-  - 코인 구성과 순서는 `topCoins`
-  - 가격 / 변동률 / 시총은 CoinGecko live 응답
-  - 즉 현재 구현은 "고정된 추천 코인 셋 + 실시간 시세" 조합으로 이해하면 된다.
-
-## 17. 2026-03-23 23:15 KST memory.md 재독해 기준 추가 고정 판단
-
-- `memory.md`는 단순 회고가 아니라 다음 세션 진입 순서와 주의사항까지 담은 운영 인계 문서로 봐야 한다.
-- 지금 가장 먼저 확인해야 하는 미커밋 핵심 코드는 4개다.
-  - `src/application/prompts/characterPrompts.ts`
-  - `src/application/useCases/generateBattleDebate.ts`
-  - `src/application/useCases/generateBattleDebate.test.ts`
-  - `src/app/battle/[coinId]/result/ResultPageClient.tsx`
-- 최근 체감 개선의 본질은 "모델을 더 똑똑하게 만든 것"보다 아래 두 축이다.
-  - opening round인 `Aira + Ledger`를 먼저 준비하고 분산시킨 점
-  - `battle_pick_ready`로 선택 가능 시점을 앞당긴 점
-- `/me`와 `/result`는 보조 화면이 아니라 상태 전이 허브다.
-  - `/me`: guest -> auth 병합 허브
-  - `/result`: 정산 완료 전후 문맥을 이어주는 허브
-- 최근 prompt / parser 보강의 목적도 문장 품질 향상 자체보다 실패 유형 축소에 더 가깝다.
-  - `aira`: `message_parse_failed` 감소
-  - `ledger`: `non_korean_response` 감소
-- 홈 추천 코인은 현재 "curated 목록 유지 + live 시세만 덮기"로 이해해야 맞다.
-  - 따라서 추천 코인 이상 징후를 보면 `mockCoins.ts`만 보지 말고 `CoinGeckoRepository.fetchTopCoins()`까지 같이 봐야 한다.
-- 현재 워크트리는 계속 더럽기 때문에 새 작업 시작 전 `git status`로 코드 변경과 런타임 산출물을 분리해서 읽는 습관이 필수다.
-
-## 18. 새 세션 첫 체크포인트
-
-1. `git status`로 미커밋 코드 4개와 `database/data`, `tmp`, `out` 산출물을 분리해서 본다.
-2. `/battle/bitcoin` 재실측 전 `pickReadyAt`가 실제 timing metrics에 남는지부터 확인한다.
-3. `aira`, `ledger`의 실패 유형이 줄었는지 확인하면서 prompt / parser 보강 커밋 여부를 판단한다.
-4. `waiting -> result` 이동 시 pending UX가 여전히 자연스러운지 확인하고, 필요하면 버튼 라벨까지 조정한다.
-5. 추천 코인 구성이 이상하면 curated 목록과 CoinGecko live 병합 구조를 함께 점검한다.
-
-## 19. 2026-03-25 보안 보강 후 현재 구조
-
-### 19-1. admin 접근 제어
-
-- `/admin` 아래는 이제 `src/app/admin/layout.tsx`에서 공통으로 차단한다.
-- admin 판별 기준은 `src/infrastructure/auth/adminAccess.ts`에 모여 있다.
-- 현재 기본 상태는 차단이다.
-- 나중에 아래 중 하나만 주면 바로 admin 접근이 열린다.
+- `/admin`은 이제 `src/app/admin/layout.tsx`에서 공통 차단한다.
+- admin 판단은 `src/infrastructure/auth/adminAccess.ts`에 모아뒀다.
+- 기본값은 차단 상태다.
+- 아래 네 방식 중 하나만 설정하면 바로 관리자 권한이 열린다.
   - `user_profiles.is_admin = true`
-  - `app_metadata.role = "admin"`
-  - `app_metadata.is_admin = true`
+  - `auth.users.app_metadata.role = 'admin'`
+  - `auth.users.app_metadata.is_admin = true`
   - `ADMIN_USER_IDS` env allowlist
 
-즉 지금 구현은 "아직 관리자 계정은 없지만, 권한만 주면 즉시 활성화" 구조로 이해하면 된다.
+rate limit도 이제 중요하다.
 
-### 19-2. rate limit 구조
-
-- 기존 메모리 limiter는 테스트/로컬 fallback으로 남겼다.
-- 실제 라우트는 이제 shared limiter를 쓰도록 바뀌었다.
+- 실제 라우트는 Supabase RPC 기반 shared limiter로 연결됐다.
+- 적용 라우트
   - `/api/battle`
   - `/api/battle/outcome`
   - `/api/admin/cache/prewarm`
-- shared limiter는 Supabase RPC `consume_request_rate_limit()`를 통해 동작한다.
-- 실제 운영에서 효력이 나려면 migration 적용이 필요하다.
+- 테스트 환경에서는 로컬 fallback을 타서 Vitest를 깨지 않게 했다.
 
-### 19-3. AI / 에러 / 헤더 보강
+AI / 에러 / 헤더 쪽 의미도 분명하다.
 
-- Gemini provider는 시스템 프롬프트와 사용자 프롬프트를 분리해서 보낸다.
-- `/api/battle`는 내부 에러 문자열을 그대로 사용자에게 보내지 않는다.
-- `next.config.ts`에는 아래 보안 헤더가 추가됐다.
+- Gemini provider는 system/user 프롬프트를 분리한다.
+- `/api/battle` 스트림 에러는 내부 상세를 그대로 노출하지 않는다.
+- `next.config.ts`에는 주요 보안 헤더가 추가됐다.
   - `Content-Security-Policy`
   - `X-Frame-Options`
   - `X-Content-Type-Options`
   - `Referrer-Policy`
   - `Permissions-Policy`
 
-### 19-4. 새 세션에서 꼭 기억할 운영 포인트
+운영 반영 전 필수 체크는 아래다.
 
-1. 코드만 머지해도 끝이 아니다. Supabase migration 적용 전에는 shared rate limit와 admin role 컬럼이 아직 실제 효력이 없다.
-2. `/admin`이 404/403처럼 막히는 건 현재 정상이다. 관리자 권한을 안 줬기 때문이다.
-3. admin 계정이 생기면 DB `is_admin` 또는 `ADMIN_USER_IDS`부터 반영하고 나서 `/admin`을 검증해야 한다.
-4. 보안 변경 후 품질게이트는 다시 통과했다.
-   - `pnpm lint`
-   - `pnpm typecheck`
-   - `pnpm test`
+1. `supabase/migrations/20260325170000_add_admin_role_and_rate_limits.sql` 적용
+2. 실제 관리자 계정 권한 부여
+3. 필요 시 `ADMIN_USER_IDS` 환경 변수 설정
+
+## 15. 현재 검증 상태 해석
+
+최신 메모 기준 검증은 아래처럼 읽는 게 맞다.
+
+- 최근 보안 후속 수정 기준
+  - `pnpm.cmd lint` 통과
+  - `pnpm.cmd typecheck` 통과
+  - `pnpm.cmd test` 통과
+- 테스트 메모
+  - `53 passed`, `1 skipped`
+  - `134 passed`, `8 skipped`
+
+다만 과거 세션 메모에서 보였던 아래 맥락도 기억해야 한다.
+
+- `spawn EPERM`으로 특정 Vitest 시작이 막힌 적이 있다.
+- `tmp/**` 산출물의 `require()` 때문에 lint가 깨진 적이 있다.
+- dev 서버가 env를 못 문 상태처럼 보이며 `@supabase/ssr` 에러를 낸 적이 있다.
+
+즉 검증 결과를 볼 때는 코드 문제와 환경 문제를 분리해서 읽어야 한다.
+
+## 16. 현재 워크트리 해석 원칙
+
+`memory.md`가 계속 강조하는 전제는 이 워크트리가 매우 더럽다는 점이다.
+
+따라서 새 세션에서 반드시 지켜야 할 해석 원칙은 아래다.
+
+1. 코드 변경과 런타임 산출물을 분리해서 본다.
+2. 사용자 변경처럼 보이는 파일은 절대 함부로 되돌리지 않는다.
+3. 작업 시작 전에 `git status`로 현재 범위를 분리한다.
+
+특히 계속 섞여 나오는 대상은 아래다.
+
+- `database/data/*.json`
+- `tmp/*`
+- `out/*`
+- 이미지 / 로그 산출물
+
+## 17. 아직 남은 핵심 리스크
+
+### 17-1. 무료 모델 가용성과 출력 품질
+
+이 프로젝트의 가장 큰 운영 리스크다.
+
+- free 모델 rate limit
+- 죽은 모델
+- 한국어 실패
+- 파싱 실패
+
+### 17-2. prewarm wall-clock
+
+- warm battle은 좋아졌지만
+- fresh prewarm은 여전히 무겁다
+
+### 17-3. UTF-8 / 문서 인코딩 흔적
+
+- 주요 사용자 노출 화면은 많이 정리됐지만
+- 문서와 일부 레거시에 깨진 흔적이 남아 있다
+
+이 `research.md` 재정리 자체도 그 흔적을 줄이기 위한 작업의 일부다.
+
+### 17-4. 기준 문서 경로 혼선
+
+AGENTS에서는 제품 사양 기준 문서를 `docs/PRD.md`로 적고 있지만, 현재 저장소에서 실제로 계속 갱신되는 문맥은 `docs/planning/01-prd.md` 쪽에 더 가깝다.
+
+이 차이는 다음 작업에서 참조 우선순위 혼선을 만들 수 있으니 계속 의식해야 한다.
+
+## 18. 다음 세션 우선순위
+
+`memory.md`를 충분히 이해한 뒤의 우선순위는 아래처럼 정리된다.
+
+1. `/battle/bitcoin` 반복 실측으로 `firstMessageDisplayedAt`, `pickReadyAt`, 완료 시점 편차를 다시 본다.
+2. `pickReadyAt`가 실제 timing metrics에 남는지 확인하고, 빠져 있으면 추가한다.
+3. `aira`의 `message_parse_failed`, `ledger`의 `non_korean_response`가 얼마나 줄었는지 재측정한다.
+4. result pending UX와 버튼 문구가 실제 체감에 맞는지 다시 본다.
+5. prewarm wall-clock과 UTF-8 깨짐 정리를 이어간다.
+6. 운영 반영 전에는 Supabase migration과 admin 권한 부여를 먼저 끝낸다.
+
+## 19. 이번에 `memory.md`를 다시 읽고 확정한 이해
+
+이번 재정리 기준으로 내가 확정한 핵심 이해는 아래다.
+
+1. 이 프로젝트의 주된 난제는 기능 부족이 아니라 무료 모델 조합의 불안정성을 운영 가능한 UX로 흡수하는 일이다.
+2. 체감 속도 최적화의 중심은 첫 발언보다 `pick-ready` 시점이다.
+3. `/me`와 `/result`는 단순 페이지가 아니라 상태 전환을 연결하는 허브다.
+4. 최근의 큰 미완료 범위는 보안 후속 수정의 운영 반영이다.
+5. 새 작업을 시작할 때는 코드보다 먼저 더러운 워크트리와 산출물 범위를 분리해서 읽어야 한다.

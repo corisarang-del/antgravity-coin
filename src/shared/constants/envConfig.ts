@@ -3,9 +3,18 @@ function readEnv(name: string) {
   return typeof value === "string" ? value.trim() : "";
 }
 
+// NEXT_PUBLIC_* values must be referenced directly so Next can inline them into client bundles.
+const publicSupabaseUrl = typeof process.env.NEXT_PUBLIC_SUPABASE_URL === "string"
+  ? process.env.NEXT_PUBLIC_SUPABASE_URL.trim()
+  : "";
+const publicSupabasePublishableKey =
+  typeof process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY === "string"
+    ? process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY.trim()
+    : "";
+
 export const envConfig = {
-  supabaseUrl: readEnv("NEXT_PUBLIC_SUPABASE_URL"),
-  supabasePublishableKey: readEnv("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY"),
+  supabaseUrl: publicSupabaseUrl,
+  supabasePublishableKey: publicSupabasePublishableKey,
   openRouterApiKey: readEnv("OPENROUTER_API_KEY"),
   openRouterBaseUrl: readEnv("OPENROUTER_BASE_URL") || "https://openrouter.ai/api/v1/chat/completions",
   anthropicApiKey: readEnv("ANTHROPIC_API_KEY"),
