@@ -49,4 +49,51 @@ describe("geminiProvider", () => {
     expect(result).toContain('"summary"');
     vi.unstubAllGlobals();
   });
+  it("system prompt와 user prompt를 분리해서 보낸다", async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        candidates: [
+          {
+            content: {
+              parts: [{ text: '{"summary":"ok"}' }],
+            },
+          },
+        ],
+      }),
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const { geminiProvider } = await import("@/infrastructure/api/geminiProvider");
+
+    await geminiProvider.generateDebateChunk(
+      {
+        characterId: "judy",
+        characterName: "Judy",
+        role: "?댁뒪 ?ㅼ뭅?고꽣",
+        team: "bull",
+        specialty: "?댁뒪",
+        personality: "?щ즺瑜?癒쇱? 蹂대뒗 ??낆씠??",
+        selectionReason: "?댁뒪??罹먮┃???뚯뒪?몄슜?댁빞.",
+        coinSymbol: "BTC",
+        focusSummary: "summary",
+        evidence: [],
+        recentBattleLessons: [],
+        characterLessons: [],
+        previousMessages: [],
+      },
+      "gemini-2.5-flash-lite",
+    );
+
+    const requestInit = fetchMock.mock.calls[0]?.[1];
+    const body = JSON.parse((requestInit?.body as string) ?? "{}") as {
+      systemInstruction?: { parts?: Array<{ text?: string }> };
+      contents?: Array<{ role?: string; parts?: Array<{ text?: string }> }>;
+    };
+
+    expect(body.systemInstruction?.parts?.[0]?.text).toContain("Judy");
+    expect(body.contents?.[0]?.role).toBe("user");
+    expect(body.contents?.[0]?.parts?.[0]?.text).toContain("summary");
+    vi.unstubAllGlobals();
+  });
 });

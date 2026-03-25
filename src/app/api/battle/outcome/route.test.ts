@@ -369,7 +369,7 @@ describe("POST /api/battle/outcome", () => {
   });
 
   it("짧은 시간 안에 너무 많이 저장 요청하면 429를 반환한다", async () => {
-    vi.spyOn(requestRateLimiter, "consumeRequestRateLimit").mockReturnValueOnce({
+    vi.spyOn(requestRateLimiter, "consumeSharedRequestRateLimit").mockResolvedValueOnce({
       allowed: false,
       remaining: 0,
       retryAfterSeconds: 60,

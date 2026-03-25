@@ -18,6 +18,18 @@ interface RateLimitResult {
   resetAt: number;
 }
 
+interface SharedRateLimitInput extends RateLimitInput {
+  supabase?: {
+    rpc: (
+      fn: string,
+      args: Record<string, string | number>,
+    ) => PromiseLike<{
+      data: unknown;
+      error: { message: string } | null;
+    }>;
+  } | null;
+}
+
 const windows = new Map<string, RateLimitWindow>();
 
 function cleanupExpiredWindows(now: number) {
@@ -72,6 +84,46 @@ export function consumeRequestRateLimit(input: RateLimitInput): RateLimitResult 
     remaining: Math.max(0, input.max - current.count),
     retryAfterSeconds: Math.max(1, Math.ceil((current.resetAt - now) / 1000)),
     resetAt: current.resetAt,
+  };
+}
+
+export async function consumeSharedRequestRateLimit(
+  input: SharedRateLimitInput,
+): Promise<RateLimitResult> {
+  if (process.env.NODE_ENV === "test" || !input.supabase || typeof input.supabase.rpc !== "function") {
+    return consumeRequestRateLimit(input);
+  }
+
+  const response = await input.supabase.rpc("consume_request_rate_limit", {
+    p_bucket: input.bucket,
+    p_key: input.key,
+    p_max_count: input.max,
+    p_window_ms: input.windowMs,
+  });
+
+  if (response.error) {
+    throw new Error(`shared_rate_limit_failed:${response.error.message}`);
+  }
+
+  const row = Array.isArray(response.data) ? response.data[0] : response.data;
+  const parsedRow = row as
+    | {
+        allowed: boolean;
+        remaining: number;
+        retry_after_seconds: number;
+        reset_at: string;
+      }
+    | undefined;
+
+  if (!parsedRow) {
+    throw new Error("shared_rate_limit_empty");
+  }
+
+  return {
+    allowed: parsedRow.allowed,
+    remaining: parsedRow.remaining,
+    retryAfterSeconds: parsedRow.retry_after_seconds,
+    resetAt: Date.parse(parsedRow.reset_at),
   };
 }
 

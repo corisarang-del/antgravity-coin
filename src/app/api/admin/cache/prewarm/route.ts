@@ -1,17 +1,22 @@
 import { NextResponse } from "next/server";
 import { prewarmMarketCache } from "@/application/useCases/prewarmMarketCache";
-import { getRequestOwnerId } from "@/infrastructure/auth/requestOwner";
+import { getAdminAccess } from "@/infrastructure/auth/adminAccess";
 import { cachePolicy } from "@/shared/constants/cachePolicy";
 import {
-  consumeRequestRateLimit,
+  consumeSharedRequestRateLimit,
   getRequestRateLimitKey,
 } from "@/shared/utils/requestRateLimiter";
 
 export async function POST(request: Request) {
-  const { ownerId } = await getRequestOwnerId();
-  const rateLimit = consumeRequestRateLimit({
+  const adminAccess = await getAdminAccess();
+  if (!adminAccess.allowed || !adminAccess.user) {
+    return NextResponse.json({ error: "forbidden" }, { status: adminAccess.status });
+  }
+
+  const rateLimit = await consumeSharedRequestRateLimit({
+    supabase: adminAccess.supabase,
     bucket: "admin-prewarm-post",
-    key: getRequestRateLimitKey(request, "admin-prewarm-post", ownerId),
+    key: getRequestRateLimitKey(request, "admin-prewarm-post", adminAccess.user.id),
     max: 2,
     windowMs: 60_000,
   });

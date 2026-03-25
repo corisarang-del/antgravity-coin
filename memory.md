@@ -520,3 +520,97 @@
   2. `src/shared/constants/mockCoins.ts`
   3. dev 서버 재기동 여부
   순서로 보면 됨
+
+## 2026-03-25 17:51 KST 추가 기록
+
+### 최근 커밋과 현재 판단
+
+- 최근 커밋
+  - `bc49792`
+  - `fix: sharpen debate voices and trim client overhead`
+  - `f557ca7`
+  - `fix: dedupe auth snapshot and share battle header`
+- 위 두 커밋까지는 이미 반영 끝났고, 지금 워크트리의 핵심 미커밋은 보안 감사 후속 수정이다.
+
+### 보안 후속 수정 핵심
+
+- `SECURITY_AUDIT.md`에서 잡힌 CRITICAL/HIGH/MEDIUM 6건을 실제 코드에서 막는 작업까지 진행했음.
+- 핵심 변경 파일
+  - `src/infrastructure/auth/adminAccess.ts`
+  - `src/app/admin/layout.tsx`
+  - `src/app/api/admin/battles/route.ts`
+  - `src/app/api/admin/battles/[battleId]/route.ts`
+  - `src/app/api/admin/cache/prewarm/route.ts`
+  - `src/app/api/battle/route.ts`
+  - `src/app/api/battle/outcome/route.ts`
+  - `src/infrastructure/api/geminiProvider.ts`
+  - `src/shared/utils/requestRateLimiter.ts`
+  - `next.config.ts`
+  - `supabase/migrations/20260325170000_add_admin_role_and_rate_limits.sql`
+
+### 관리자 권한 설계 메모
+
+- 아직 실제 관리자 계정은 없음.
+- 대신 아래 중 하나만 나중에 설정하면 바로 admin 보호가 풀리도록 구현해둠.
+  - `user_profiles.is_admin = true`
+  - `auth.users.app_metadata.role = 'admin'`
+  - `auth.users.app_metadata.is_admin = true`
+  - `ADMIN_USER_IDS` env allowlist
+- 즉 지금은 기본 차단 상태가 맞고, 관리자 권한이 생기는 순간 바로 열리는 구조다.
+
+### rate limit 구조 메모
+
+- 기존 인메모리 Map limiter는 유지하되, 실제 라우트는 Supabase RPC 기반 shared limiter로 연결함.
+- 적용 라우트
+  - `/api/battle`
+  - `/api/battle/outcome`
+  - `/api/admin/cache/prewarm`
+- 테스트 환경에서는 기존 로컬 limiter fallback을 타게 해서 Vitest를 깨지 않게 맞춤.
+
+### Prompt Injection / 정보 노출 / 헤더
+
+- Gemini provider는 이제 system/user 프롬프트를 분리해서 보냄.
+- `/api/battle` 스트림 에러는 내부 에러 상세 대신 일반화된 사용자 메시지만 노출함.
+- `next.config.ts`에 아래 보안 헤더 추가함.
+  - `Content-Security-Policy`
+  - `X-Frame-Options`
+  - `X-Content-Type-Options`
+  - `Referrer-Policy`
+  - `Permissions-Policy`
+
+### 운영 반영 전에 꼭 해야 할 것
+
+1. Supabase migration `20260325170000_add_admin_role_and_rate_limits.sql` 적용
+2. 실제 관리자 계정에 권한 부여
+3. 필요하면 `.env` 또는 배포 환경 변수에 `ADMIN_USER_IDS` 설정
+
+### 현재 검증 상태
+
+- 통과
+  - `pnpm.cmd lint`
+  - `pnpm.cmd typecheck`
+  - `pnpm.cmd test`
+- 테스트 결과 메모
+  - `53 passed`, `1 skipped`
+  - `134 passed`, `8 skipped`
+- `tmp/**`는 품질게이트를 불안정하게 만들던 임시 테스트/산출물이라 lint/test 대상에서 제외해둠.
+
+### 새 세션에서 바로 보면 좋은 파일
+
+- `SECURITY_AUDIT.md`
+- `src/infrastructure/auth/adminAccess.ts`
+- `src/shared/utils/requestRateLimiter.ts`
+- `src/app/api/admin/battles/route.ts`
+- `src/app/api/admin/cache/prewarm/route.ts`
+- `src/app/api/battle/route.ts`
+- `src/infrastructure/api/geminiProvider.ts`
+- `next.config.ts`
+- `supabase/migrations/20260325170000_add_admin_role_and_rate_limits.sql`
+
+### 새 세션 시작 시 추천 순서
+
+1. `git status`로 이번 보안 수정 파일과 런타임 산출물을 분리해서 보기
+2. 보안 수정 커밋 전에 migration 파일이 포함됐는지 확인
+3. Supabase 쪽 적용이 필요하면 migration부터 반영
+4. 관리자 계정이 생기면 `is_admin` 또는 `ADMIN_USER_IDS`로 바로 권한 부여
+5. 이후에만 `/admin` 페이지와 admin API를 실사용 검증

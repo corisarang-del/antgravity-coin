@@ -23,7 +23,7 @@ import { persistAuthenticatedBattleOutcome } from "@/infrastructure/db/supabaseB
 import { runSerializedByKey } from "@/shared/utils/keyedSerialExecutor";
 import { getRequestOwnerId } from "@/infrastructure/auth/requestOwner";
 import {
-  consumeRequestRateLimit,
+  consumeSharedRequestRateLimit,
   getRequestRateLimitKey,
 } from "@/shared/utils/requestRateLimiter";
 
@@ -42,7 +42,8 @@ export async function POST(request: Request) {
   const userBattle = body.userBattle;
 
   const { ownerId: userId, user, supabase } = await getRequestOwnerId();
-  const rateLimit = consumeRequestRateLimit({
+  const rateLimit = await consumeSharedRequestRateLimit({
+    supabase,
     bucket: "battle-outcome-post",
     key: getRequestRateLimitKey(request, "battle-outcome-post", userId),
     max: 10,

@@ -1,8 +1,14 @@
 import { NextResponse } from "next/server";
+import { getAdminAccess } from "@/infrastructure/auth/adminAccess";
 import { FileReportRepository } from "@/infrastructure/db/fileReportRepository";
 import { FileSeedRepository } from "@/infrastructure/db/fileSeedRepository";
 
 export async function GET(request: Request) {
+  const adminAccess = await getAdminAccess();
+  if (!adminAccess.allowed) {
+    return NextResponse.json({ error: "forbidden" }, { status: adminAccess.status });
+  }
+
   const url = new URL(request.url);
   const battleId = url.searchParams.get("battleId");
   const limit = Number(url.searchParams.get("limit") ?? "20");

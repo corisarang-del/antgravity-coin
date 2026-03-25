@@ -38,11 +38,19 @@ export const geminiProvider: LlmProvider = {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          systemInstruction: {
+            parts: [
+              {
+                text: buildCharacterSystemPrompt(input),
+              },
+            ],
+          },
           contents: [
             {
+              role: "user",
               parts: [
                 {
-                  text: `${buildCharacterSystemPrompt(input)}\n\n${buildCharacterUserPrompt(input)}`,
+                  text: buildCharacterUserPrompt(input),
                 },
               ],
             },

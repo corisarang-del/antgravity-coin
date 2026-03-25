@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { getAdminAccess } from "@/infrastructure/auth/adminAccess";
 import { FileEventLog } from "@/infrastructure/db/fileEventLog";
 import { FileReportRepository } from "@/infrastructure/db/fileReportRepository";
 import { FileSeedRepository } from "@/infrastructure/db/fileSeedRepository";
@@ -10,6 +11,11 @@ interface RouteContext {
 }
 
 export async function GET(_request: Request, context: RouteContext) {
+  const adminAccess = await getAdminAccess();
+  if (!adminAccess.allowed) {
+    return NextResponse.json({ error: "forbidden" }, { status: adminAccess.status });
+  }
+
   const { battleId } = await context.params;
 
   const seedRepository = new FileSeedRepository();

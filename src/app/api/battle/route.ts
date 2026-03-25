@@ -1,11 +1,11 @@
+import { NextResponse } from "next/server";
 import { generateCharacterMessage } from "@/application/useCases/generateBattleDebate";
 import { getPreparedBattleContext } from "@/application/useCases/preparedBattleContext";
 import type { DebateMessage } from "@/domain/models/DebateMessage";
-import { NextResponse } from "next/server";
 import { getRequestOwnerId } from "@/infrastructure/auth/requestOwner";
 import { characters } from "@/shared/constants/characters";
 import {
-  consumeRequestRateLimit,
+  consumeSharedRequestRateLimit,
   getRequestRateLimitKey,
 } from "@/shared/utils/requestRateLimiter";
 
@@ -70,8 +70,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "missing_coin_id", retryable: false }, { status: 400 });
   }
 
-  const { ownerId } = await getRequestOwnerId();
-  const rateLimit = consumeRequestRateLimit({
+  const { ownerId, supabase } = await getRequestOwnerId();
+  const rateLimit = await consumeSharedRequestRateLimit({
+    supabase,
     bucket: "battle-post",
     key: getRequestRateLimitKey(request, "battle-post", ownerId),
     max: 5,
@@ -151,15 +152,12 @@ export async function POST(request: Request) {
             }),
           ),
         );
-      } catch (error) {
+      } catch {
         controller.enqueue(
           encoder.encode(
             toSseEvent("error", {
               code: "battle_stream_failed",
-              message:
-                error instanceof Error
-                  ? error.message
-                  : "배틀 스트림을 이어가지 못했어. 다시 시도해줘.",
+              message: "배틀 스트림을 이어가지 못했어. 잠깐 뒤에 다시 시도해줘.",
               retryable: true,
             }),
           ),

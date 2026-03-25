@@ -44,7 +44,7 @@ export default defineConfig(({ mode }) => {
       environment: "jsdom",
       globals: true,
       setupFiles: "./vitest.setup.ts",
-      exclude: ["bootstrap-app/**", "backup-worktree/**", "node_modules/**", ".next/**"],
+      exclude: ["bootstrap-app/**", "backup-worktree/**", "node_modules/**", ".next/**", "tmp/**"],
     },
     resolve: {
       alias: {
