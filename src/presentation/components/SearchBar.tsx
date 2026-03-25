@@ -49,7 +49,7 @@ export function SearchBar({ initialCoins, debounceMs = 300 }: SearchBarProps) {
 
     if (!normalizedQuery) {
       startTransition(() => {
-        setResults(isOpen ? fallbackResults : []);
+        setResults(fallbackResults);
       });
       setIsLoading(false);
       return;
@@ -82,7 +82,7 @@ export function SearchBar({ initialCoins, debounceMs = 300 }: SearchBarProps) {
       controller.abort();
       window.clearTimeout(timeoutId);
     };
-  }, [debounceMs, deferredQuery, fallbackResults, isOpen]);
+  }, [debounceMs, deferredQuery, fallbackResults]);
 
   useEffect(() => {
     if (!results.length) {

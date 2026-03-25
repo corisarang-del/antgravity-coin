@@ -11,7 +11,7 @@ export default async function CharactersPage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <AppHeader initialCurrentUserSnapshot={initialCurrentUserSnapshot} />
+      <AppHeader currentPath="/characters" initialCurrentUserSnapshot={initialCurrentUserSnapshot} />
       <main className="mx-auto max-w-5xl px-4 py-6">
         <CharactersPageClient sourceNotice={sourceNotice} />
       </main>

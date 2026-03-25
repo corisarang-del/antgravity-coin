@@ -84,11 +84,36 @@ export default async function MePage({ searchParams }: MePageProps) {
             .from("battle_sessions")
             .select(
               `
-              *,
-              battle_outcomes (*),
-              battle_snapshots (*),
-              character_memory_seeds (*),
-              player_decision_seeds (*)
+              battle_id,
+              coin_symbol,
+              timeframe,
+              selected_team,
+              settled_price,
+              status,
+              snapshot_id,
+              market_symbol,
+              settlement_at,
+              battle_outcomes (
+                winning_team,
+                price_change_percent,
+                user_won,
+                report_json
+              ),
+              battle_snapshots (
+                messages_json
+              ),
+              character_memory_seeds (
+                id,
+                character_name,
+                was_correct,
+                indicator_label,
+                indicator_value,
+                summary
+              ),
+              player_decision_seeds (
+                selected_price,
+                market_symbol
+              )
             `,
             )
             .eq("owner_user_id", user.id)
@@ -131,7 +156,7 @@ export default async function MePage({ searchParams }: MePageProps) {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <AppHeader initialCurrentUserSnapshot={initialCurrentUserSnapshot} />
+      <AppHeader currentPath="/me" initialCurrentUserSnapshot={initialCurrentUserSnapshot} />
       <MergeLocalStateClient />
       <main className="mx-auto flex max-w-5xl flex-col gap-5 px-4 py-6">
         <section className="grid gap-4 rounded-[28px] border border-border bg-[linear-gradient(180deg,hsl(var(--card))_0%,hsl(var(--surface-3))_100%)] p-5 shadow-[0_22px_50px_rgba(17,29,61,0.08)] lg:grid-cols-[1.1fr_0.9fr]">

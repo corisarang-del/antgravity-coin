@@ -3,8 +3,6 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { BattleTimeframe } from "@/domain/models/BattleTimeframe";
-import type { CurrentUserSnapshot } from "@/presentation/hooks/currentUserStore";
-import { AppHeader } from "@/presentation/components/AppHeader";
 import { PickButton } from "@/presentation/components/PickButton";
 import { RiskDisclaimer } from "@/presentation/components/RiskDisclaimer";
 import { TeamSummaryCard } from "@/presentation/components/TeamSummaryCard";
@@ -16,10 +14,9 @@ import { getBattleSettlementAt } from "@/application/useCases/fetchBattleSettlem
 
 interface PickPageClientProps {
   coinId: string;
-  initialCurrentUserSnapshot: CurrentUserSnapshot;
 }
 
-export function PickPageClient({ coinId, initialCurrentUserSnapshot }: PickPageClientProps) {
+export function PickPageClient({ coinId }: PickPageClientProps) {
   const router = useRouter();
   const { saveUserBattle } = useUserBattle(coinId);
   const [selectedTeam, setSelectedTeam] = useState<"bull" | "bear">("bull");
@@ -121,7 +118,6 @@ export function PickPageClient({ coinId, initialCurrentUserSnapshot }: PickPageC
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <AppHeader initialCurrentUserSnapshot={initialCurrentUserSnapshot} />
       <main className="mx-auto max-w-5xl space-y-6 px-4 py-6">
         <section className="rounded-[28px] border border-border bg-[linear-gradient(180deg,hsl(var(--card))_0%,hsl(var(--surface-3))_100%)] p-5 shadow-[0_18px_44px_rgba(17,29,61,0.08)]">
           <h1 className="font-display text-4xl font-bold tracking-[-0.05em]">

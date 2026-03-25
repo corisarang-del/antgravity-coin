@@ -17,7 +17,7 @@ export default async function HomePage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <AppHeader initialCurrentUserSnapshot={initialCurrentUserSnapshot} />
+      <AppHeader currentPath="/home" initialCurrentUserSnapshot={initialCurrentUserSnapshot} />
       <main className="mx-auto flex max-w-5xl flex-col gap-6 px-4 py-6">
         <section className="grid gap-4 rounded-[28px] border border-border bg-[linear-gradient(180deg,hsl(var(--card))_0%,hsl(var(--surface-3))_100%)] p-5 shadow-[0_22px_50px_rgba(17,29,61,0.08)] md:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
           <div className="flex min-w-0 flex-col justify-between gap-5">

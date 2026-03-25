@@ -5,8 +5,6 @@ import { startTransition, useEffect, useEffectEvent, useMemo, useRef, useState }
 import { updateLevels } from "@/application/useCases/updateLevels";
 import type { BattleOutcomeSeed } from "@/domain/models/BattleOutcomeSeed";
 import type { BattleResult } from "@/domain/models/BattleResult";
-import type { CurrentUserSnapshot } from "@/presentation/hooks/currentUserStore";
-import { AppHeader } from "@/presentation/components/AppHeader";
 import { CharacterLevelChange } from "@/presentation/components/CharacterLevelChange";
 import { CountdownTimer } from "@/presentation/components/CountdownTimer";
 import { MyPickSummary } from "@/presentation/components/MyPickSummary";
@@ -23,7 +21,6 @@ import { storageKeys } from "@/shared/constants/storageKeys";
 
 interface ResultPageClientProps {
   coinId: string;
-  initialCurrentUserSnapshot: CurrentUserSnapshot;
 }
 
 interface OutcomeResponsePayload {
@@ -109,10 +106,7 @@ function getStageCopy(resolveStage: ResolveStage) {
   }
 }
 
-export function ResultPageClient({
-  coinId,
-  initialCurrentUserSnapshot,
-}: ResultPageClientProps) {
+export function ResultPageClient({ coinId }: ResultPageClientProps) {
   const { userBattle } = useUserBattle(coinId);
   const snapshot = useBattleSnapshot(coinId);
   const { user, isLoading: isUserLoading } = useCurrentUser();
@@ -298,7 +292,6 @@ export function ResultPageClient({
   if (!userBattle || userBattle.coinId !== coinId) {
     return (
       <div className="min-h-screen bg-background text-foreground">
-        <AppHeader initialCurrentUserSnapshot={initialCurrentUserSnapshot} />
         <main className="mx-auto max-w-4xl px-4 py-6">
           <section className="rounded-[28px] border border-border bg-card p-5 shadow-[0_18px_40px_rgba(17,29,61,0.08)]">
             <h1 className="font-display text-3xl font-bold tracking-[-0.05em]">
@@ -324,7 +317,6 @@ export function ResultPageClient({
   if (settlementPending) {
     return (
       <div className="min-h-screen bg-background text-foreground">
-        <AppHeader initialCurrentUserSnapshot={initialCurrentUserSnapshot} />
         <main className="mx-auto max-w-4xl space-y-6 px-4 py-6">
           <section className="rounded-[28px] border border-border bg-[linear-gradient(180deg,hsl(var(--card))_0%,hsl(var(--surface-3))_100%)] p-5 shadow-[0_18px_44px_rgba(17,29,61,0.08)]">
             <h1 className="font-display text-4xl font-bold tracking-[-0.05em]">실캔들 정산 대기 중</h1>
@@ -371,7 +363,6 @@ export function ResultPageClient({
 
     return (
       <div className="min-h-screen bg-background text-foreground">
-        <AppHeader initialCurrentUserSnapshot={initialCurrentUserSnapshot} />
         <main className="mx-auto max-w-4xl space-y-6 px-4 py-6">
           <section className="rounded-[28px] border border-border bg-card p-5 shadow-[0_18px_40px_rgba(17,29,61,0.08)]">
             <h1 className="font-display text-3xl font-bold tracking-[-0.05em]">{stageCopy.title}</h1>
@@ -419,7 +410,6 @@ export function ResultPageClient({
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <AppHeader initialCurrentUserSnapshot={initialCurrentUserSnapshot} />
       <main className="mx-auto max-w-4xl space-y-6 px-4 py-6">
         {isUserLoading ? (
           <p className="ag-body-copy rounded-[20px] border border-border bg-[hsl(var(--surface-2))] px-4 py-3 text-muted-foreground">

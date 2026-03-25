@@ -1,5 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
+  buildCharacterSystemPrompt,
+  buildCharacterUserPrompt,
+} from "@/application/prompts/characterPrompts";
+import type { GenerateDebateChunkInput } from "@/application/ports/LlmProvider";
+import {
   generateBattleDebate,
   generateCharacterMessage,
 } from "@/application/useCases/generateBattleDebate";
@@ -73,6 +78,97 @@ describe("generateBattleDebate", () => {
     expect(shade?.summary).toContain("내 기준엔");
     expect(vela?.summary).toContain("밑에서 보면");
     expect(flip?.summary).toContain("근데 난");
+  });
+
+  it("fallback 메시지는 직전 발언을 대화창에 직접 노출하지 않는다", async () => {
+    const judy = getCharacterById("judy");
+
+    if (!judy) {
+      throw new Error("missing_judy");
+    }
+
+    const message = await generateCharacterMessage(marketData, judy, [
+      {
+        id: "m1",
+        characterId: "aira",
+        characterName: "Aira",
+        team: "bull",
+        stance: "bullish",
+        summary: "Aira가 방금 위로 더 열린다고 했어.",
+        detail: "직전 발언 detail",
+        indicatorLabel: "RSI",
+        indicatorValue: "61.2",
+        provider: "test",
+        model: "fixture",
+        fallbackUsed: false,
+        createdAt: new Date().toISOString(),
+      },
+    ]);
+
+    expect(message.summary).not.toContain("직전 발언");
+    expect(message.detail).not.toContain("직전 발언");
+    expect(message.detail).not.toContain("Aira가 방금 위로 더 열린다고 했어.");
+  });
+
+  it("fallback 메시지에서도 캐릭터 맡은 분야가 더 또렷하게 드러난다", async () => {
+    const messages = await generateBattleDebate(marketData);
+
+    const judy = messages.find((message) => message.characterId === "judy");
+    const clover = messages.find((message) => message.characterId === "clover");
+    const ledger = messages.find((message) => message.characterId === "ledger");
+    const vela = messages.find((message) => message.characterId === "vela");
+
+    expect(judy?.detail).toMatch(/공시|일정|정책/);
+    expect(clover?.detail).toMatch(/공포탐욕|커뮤니티|군중/);
+    expect(ledger?.detail).toMatch(/지갑 이동|거래소 입출금|온체인|수급/);
+    expect(vela?.detail).toMatch(/대형 자금|고래|미결제약정|자금 흐름/);
+  });
+
+  it("프롬프트는 이전 발언을 내부 참고용으로만 주고 직접 언급을 금지한다", () => {
+    const judy = getCharacterById("judy");
+
+    if (!judy) {
+      throw new Error("missing_judy");
+    }
+
+    const baseInput: GenerateDebateChunkInput = {
+      characterId: judy.id,
+      characterName: judy.name,
+      role: judy.role,
+      team: judy.team,
+      specialty: judy.specialty,
+      personality: judy.personality,
+      selectionReason: judy.selectionReason,
+      coinSymbol: "BTC",
+      focusSummary: "BTC 24h 2.4% / 7d 6.8% / RSI 61.2",
+      evidence: ["[원소스: 뉴스] 정책 일정: 이번 주 ETF 관련 일정이 있어."],
+      recentBattleLessons: [],
+      characterLessons: [],
+      previousMessages: [
+        {
+          id: "m1",
+          characterId: "aira",
+          characterName: "Aira",
+          team: "bull",
+          stance: "bullish",
+          summary: "차트는 아직 버텨.",
+          detail: "차트 detail",
+          indicatorLabel: "RSI",
+          indicatorValue: "61.2",
+          provider: "test",
+          model: "fixture",
+          fallbackUsed: false,
+          createdAt: new Date().toISOString(),
+        },
+      ],
+    };
+
+    const systemPrompt = buildCharacterSystemPrompt(baseInput);
+    const userPrompt = buildCharacterUserPrompt(baseInput);
+
+    expect(systemPrompt).toContain("다른 캐릭터 이름이나 직전 발언을 직접 언급하지 마.");
+    expect(userPrompt).toContain("내부 참고용 이전 발언");
+    expect(userPrompt).toContain("직전 발언을 직접 인용하지 마.");
   });
 
   it("fenced json 응답을 파싱해서 실제 메시지로 만든다", async () => {

@@ -4,8 +4,6 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { characters, getCharacterById } from "@/shared/constants/characters";
-import type { CurrentUserSnapshot } from "@/presentation/hooks/currentUserStore";
-import { AppHeader } from "@/presentation/components/AppHeader";
 import { IndicatorCard } from "@/presentation/components/IndicatorCard";
 import { RiskDisclaimer } from "@/presentation/components/RiskDisclaimer";
 import { SpeakerSpotlight } from "@/presentation/components/SpeakerSpotlight";
@@ -29,7 +27,6 @@ const BattleFeed = dynamic(
 
 interface BattlePageClientProps {
   coinId: string;
-  initialCurrentUserSnapshot: CurrentUserSnapshot;
 }
 
 const teaserCopyByCharacterId: Record<string, string> = {
@@ -43,7 +40,7 @@ const teaserCopyByCharacterId: Record<string, string> = {
   flip: "곧 Flip이 과열 구간의 반전 포인트를 찾을 거야.",
 };
 
-export function BattlePageClient({ coinId, initialCurrentUserSnapshot }: BattlePageClientProps) {
+export function BattlePageClient({ coinId }: BattlePageClientProps) {
   const router = useRouter();
   const {
     messages,
@@ -120,7 +117,6 @@ export function BattlePageClient({ coinId, initialCurrentUserSnapshot }: BattleP
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <AppHeader initialCurrentUserSnapshot={initialCurrentUserSnapshot} />
       <main className="mx-auto max-w-5xl space-y-4 px-4 py-6">
         <section className="rounded-[28px] border border-border/80 bg-[linear-gradient(180deg,hsl(var(--card))_0%,hsl(var(--surface-3))_100%)] p-5 shadow-[0_18px_40px_rgba(17,29,61,0.08)]">
           <span className="inline-flex rounded-full bg-[hsl(var(--surface-2))] px-3 py-2 text-xs font-semibold text-muted-foreground">

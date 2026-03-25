@@ -36,21 +36,21 @@ const characterVoiceGuide: Record<
   judy: {
     bull: {
       summary: "헤드라인만 보면 지금 재료는 아직 더 갈 수 있어.",
-      detail: "헤드라인이랑 이벤트를 먼저 보면 지금 들어온 재료 결이 아직 살아 있어. 뉴스 쪽 온도가 생각보다 덜 식었어.",
+      detail: "공시랑 정책 일정 쪽을 먼저 보면 지금 재료 결이 아직 살아 있어. 승인 이슈랑 일정 소화가 덜 끝나서 뉴스 온도가 생각보다 덜 식었어.",
     },
     bear: {
       summary: "헤드라인은 많은데 재료 힘은 생각보다 약해 보여.",
-      detail: "이벤트는 보이는데 시장이 그 재료를 오래 붙잡을 만큼 들떠 있진 않아 보여. 지금 재료는 반짝하고 끝날 가능성도 커.",
+      detail: "공시나 정책 일정은 있어도 시장이 그 재료를 오래 붙잡을 만큼 들떠 있진 않아 보여. 지금 뉴스 재료는 반짝하고 끝날 가능성도 커.",
     },
   },
   clover: {
     bull: {
       summary: "분위기상 군중 심리가 아직 완전히 꺾이진 않았어.",
-      detail: "심리적으로 보면 공포가 있어도 기대가 미세하게 남아 있으면 반등이 붙는 구간이 생겨. 지금은 그 문이 완전히 닫힌 건 아니야.",
+      detail: "공포탐욕이 너무 차갑게 식은 건 아니고 커뮤니티 온도도 아직 기대를 남겨둔 쪽이야. 심리적으로 보면 반등 문이 완전히 닫힌 장면은 아니야.",
     },
     bear: {
       summary: "분위기상 심리 불안이 다시 커지면 흔들림이 빨라질 수 있어.",
-      detail: "심리적으로 보면 지금은 숫자보다 군중의 떨림이 더 신경 쓰여. 작은 충격에도 공포 쪽으로 금방 기울 수 있어 보여.",
+      detail: "공포탐욕이 꺾이고 커뮤니티 반응도 예민해지면 군중 심리가 숫자보다 먼저 무너질 수 있어. 지금은 작은 충격에도 공포 쪽으로 금방 기울 수 있어 보여.",
     },
   },
   blaze: {
@@ -66,11 +66,11 @@ const characterVoiceGuide: Record<
   ledger: {
     bull: {
       summary: "숫자상 거래 구조 체력이 아직 완전히 비진 않았어.",
-      detail: "구조적으로 보면 지금 보이는 거래량이랑 버팀이 같이 남아 있어. 그래서 쉽게 무너질 자리는 아직 아니야.",
+      detail: "지갑 이동이 급하게 거래소로 쏟아지는 장면은 아니고, 온체인 수급도 완전히 비어 보이진 않아. 구조적으로 보면 거래소 입출금 흐름이 아직은 버티는 쪽이야.",
     },
     bear: {
       summary: "숫자상 거래 구조는 아직 조심 쪽으로 기울어 있어.",
-      detail: "구조적으로 보면 가격이 버티는 척해도 체력이 비면 아래로 밀릴 수 있어. 지금은 구조가 먼저 흔들리는 쪽이 더 신경 쓰여.",
+      detail: "지갑 이동과 거래소 입출금 흐름을 보면 가격이 버티는 척해도 온체인 수급 체력이 비면 아래로 밀릴 수 있어. 지금은 구조가 먼저 흔들리는 쪽이 더 신경 쓰여.",
     },
   },
   shade: {
@@ -86,11 +86,11 @@ const characterVoiceGuide: Record<
   vela: {
     bull: {
       summary: "밑에서 보면 숨은 자금 흐름이 아직 완전히 꺾인 건 아니야.",
-      detail: "자금 흐름상 수면 아래를 보면 대형 자금이 급하게 도망가는 그림까진 아니야. 아직 관망이랑 재진입이 같이 섞여 보여.",
+      detail: "자금 흐름상 수면 아래를 보면 대형 자금이 급하게 도망가는 그림까진 아니야. 미결제약정과 거래 강도도 아직은 관망이랑 재진입이 같이 섞여 보여.",
     },
     bear: {
       summary: "밑에서 보면 자금 방향이 흔들리면 개인만 남는 장이 될 수 있어.",
-      detail: "자금 흐름상 고래 방향이 선명하지 않으면 가격을 오래 미는 힘도 약해져. 지금은 그 공백이 은근히 커 보여.",
+      detail: "자금 흐름상 고래 방향이 선명하지 않고 미결제약정까지 흔들리면 가격을 오래 미는 힘도 약해져. 지금은 대형 자금 공백이 은근히 커 보여.",
     },
   },
   flip: {
@@ -315,7 +315,13 @@ function buildRoleEvidence(
   const items = profile.evidenceSources.map((evidenceSource) => {
     if (evidenceSource.kind === "previous_messages") {
       const previousSummary =
-        previousMessages.map((message) => `${message.characterName}: ${message.summary}`).join(" | ") ||
+        previousMessages
+          .map((message) =>
+            message.characterId === "context-summary"
+              ? `공통 요약: ${message.summary}`
+              : `${message.team === "bull" ? "불리시" : "베어리시"} 논지: ${message.summary}`,
+          )
+          .join(" | ") ||
         evidenceSource.emptyText ||
         "없음";
 
@@ -404,23 +410,15 @@ function compressPreviousMessages(
   return [...uniqueMessages.values()];
 }
 
-function buildUnavailableEvidenceMessage(
-  character: (typeof characters)[number],
-  previousMessages: DebateMessage[],
-): DebateMessage {
-  const tensionPoint =
-    previousMessages.length > 0
-      ? `직전 발언 "${previousMessages.at(-1)?.summary}"까지는 들었지만, 지금은 이 캐릭터가 써야 할 원소스 근거가 비어 있어.`
-      : "첫 발언을 준비했지만, 지금은 이 캐릭터가 써야 할 원소스 근거가 부족해.";
-
+function buildUnavailableEvidenceMessage(character: (typeof characters)[number]): DebateMessage {
   return {
-    id: `${character.id}-${Date.now()}-${previousMessages.length}`,
+    id: `${character.id}-${Date.now()}`,
     characterId: character.id,
     characterName: character.name,
     team: character.team,
     stance: character.team === "bull" ? "bullish" : "bearish",
     summary: "지금은 이 역할답게 말할 만큼 근거가 부족해서 섣불리 결론 내리기 어려워.",
-    detail: `${tensionPoint} 다음 턴에서는 ${character.role}답게 더 분명한 근거로 말할게.`,
+    detail: `지금은 ${character.role}가 붙잡아야 할 원소스 근거가 비어 있어. 다음 턴에서는 ${character.specialty} 쪽 신호가 더 채워지면 그 근거로 분명하게 말할게.`,
     indicatorLabel: "근거 상태",
     indicatorValue: "데이터 부족",
     provider: "fallback",
@@ -433,13 +431,8 @@ function buildUnavailableEvidenceMessage(
 function buildFallbackMessage(
   marketData: MarketData,
   character: (typeof characters)[number],
-  previousMessages: DebateMessage[],
 ): DebateMessage {
   const isBull = character.team === "bull";
-  const tensionPoint =
-    previousMessages.length > 0
-      ? `직전 발언 "${previousMessages.at(-1)?.summary}"도 참고했어.`
-      : "첫 발언이라 캐릭터 렌즈를 먼저 세울게.";
 
   const indicatorLabel = isBull
     ? marketData.rsi >= 50
@@ -469,11 +462,11 @@ function buildFallbackMessage(
     : characterVoiceGuide[character.id]?.bear.summary ?? fallbackTemplates[character.id]?.bear.summary;
 
   const detail = isBull
-    ? `${tensionPoint} ${characterVoiceGuide[character.id]?.bull.detail ?? fallbackTemplates[character.id]?.bull.detail}`
-    : `${tensionPoint} ${characterVoiceGuide[character.id]?.bear.detail ?? fallbackTemplates[character.id]?.bear.detail}`;
+    ? (characterVoiceGuide[character.id]?.bull.detail ?? fallbackTemplates[character.id]?.bull.detail)
+    : (characterVoiceGuide[character.id]?.bear.detail ?? fallbackTemplates[character.id]?.bear.detail);
 
   return {
-    id: `${character.id}-${Date.now()}-${previousMessages.length}`,
+    id: `${character.id}-${Date.now()}`,
     characterId: character.id,
     characterName: character.name,
     team: character.team,
@@ -521,7 +514,7 @@ export async function generateCharacterMessage(
   );
 
   if (roleEvidence.hasMissingRequiredEvidence) {
-    return buildUnavailableEvidenceMessage(character, previousMessages);
+    return buildUnavailableEvidenceMessage(character);
   }
 
   try {
@@ -559,7 +552,7 @@ export async function generateCharacterMessage(
           console.warn(
             `[battle-llm:error] character=${character.id} provider=${aiResult.provider} model=${aiResult.model} reason=non_korean_response fallbackUsed=${aiResult.fallbackUsed}`,
           );
-          return buildFallbackMessage(marketData, character, previousMessages);
+          return buildFallbackMessage(marketData, character);
         }
 
         return {
@@ -587,5 +580,5 @@ export async function generateCharacterMessage(
     console.warn(`[battle-llm:error] character=${character.id} reason=character_message_failed`);
   }
 
-  return buildFallbackMessage(marketData, character, previousMessages);
+  return buildFallbackMessage(marketData, character);
 }

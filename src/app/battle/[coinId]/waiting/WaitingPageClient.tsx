@@ -3,8 +3,6 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import type { CurrentUserSnapshot } from "@/presentation/hooks/currentUserStore";
-import { AppHeader } from "@/presentation/components/AppHeader";
 import { CountdownTimer } from "@/presentation/components/CountdownTimer";
 import { MyPickSummary } from "@/presentation/components/MyPickSummary";
 import { useBattleSnapshot } from "@/presentation/hooks/useBattleSnapshot";
@@ -13,7 +11,6 @@ import { getBattleTimeframeMeta } from "@/shared/constants/battleTimeframes";
 
 interface WaitingPageClientProps {
   coinId: string;
-  initialCurrentUserSnapshot: CurrentUserSnapshot;
 }
 
 function getRemainingSeconds(settlementAt: string) {
@@ -22,7 +19,6 @@ function getRemainingSeconds(settlementAt: string) {
 
 export function WaitingPageClient({
   coinId,
-  initialCurrentUserSnapshot,
 }: WaitingPageClientProps) {
   const router = useRouter();
   const { userBattle } = useUserBattle(coinId);
@@ -88,7 +84,6 @@ export function WaitingPageClient({
   if (!userBattle || userBattle.coinId !== coinId) {
     return (
       <div className="min-h-screen bg-background text-foreground">
-        <AppHeader initialCurrentUserSnapshot={initialCurrentUserSnapshot} />
         <main className="mx-auto max-w-4xl px-4 py-6">
           <section className="rounded-[28px] border border-border bg-card p-5 shadow-[0_18px_40px_rgba(17,29,61,0.08)]">
             <h1 className="font-display text-3xl font-bold tracking-[-0.05em]">
@@ -113,7 +108,6 @@ export function WaitingPageClient({
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <AppHeader initialCurrentUserSnapshot={initialCurrentUserSnapshot} />
       <main className="mx-auto max-w-4xl space-y-6 px-4 py-6">
         <section className="rounded-[28px] border border-border bg-[linear-gradient(180deg,hsl(var(--card))_0%,hsl(var(--surface-3))_100%)] p-5 shadow-[0_18px_44px_rgba(17,29,61,0.08)]">
           <h1 className="font-display text-4xl font-bold tracking-[-0.05em]">

@@ -117,12 +117,13 @@ export function useBattleStream({ coinId }: UseBattleStreamOptions) {
       persistSnapshot();
     };
 
-    const persistTimingMetrics = () => {
-      window.localStorage.setItem(
-        storageKeys.battleTimingMetrics,
-        JSON.stringify(timingTracker.getMetrics()),
-      );
-      setTimingMetrics(timingTracker.getMetrics());
+    const persistTimingMetrics = (syncState = false) => {
+      const nextMetrics = timingTracker.getMetrics();
+      window.localStorage.setItem(storageKeys.battleTimingMetrics, JSON.stringify(nextMetrics));
+
+      if (syncState) {
+        setTimingMetrics(nextMetrics);
+      }
     };
 
     setMessages([]);
@@ -219,8 +220,9 @@ export function useBattleStream({ coinId }: UseBattleStreamOptions) {
 
             if (event === "message") {
               currentMessages = [...currentMessages, parsed as DebateMessage];
+              const shouldSyncTimingState = timingTracker.getMetrics().firstMessageDisplayedAt === null;
               timingTracker.markFirstMessageDisplayed();
-              persistTimingMetrics();
+              persistTimingMetrics(shouldSyncTimingState);
               startTransition(() => {
                 setMessages(currentMessages);
               });
