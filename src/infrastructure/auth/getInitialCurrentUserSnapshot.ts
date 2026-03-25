@@ -2,6 +2,7 @@ import type { User } from "@supabase/supabase-js";
 import { getGuestUserId } from "@/infrastructure/auth/guestSession";
 import { createSupabaseServerClient } from "@/infrastructure/auth/supabaseServerClient";
 import type { CurrentUserSnapshot } from "@/presentation/hooks/currentUserStore";
+import { hasSupabasePublicEnv } from "@/shared/constants/envConfig";
 
 export function createCurrentUserSnapshot(input: {
   user: User | null;
@@ -46,10 +47,13 @@ export function createCurrentUserSnapshot(input: {
 }
 
 export async function getInitialCurrentUserSnapshot(): Promise<CurrentUserSnapshot> {
-  const [guestUserId, supabase] = await Promise.all([
-    getGuestUserId(),
-    createSupabaseServerClient(),
-  ]);
+  const guestUserId = await getGuestUserId();
+
+  if (!hasSupabasePublicEnv) {
+    return createCurrentUserSnapshot({ user: null, guestUserId });
+  }
+
+  const supabase = await createSupabaseServerClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();

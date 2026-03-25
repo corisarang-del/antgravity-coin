@@ -12,6 +12,9 @@ const publicSupabasePublishableKey =
     ? process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY.trim()
     : "";
 
+export const hasSupabasePublicEnv =
+  publicSupabaseUrl.length > 0 && publicSupabasePublishableKey.length > 0;
+
 export const envConfig = {
   supabaseUrl: publicSupabaseUrl,
   supabasePublishableKey: publicSupabasePublishableKey,

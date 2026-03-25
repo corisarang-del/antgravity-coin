@@ -27,12 +27,26 @@ export function LoginPageClient() {
   const error = searchParams.get("error");
   const [isPending, startTransition] = useTransition();
   const [pendingProvider, setPendingProvider] = useState<"google" | "kakao" | null>(null);
+  const [configError, setConfigError] = useState<string | null>(null);
 
   const handleSignIn = async (provider: "google" | "kakao") => {
-    const supabase = createSupabaseBrowserClient();
+    let supabase;
+
+    try {
+      supabase = createSupabaseBrowserClient();
+    } catch (clientError) {
+      setConfigError(
+        clientError instanceof Error
+          ? clientError.message
+          : "Supabase public env is missing.",
+      );
+      return;
+    }
+
     const next = searchParams.get("next") ?? "/me";
 
     setPendingProvider(provider);
+    setConfigError(null);
     startTransition(() => {
       void supabase.auth.signInWithOAuth({
         provider,
@@ -103,6 +117,12 @@ export function LoginPageClient() {
               {error === "oauth_callback_failed" ? (
                 <div className="ag-body-copy rounded-[22px] border border-bear/20 bg-[linear-gradient(180deg,hsl(var(--surface-2))_0%,hsl(var(--card))_100%)] p-4 text-foreground">
                   로그인 연결이 끊겼어. 같은 버튼으로 다시 시도해줘.
+                </div>
+              ) : null}
+
+              {configError ? (
+                <div className="ag-body-copy rounded-[22px] border border-bear/20 bg-[linear-gradient(180deg,hsl(var(--surface-2))_0%,hsl(var(--card))_100%)] p-4 text-foreground">
+                  {configError}
                 </div>
               ) : null}
 
