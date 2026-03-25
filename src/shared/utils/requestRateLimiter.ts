@@ -102,7 +102,10 @@ export async function consumeSharedRequestRateLimit(
   });
 
   if (response.error) {
-    throw new Error(`shared_rate_limit_failed:${response.error.message}`);
+    console.warn(
+      `[rate-limit:fallback] bucket=${input.bucket} reason=shared_rate_limit_failed message=${response.error.message}`,
+    );
+    return consumeRequestRateLimit(input);
   }
 
   const row = Array.isArray(response.data) ? response.data[0] : response.data;
@@ -116,7 +119,8 @@ export async function consumeSharedRequestRateLimit(
     | undefined;
 
   if (!parsedRow) {
-    throw new Error("shared_rate_limit_empty");
+    console.warn(`[rate-limit:fallback] bucket=${input.bucket} reason=shared_rate_limit_empty`);
+    return consumeRequestRateLimit(input);
   }
 
   return {

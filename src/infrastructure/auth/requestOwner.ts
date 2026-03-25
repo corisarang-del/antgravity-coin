@@ -1,7 +1,17 @@
 import { createSupabaseServerClient } from "@/infrastructure/auth/supabaseServerClient";
 import { getOrCreateGuestUserId } from "@/infrastructure/auth/guestSession";
+import { hasSupabasePublicEnv } from "@/shared/constants/envConfig";
 
 export async function getRequestOwnerId() {
+  if (!hasSupabasePublicEnv) {
+    return {
+      ownerId: await getOrCreateGuestUserId(),
+      isAuthenticated: false,
+      user: null,
+      supabase: null,
+    };
+  }
+
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },
