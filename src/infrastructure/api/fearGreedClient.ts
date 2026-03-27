@@ -1,3 +1,5 @@
+import { fetchWithTimeout } from "@/shared/utils/fetchWithTimeout";
+
 interface FearGreedResponse {
   data: Array<{
     value: string;
@@ -6,8 +8,9 @@ interface FearGreedResponse {
 }
 
 export async function fetchFearGreedIndex() {
-  const response = await fetch("https://api.alternative.me/fng/?limit=1", {
+  const response = await fetchWithTimeout("https://api.alternative.me/fng/?limit=1", {
     next: { revalidate: 300 },
+    timeoutMs: 3_000,
   });
 
   if (!response.ok) {

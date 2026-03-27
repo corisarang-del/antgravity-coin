@@ -1,3 +1,5 @@
+import { fetchWithTimeout } from "@/shared/utils/fetchWithTimeout";
+
 type HyperliquidUniverse = Array<{
   name?: string;
 }>;
@@ -23,7 +25,7 @@ function toNumber(value: string | undefined, fallback = 0) {
 }
 
 export async function fetchHyperliquidPerpetualMetrics(symbol: string) {
-  const response = await fetch(BASE_URL, {
+  const response = await fetchWithTimeout(BASE_URL, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -32,6 +34,7 @@ export async function fetchHyperliquidPerpetualMetrics(symbol: string) {
       type: "metaAndAssetCtxs",
     }),
     next: { revalidate: 300 },
+    timeoutMs: 4_000,
   });
 
   if (!response.ok) {

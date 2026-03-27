@@ -1,6 +1,8 @@
 import { envConfig } from "@/shared/constants/envConfig";
+import { fetchWithTimeout } from "@/shared/utils/fetchWithTimeout";
 
 const BASE_URL = "https://api.coingecko.com/api/v3";
+const COINGECKO_TIMEOUT_MS = 4_000;
 
 function buildHeaders() {
   const headers = new Headers({
@@ -15,9 +17,10 @@ function buildHeaders() {
 }
 
 export async function coinGeckoFetch<T>(path: string): Promise<T> {
-  const response = await fetch(`${BASE_URL}${path}`, {
+  const response = await fetchWithTimeout(`${BASE_URL}${path}`, {
     headers: buildHeaders(),
     next: { revalidate: 60 },
+    timeoutMs: COINGECKO_TIMEOUT_MS,
   });
 
   if (!response.ok) {

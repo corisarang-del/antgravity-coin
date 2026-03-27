@@ -156,14 +156,18 @@ export function useBattleStream({ coinId }: UseBattleStreamOptions) {
           throw new Error("스트림 응답이 비어 있다.");
         }
 
-        timingTracker.markPreparedContext({
-          preparedContextHit: response.headers.get("x-battle-prepared-context-hit") === "true",
-          preparedFirstTurnHit: response.headers.get("x-battle-prepared-first-turn-hit") === "true",
-          preparedAtAgeMs: response.headers.get("x-battle-prepared-at-age-ms")
-            ? Number(response.headers.get("x-battle-prepared-at-age-ms"))
-            : null,
-        });
-        persistTimingMetrics();
+        const preparedContextHitHeader = response.headers.get("x-battle-prepared-context-hit");
+        if (preparedContextHitHeader !== null) {
+          timingTracker.markPreparedContext({
+            preparedContextHit: preparedContextHitHeader === "true",
+            preparedFirstTurnHit:
+              response.headers.get("x-battle-prepared-first-turn-hit") === "true",
+            preparedAtAgeMs: response.headers.get("x-battle-prepared-at-age-ms")
+              ? Number(response.headers.get("x-battle-prepared-at-age-ms"))
+              : null,
+          });
+          persistTimingMetrics();
+        }
 
         reader = response.body.getReader();
         const decoder = new TextDecoder();
@@ -191,20 +195,53 @@ export function useBattleStream({ coinId }: UseBattleStreamOptions) {
 
             const parsed = JSON.parse(data) as
               | DebateMessage
-              | { marketData: MarketData; summary: BattleSummary }
+              | {
+                  marketData: MarketData | null;
+                  summary: BattleSummary | null;
+                  preparedContextHit?: boolean | null;
+                  preparedFirstTurnHit?: boolean;
+                  preparedAtAgeMs?: number | null;
+                }
               | { characterId: string }
               | { completed: boolean }
               | { message: string };
 
             if (event === "battle_start") {
-              const payload = parsed as { marketData: MarketData; summary: BattleSummary };
-              currentMarketData = payload.marketData;
-              currentSummary = payload.summary;
-              timingTracker.markMarketDataReady();
-              persistTimingMetrics();
+              const payload = parsed as {
+                marketData: MarketData | null;
+                summary: BattleSummary | null;
+                preparedContextHit?: boolean | null;
+                preparedFirstTurnHit?: boolean;
+                preparedAtAgeMs?: number | null;
+              };
+
+              if (payload.preparedContextHit != null) {
+                timingTracker.markPreparedContext({
+                  preparedContextHit: payload.preparedContextHit,
+                  preparedFirstTurnHit: payload.preparedFirstTurnHit ?? false,
+                  preparedAtAgeMs: payload.preparedAtAgeMs ?? null,
+                });
+                persistTimingMetrics();
+              }
+
+              if (payload.marketData) {
+                currentMarketData = payload.marketData;
+                timingTracker.markMarketDataReady();
+                persistTimingMetrics();
+              }
+
+              if (payload.summary) {
+                currentSummary = payload.summary;
+              }
+
               startTransition(() => {
-                setMarketData(payload.marketData);
-                setSummary(payload.summary);
+                if (payload.marketData) {
+                  setMarketData(payload.marketData);
+                }
+
+                if (payload.summary) {
+                  setSummary(payload.summary);
+                }
               });
               continue;
             }

@@ -3,7 +3,6 @@ import type { DebateMessage } from "@/domain/models/DebateMessage";
 import type { MarketData } from "@/domain/models/MarketData";
 import type { ReusableDebateContext } from "@/application/useCases/getReusableDebateContext";
 import { getBattleMarketSnapshot } from "@/application/useCases/getBattleMarketSnapshot";
-import { generateCharacterMessage } from "@/application/useCases/generateBattleDebate";
 import { getReusableDebateContext } from "@/application/useCases/getReusableDebateContext";
 import { FilePreparedBattleContextRepository } from "@/infrastructure/db/filePreparedBattleContextRepository";
 import { FileReportRepository } from "@/infrastructure/db/fileReportRepository";
@@ -60,19 +59,6 @@ function hasPreparedFirstTurn(context: PreparedBattleContext) {
   return getOpeningRoundCharacters().some((character) => Boolean(context.firstTurnDrafts[character.id]));
 }
 
-function buildPreparedEvidenceFromDraft(
-  draft: DebateMessage,
-  fallback: string[],
-) {
-  const evidenceFromDraft = draft.detail
-    .split("[원소스:")
-    .map((item) => item.trim())
-    .filter(Boolean)
-    .map((item) => `[원소스:${item}`);
-
-  return evidenceFromDraft.length > 0 ? evidenceFromDraft : fallback;
-}
-
 const inFlightBuilds = new Map<string, Promise<PreparedBattleContext>>();
 
 async function buildAndSavePreparedBattleContext(
@@ -109,26 +95,6 @@ async function buildPreparedBattleContext(coinId: string) {
 
   const preparedEvidence: Record<string, string[]> = {};
   const firstTurnDrafts: Record<string, DebateMessage> = {};
-
-  const openingRoundDrafts = await Promise.all(
-    getOpeningRoundCharacters().map(async (firstCharacter) => ({
-      characterId: firstCharacter.id,
-      draft: await generateCharacterMessage(
-        marketData,
-        firstCharacter,
-        [],
-        reusableDebateContext,
-      ),
-    })),
-  );
-
-  for (const openingRoundDraft of openingRoundDrafts) {
-    firstTurnDrafts[openingRoundDraft.characterId] = openingRoundDraft.draft;
-    preparedEvidence[openingRoundDraft.characterId] = buildPreparedEvidenceFromDraft(
-      openingRoundDraft.draft,
-      [],
-    );
-  }
 
   return {
     coinId,

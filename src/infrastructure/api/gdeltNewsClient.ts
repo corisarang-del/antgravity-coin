@@ -1,3 +1,4 @@
+import { fetchWithTimeout } from "@/shared/utils/fetchWithTimeout";
 import {
   getPrimaryNewsKeyword,
   pickTopHeadlines,
@@ -22,8 +23,9 @@ export async function fetchGdeltNewsSentiment(symbol: string) {
   url.searchParams.set("format", "json");
   url.searchParams.set("sort", "DateDesc");
 
-  const response = await fetch(url, {
+  const response = await fetchWithTimeout(url, {
     next: { revalidate: 300 },
+    timeoutMs: 4_000,
   });
 
   if (!response.ok) {

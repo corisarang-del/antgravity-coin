@@ -1,4 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  clearRuntimeCharacterModelRouteOverrides,
+  setRuntimeCharacterModelRoute,
+} from "@/infrastructure/config/providerRuntimeConfig";
 
 const generateOpenRouterChunkMock = vi.fn();
 const generateGeminiChunkMock = vi.fn();
@@ -32,9 +36,21 @@ describe("generateCharacterDebateChunk", () => {
     getCachedLlmResponseMock.mockReset();
     setCachedLlmResponseMock.mockReset();
     getCachedLlmResponseMock.mockReturnValue(null);
+    clearRuntimeCharacterModelRouteOverrides();
   });
 
   it("같은 openrouter provider여도 fallback model이 다르면 fallback을 시도한다", async () => {
+    setRuntimeCharacterModelRoute({
+      characterId: "judy",
+      tier: "cheap",
+      provider: "openrouter",
+      model: "arcee-ai/trinity-large-preview:free",
+      fallbackProvider: "openrouter",
+      fallbackModel: "qwen/qwen3.5-9b",
+      timeoutMs: 8000,
+      cacheTtlSeconds: 60,
+    });
+
     generateOpenRouterChunkMock
       .mockResolvedValueOnce(null)
       .mockResolvedValueOnce(
@@ -72,6 +88,17 @@ describe("generateCharacterDebateChunk", () => {
   });
 
   it("기본 fallback까지 실패하면 추가 recovery model 풀은 돌지 않는다", async () => {
+    setRuntimeCharacterModelRoute({
+      characterId: "judy",
+      tier: "cheap",
+      provider: "openrouter",
+      model: "arcee-ai/trinity-large-preview:free",
+      fallbackProvider: "openrouter",
+      fallbackModel: "qwen/qwen3.5-9b",
+      timeoutMs: 8000,
+      cacheTtlSeconds: 60,
+    });
+
     generateOpenRouterChunkMock
       .mockResolvedValueOnce(null)
       .mockResolvedValueOnce(null);

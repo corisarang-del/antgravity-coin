@@ -151,9 +151,9 @@ describe("POST /api/battle", () => {
     );
 
     const text = await response.text();
-    expect(text).toContain("Aira: 준비된 첫 발언");
-    expect(text).toContain("Ledger: 준비된 첫 반박");
-    expect(response.headers.get("x-battle-prepared-first-turn-hit")).toBe("true");
+    expect(text).toContain('"headline":"BITCOIN 시장 데이터를 모으는 중이야."');
+    expect(text).toContain("event: battle_start");
+    expect(text).toContain('"preparedContextHit":true');
   });
 
   it("양 팀 핵심 논거가 2개씩 모이면 battle_pick_ready 이벤트를 먼저 보낸다", async () => {

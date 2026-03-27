@@ -12,6 +12,14 @@ import {
 const MINUTE_WINDOW_MS = 60_000;
 const DAILY_WINDOW_MS = 86_400_000;
 
+function createPlaceholderSummary(coinId: string) {
+  return {
+    headline: `${coinId.toUpperCase()} 시장 데이터를 모으는 중이야.`,
+    bias: "neutral",
+    indicators: [],
+  };
+}
+
 function toSseEvent(event: string, payload: unknown) {
   return `event: ${event}\ndata: ${JSON.stringify(payload)}\n\n`;
 }
@@ -127,17 +135,38 @@ export async function POST(request: Request) {
   }
 
   const coinId = body.coinId;
-  const preparedContextResult = await getPreparedBattleContext(coinId);
-  const preparedFirstTurnDrafts = preparedContextResult.context.firstTurnDrafts;
 
   const stream = new ReadableStream({
     async start(controller) {
       const encoder = new TextEncoder();
 
       try {
+        controller.enqueue(
+          encoder.encode(
+            toSseEvent("battle_start", {
+              marketData: null,
+              summary: createPlaceholderSummary(coinId),
+              preparedContextHit: null,
+              preparedFirstTurnHit: false,
+              preparedAtAgeMs: null,
+            }),
+          ),
+        );
+
+        const preparedContextResult = await getPreparedBattleContext(coinId);
         const { marketData, summary, reusableDebateContext } = preparedContextResult.context;
 
-        controller.enqueue(encoder.encode(toSseEvent("battle_start", { marketData, summary })));
+        controller.enqueue(
+          encoder.encode(
+            toSseEvent("battle_start", {
+              marketData,
+              summary,
+              preparedContextHit: preparedContextResult.preparedContextHit,
+              preparedFirstTurnHit: preparedContextResult.preparedFirstTurnHit,
+              preparedAtAgeMs: preparedContextResult.preparedAtAgeMs,
+            }),
+          ),
+        );
 
         const messages: DebateMessage[] = [];
         const debateRounds = buildDebateRounds();
@@ -151,15 +180,12 @@ export async function POST(request: Request) {
           );
           const pendingTasks = roundCharacters.map((character) => ({
             character,
-            promise:
-              preparedFirstTurnDrafts[character.id]
-                ? Promise.resolve(preparedFirstTurnDrafts[character.id])
-                : generateCharacterMessage(
-                    marketData,
-                    character,
-                    messages,
-                    reusableDebateContext,
-                  ),
+            promise: generateCharacterMessage(
+              marketData,
+              character,
+              messages,
+              reusableDebateContext,
+            ),
           }));
 
           for (const task of pendingTasks) {
@@ -239,12 +265,6 @@ export async function POST(request: Request) {
       "Content-Type": "text/event-stream",
       "Cache-Control": "no-cache, no-transform",
       Connection: "keep-alive",
-      "x-battle-prepared-context-hit": `${preparedContextResult.preparedContextHit}`,
-      "x-battle-prepared-first-turn-hit": `${preparedContextResult.preparedFirstTurnHit}`,
-      "x-battle-prepared-at-age-ms":
-        preparedContextResult.preparedAtAgeMs == null
-          ? ""
-          : `${preparedContextResult.preparedAtAgeMs}`,
     },
   });
 }

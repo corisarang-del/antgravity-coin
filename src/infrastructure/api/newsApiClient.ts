@@ -1,4 +1,5 @@
 import { envConfig } from "@/shared/constants/envConfig";
+import { fetchWithTimeout } from "@/shared/utils/fetchWithTimeout";
 import {
   buildNewsSearchQuery,
   pickTopHeadlines,
@@ -28,8 +29,9 @@ export async function fetchNewsApiSentiment(symbol: string) {
   url.searchParams.set("pageSize", "25");
   url.searchParams.set("apiKey", envConfig.newsApiKey);
 
-  const response = await fetch(url, {
+  const response = await fetchWithTimeout(url, {
     next: { revalidate: 300 },
+    timeoutMs: 4_000,
   });
 
   if (!response.ok) {

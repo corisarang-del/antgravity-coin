@@ -1,4 +1,5 @@
 import { envConfig } from "@/shared/constants/envConfig";
+import { fetchWithTimeout } from "@/shared/utils/fetchWithTimeout";
 import {
   pickTopHeadlines,
   scoreNewsTitles,
@@ -26,8 +27,9 @@ export async function fetchAlphaVantageNewsSentiment(symbol: string) {
   url.searchParams.set("limit", "25");
   url.searchParams.set("apikey", envConfig.alphaVantageApiKey);
 
-  const response = await fetch(url, {
+  const response = await fetchWithTimeout(url, {
     next: { revalidate: 300 },
+    timeoutMs: 4_000,
   });
 
   if (!response.ok) {
