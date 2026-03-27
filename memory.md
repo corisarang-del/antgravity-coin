@@ -690,3 +690,82 @@
    - 이후 `round=3` 진입
    를 확인
 5. 여기서 성공이면 그때만 커밋/푸시
+## 2026-03-27 12:28 KST 보안 수정 체크포인트
+
+### 이번에 실제로 마무리한 보안 수정
+
+- `merge-local`은 이제 클라이언트가 보내는 `localUserLevel`, `userBattle`, `battleSnapshot`를 신뢰하지 않음
+  - 최근 코인만 정제해서 병합
+  - guest battle 결과는 서버에 저장된 seed / report / snapshot 기준으로만 계정에 반영
+- `battle/session`은 서버 snapshot과 맞는 값만 저장
+  - `snapshotId` 필수
+  - `coinId`, `coinSymbol`, `selectedPrice`, `settlementAt`, `marketSymbol` 불일치 시 409
+- guest owner 쿠키는 서명 방식으로 변경
+  - `GUEST_SESSION_SECRET` 추가
+  - 서명되지 않거나 깨진 쿠키는 무효 처리
+- `/api/battle`, `/api/battle/outcome`에 일일 quota 추가
+- shared rate limit RPC는 운영 환경에서 fail-open 하지 않음
+  - production에서 RPC 실패나 미설정이면 `shared_unavailable`로 차단
+  - test / development에서만 로컬 limiter fallback 허용
+- `.gitignore`는 `.env*` 전체를 막고 example만 예외 처리
+- `pnpm overrides` + 재설치로 dependency advisory를 0건으로 정리
+
+### 같이 기억해야 할 관련 보안 범위
+
+- 이전에 잡혀 있던 admin 보호도 계속 유효
+  - `/api/providers/routes`는 admin guard 유지
+  - `/api/admin/cache/prewarm`도 admin guard + rate limit 유지
+- guest 관련 보호는 이제 세 층으로 봐야 함
+  - signed guest cookie
+  - owner 매칭
+  - minute + daily quota
+- snapshot / applications 쪽 rate limit과 daily quota도 이미 들어간 상태라 battle / outcome과 정책이 맞춰졌다고 보면 됨
+
+### 검증 결과
+
+- 통과
+  - `pnpm.cmd typecheck`
+  - `pnpm.cmd lint`
+  - `pnpm.cmd audit --json` 기준 취약점 0건
+  - 타깃 테스트
+    - `src/shared/utils/requestRateLimiter.test.ts`
+    - `src/app/api/auth/merge-local/route.test.ts`
+    - `src/app/api/battle/session/route.test.ts`
+    - `src/infrastructure/auth/guestSession.test.ts`
+    - `src/app/api/battle/route.test.ts`
+    - `src/app/api/battle/outcome/route.test.ts`
+- 주의
+  - 전체 `pnpm.cmd test`는 이번 보안 수정과 무관한 기존 `src/infrastructure/api/llmRouter.test.ts` 2건 실패가 아직 남아 있음
+
+### 새 세션에서 바로 이어서 할 순서
+
+1. 이 커밋 기준 `git status`가 깨끗한지 먼저 확인
+2. 배포 전이면 Supabase migration
+   - `20260325170000_add_admin_role_and_rate_limits.sql`
+   - `20260325212000_fix_rate_limit_function_ambiguity.sql`
+   - `20260327103500_extend_rate_limit_window_for_daily_quota.sql`
+   적용 여부부터 확인
+3. 배포 환경 변수에 `GUEST_SESSION_SECRET`가 실제로 들어갔는지 확인
+4. 그다음 보안과 별개로 남아 있는 기존 WIP
+   - `judy` / `shade` round 2 진행 확인
+   - `llmRouter.test.ts` 기존 실패 2건 정리
+   - battle live 재실측
+   순서로 이어가면 됨
+
+### 커밋에 같이 봐야 할 파일
+
+- `src/infrastructure/auth/guestSession.ts`
+- `src/app/api/auth/merge-local/route.ts`
+- `src/app/api/battle/session/route.ts`
+- `src/shared/utils/requestRateLimiter.ts`
+- `src/app/api/battle/route.ts`
+- `src/app/api/battle/outcome/route.ts`
+- `src/app/api/battle/snapshot/route.ts`
+- `src/app/api/battle/applications/route.ts`
+- `src/app/api/providers/routes/route.ts`
+- `.gitignore`
+- `.env.local.example`
+- `package.json`
+- `pnpm-lock.yaml`
+- `SECURITY_AUDIT.md`
+- `research.md`

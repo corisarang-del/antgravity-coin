@@ -1,7 +1,4 @@
 import { NextResponse } from "next/server";
-import type { DebateMessage } from "@/domain/models/DebateMessage";
-import type { MarketData } from "@/domain/models/MarketData";
-import type { UserBattle } from "@/domain/models/UserBattle";
 import { createSupabaseServerClient } from "@/infrastructure/auth/supabaseServerClient";
 import { getGuestUserId } from "@/infrastructure/auth/guestSession";
 import { FileBattleSnapshotRepository } from "@/infrastructure/db/fileBattleSnapshotRepository";
@@ -10,38 +7,23 @@ import { FileReportRepository } from "@/infrastructure/db/fileReportRepository";
 import { FileSeedRepository } from "@/infrastructure/db/fileSeedRepository";
 import {
   persistAuthenticatedBattleOutcome,
-  persistAuthenticatedBattleSession,
-  persistAuthenticatedBattleSnapshot,
 } from "@/infrastructure/db/supabaseBattlePersistence";
 
-interface MergeBattleSnapshotPayload {
-  snapshotId?: string | null;
-  coinId: string;
-  marketData: MarketData | null;
-  summary: {
-    headline: string;
-    bias: string;
-    indicators: Array<{
-      label: string;
-      value: string;
-    }>;
-  } | null;
-  messages: DebateMessage[];
-  savedAt?: string;
+function sanitizeRecentCoins(input: unknown) {
+  if (!Array.isArray(input)) {
+    return [];
+  }
+
+  return input
+    .filter((coinId): coinId is string => typeof coinId === "string")
+    .map((coinId) => coinId.trim().toLowerCase())
+    .filter((coinId) => /^[a-z0-9-]{1,32}$/.test(coinId))
+    .slice(0, 20);
 }
 
 export async function POST(request: Request) {
   const body = (await request.json()) as {
-    localUserLevel?: {
-      level: number;
-      title: string;
-      xp: number;
-      wins: number;
-      losses: number;
-    } | null;
-    recentCoins?: string[] | null;
-    userBattle?: UserBattle | null;
-    battleSnapshot?: MergeBattleSnapshotPayload | null;
+    recentCoins?: unknown;
   };
 
   const supabase = await createSupabaseServerClient();
@@ -53,43 +35,15 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
-  if (body.localUserLevel) {
-    await supabase.from("user_progress").upsert({
-      user_id: user.id,
-      level: body.localUserLevel.level,
-      title: body.localUserLevel.title,
-      xp: body.localUserLevel.xp,
-      wins: body.localUserLevel.wins,
-      losses: body.localUserLevel.losses,
-      updated_at: new Date().toISOString(),
-    });
-  }
-
-  if (body.recentCoins && body.recentCoins.length > 0) {
+  const recentCoins = sanitizeRecentCoins(body.recentCoins);
+  if (recentCoins.length > 0) {
     await supabase.from("user_recent_coins").upsert(
-      body.recentCoins.map((coinId) => ({
+      recentCoins.map((coinId) => ({
         user_id: user.id,
         coin_id: coinId,
         viewed_at: new Date().toISOString(),
       })),
     );
-  }
-
-  if (body.userBattle) {
-    await persistAuthenticatedBattleSession(supabase, user, body.userBattle);
-  }
-
-  if (body.battleSnapshot?.snapshotId) {
-    await persistAuthenticatedBattleSnapshot(supabase, user, {
-      snapshotId: body.battleSnapshot.snapshotId,
-      userId: user.id,
-      battleId: body.userBattle?.battleId ?? null,
-      coinId: body.battleSnapshot.coinId,
-      marketData: body.battleSnapshot.marketData,
-      summary: body.battleSnapshot.summary,
-      messages: body.battleSnapshot.messages,
-      savedAt: body.battleSnapshot.savedAt ?? new Date().toISOString(),
-    });
   }
 
   const guestUserId = await getGuestUserId();
@@ -105,20 +59,35 @@ export async function POST(request: Request) {
     const battleIds = [...new Set(events.filter((event) => event.userId === guestUserId).map((event) => event.battleId))];
 
     for (const battleId of battleIds) {
-      const snapshot = await snapshotRepository.getSnapshotByBattleId(battleId);
-      if (snapshot) {
-        await persistAuthenticatedBattleSnapshot(supabase, user, {
-          ...snapshot,
-          userId: user.id,
-        });
-      }
-
       const battleOutcomeSeed = await seedRepository.getBattleOutcomeSeed(battleId);
       const playerDecisionSeed = await seedRepository.getPlayerDecisionSeed(battleId);
       const characterMemorySeeds = await seedRepository.getCharacterMemorySeeds(battleId);
       const report = await reportRepository.getByBattleId(battleId);
 
       if (battleOutcomeSeed && playerDecisionSeed && report) {
+        const snapshot = await snapshotRepository.getSnapshotByBattleIdForUser(
+          battleId,
+          guestUserId,
+        );
+
+        if (snapshot) {
+          await supabase.from("battle_snapshots").upsert({
+            snapshot_id: snapshot.snapshotId,
+            owner_user_id: user.id,
+            battle_id: snapshot.battleId,
+            coin_id: snapshot.coinId,
+            market_data_json: snapshot.marketData,
+            summary_json: snapshot.summary,
+            messages_json: snapshot.messages,
+            saved_at: snapshot.savedAt,
+            expires_at: new Date(
+              Date.parse(snapshot.savedAt) + 1000 * 60 * 60 * 24 * 30,
+            ).toISOString(),
+            import_source: "guest-merge",
+            updated_at: new Date().toISOString(),
+          });
+        }
+
         await persistAuthenticatedBattleOutcome(supabase, user, {
           userBattle: {
             battleId,

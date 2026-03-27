@@ -1,7 +1,9 @@
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { GET, POST } from "@/app/api/battle/snapshot/route";
 import { getRequestOwnerId } from "@/infrastructure/auth/requestOwner";
 import { FileBattleSnapshotRepository } from "@/infrastructure/db/fileBattleSnapshotRepository";
+import { clearRequestRateLimitStore } from "@/shared/utils/requestRateLimiter";
+import * as requestRateLimiter from "@/shared/utils/requestRateLimiter";
 
 vi.mock("@/infrastructure/auth/requestOwner", () => ({
   getRequestOwnerId: vi.fn().mockResolvedValue({
@@ -13,7 +15,18 @@ vi.mock("@/infrastructure/auth/requestOwner", () => ({
 }));
 
 describe("POST /api/battle/snapshot", () => {
-  it("snapshot을 저장하고 userId, battleId까지 포함해 다시 조회할 수 있다", async () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    clearRequestRateLimitStore();
+    vi.mocked(getRequestOwnerId).mockResolvedValue({
+      ownerId: "anonymous",
+      isAuthenticated: false,
+      user: null,
+      supabase: {} as never,
+    });
+  });
+
+  it("snapshot을 저장하고 userId, battleId까지 포함해서 다시 조회할 수 있다", async () => {
     const snapshotId = `snapshot-${crypto.randomUUID()}`;
     const battleId = `battle-${crypto.randomUUID()}`;
 
@@ -168,5 +181,76 @@ describe("POST /api/battle/snapshot", () => {
 
     expect(response.status).toBe(403);
     expect(data.error).toBe("snapshot_owner_mismatch");
+  });
+
+  it("짧은 시간에 너무 많이 저장 요청하면 429를 반환한다", async () => {
+    vi.spyOn(requestRateLimiter, "consumeSharedRequestRateLimit").mockResolvedValueOnce({
+      allowed: false,
+      remaining: 0,
+      retryAfterSeconds: 60,
+      resetAt: Date.now() + 60_000,
+    });
+
+    const response = await POST(
+      new Request("http://localhost/api/battle/snapshot", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          snapshotId: `snapshot-${crypto.randomUUID()}`,
+          battleId: `battle-${crypto.randomUUID()}`,
+          coinId: "bitcoin",
+          marketData: null,
+          summary: null,
+          messages: [],
+          savedAt: new Date().toISOString(),
+        }),
+      }),
+    );
+    const data = (await response.json()) as { error: string };
+
+    expect(response.status).toBe(429);
+    expect(data.error).toBe("rate_limit_exceeded");
+    expect(response.headers.get("Retry-After")).toBeTruthy();
+  });
+
+  it("일일 quota를 넘기면 429를 반환한다", async () => {
+    vi.spyOn(requestRateLimiter, "consumeSharedRequestRateLimit")
+      .mockResolvedValueOnce({
+        allowed: true,
+        remaining: 19,
+        retryAfterSeconds: 60,
+        resetAt: Date.now() + 60_000,
+      })
+      .mockResolvedValueOnce({
+        allowed: false,
+        remaining: 0,
+        retryAfterSeconds: 60 * 60 * 12,
+        resetAt: Date.now() + 60 * 60 * 12 * 1000,
+      });
+
+    const response = await POST(
+      new Request("http://localhost/api/battle/snapshot", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          snapshotId: `snapshot-${crypto.randomUUID()}`,
+          battleId: `battle-${crypto.randomUUID()}`,
+          coinId: "bitcoin",
+          marketData: null,
+          summary: null,
+          messages: [],
+          savedAt: new Date().toISOString(),
+        }),
+      }),
+    );
+    const data = (await response.json()) as { error: string };
+
+    expect(response.status).toBe(429);
+    expect(data.error).toBe("daily_quota_exceeded");
+    expect(response.headers.get("Retry-After")).toBeTruthy();
   });
 });

@@ -1,15 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { POST } from "@/app/api/auth/merge-local/route";
 import { createSupabaseServerClient } from "@/infrastructure/auth/supabaseServerClient";
-import {
-  persistAuthenticatedBattleOutcome,
-  persistAuthenticatedBattleSession,
-  persistAuthenticatedBattleSnapshot,
-} from "@/infrastructure/db/supabaseBattlePersistence";
+import { persistAuthenticatedBattleOutcome } from "@/infrastructure/db/supabaseBattlePersistence";
 import { getGuestUserId } from "@/infrastructure/auth/guestSession";
 
+const upsertMock = vi.fn();
 const listEventsMock = vi.fn();
-const getSnapshotByBattleIdMock = vi.fn();
+const getSnapshotByBattleIdForUserMock = vi.fn();
 const getBattleOutcomeSeedMock = vi.fn();
 const getPlayerDecisionSeedMock = vi.fn();
 const getCharacterMemorySeedsMock = vi.fn();
@@ -25,8 +22,6 @@ vi.mock("@/infrastructure/auth/guestSession", () => ({
 
 vi.mock("@/infrastructure/db/supabaseBattlePersistence", () => ({
   persistAuthenticatedBattleOutcome: vi.fn(),
-  persistAuthenticatedBattleSession: vi.fn(),
-  persistAuthenticatedBattleSnapshot: vi.fn(),
 }));
 
 vi.mock("@/infrastructure/db/fileEventLog", () => ({
@@ -37,7 +32,7 @@ vi.mock("@/infrastructure/db/fileEventLog", () => ({
 
 vi.mock("@/infrastructure/db/fileBattleSnapshotRepository", () => ({
   FileBattleSnapshotRepository: vi.fn().mockImplementation(() => ({
-    getSnapshotByBattleId: getSnapshotByBattleIdMock,
+    getSnapshotByBattleIdForUser: getSnapshotByBattleIdForUserMock,
   })),
 }));
 
@@ -58,14 +53,32 @@ vi.mock("@/infrastructure/db/fileReportRepository", () => ({
 describe("POST /api/auth/merge-local", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    upsertMock.mockResolvedValue({ data: null, error: null });
     listEventsMock.mockResolvedValue([]);
-    getSnapshotByBattleIdMock.mockResolvedValue(null);
+    getSnapshotByBattleIdForUserMock.mockResolvedValue(null);
     getBattleOutcomeSeedMock.mockResolvedValue(null);
     getPlayerDecisionSeedMock.mockResolvedValue(null);
     getCharacterMemorySeedsMock.mockResolvedValue([]);
     getReportByBattleIdMock.mockResolvedValue(null);
     vi.mocked(getGuestUserId).mockResolvedValue(null);
   });
+
+  function createSupabaseMock() {
+    return {
+      auth: {
+        getUser: vi.fn().mockResolvedValue({
+          data: {
+            user: {
+              id: "user-1",
+            },
+          },
+        }),
+      },
+      from: vi.fn().mockReturnValue({
+        upsert: upsertMock,
+      }),
+    };
+  }
 
   it("비로그인 사용자는 401을 반환한다", async () => {
     vi.mocked(createSupabaseServerClient).mockResolvedValueOnce({
@@ -91,23 +104,8 @@ describe("POST /api/auth/merge-local", () => {
     expect(response.status).toBe(401);
   });
 
-  it("현재 local battle/session/snapshot을 인증 사용자 쪽에 병합한다", async () => {
-    const upsertMock = vi.fn().mockResolvedValue({ data: null, error: null });
-    const supabase = {
-      auth: {
-        getUser: vi.fn().mockResolvedValue({
-          data: {
-            user: {
-              id: "user-1",
-            },
-          },
-        }),
-      },
-      from: vi.fn().mockReturnValue({
-        upsert: upsertMock,
-      }),
-    };
-
+  it("최근 코인만 정제해서 병합하고 클라이언트 진행도는 신뢰하지 않는다", async () => {
+    const supabase = createSupabaseMock();
     vi.mocked(createSupabaseServerClient).mockResolvedValueOnce(supabase as never);
 
     const response = await POST(
@@ -118,34 +116,18 @@ describe("POST /api/auth/merge-local", () => {
         },
         body: JSON.stringify({
           localUserLevel: {
-            level: 2,
-            title: "개미",
-            xp: 120,
-            wins: 3,
-            losses: 1,
+            level: 99,
+            xp: 99999,
+            wins: 999,
+            losses: 0,
           },
-          recentCoins: ["bitcoin"],
           userBattle: {
             battleId: "battle-1",
-            coinId: "bitcoin",
-            coinSymbol: "BTC",
-            selectedTeam: "bull",
-            timeframe: "24h",
-            selectedPrice: 84000,
-            selectedAt: "2026-03-20T00:00:00.000Z",
-            snapshotId: "snapshot-1",
-            settlementAt: "2026-03-21T00:00:00.000Z",
-            priceSource: "bybit-linear",
-            marketSymbol: "BTCUSDT",
-            settledPrice: null,
           },
           battleSnapshot: {
             snapshotId: "snapshot-1",
-            coinId: "bitcoin",
-            marketData: null,
-            summary: null,
-            messages: [],
           },
+          recentCoins: ["bitcoin", "ETHEREUM", "../admin", "x".repeat(40)],
         }),
       }),
     );
@@ -153,28 +135,17 @@ describe("POST /api/auth/merge-local", () => {
     const data = (await response.json()) as { ok: boolean; importedBattleIds: string[] };
 
     expect(data.ok).toBe(true);
-    expect(persistAuthenticatedBattleSession).toHaveBeenCalledTimes(1);
-    expect(persistAuthenticatedBattleSnapshot).toHaveBeenCalledTimes(1);
+    expect(data.importedBattleIds).toEqual([]);
+    expect(supabase.from).toHaveBeenCalledWith("user_recent_coins");
+    expect(upsertMock).toHaveBeenCalledWith([
+      expect.objectContaining({ coin_id: "bitcoin" }),
+      expect.objectContaining({ coin_id: "ethereum" }),
+    ]);
     expect(persistAuthenticatedBattleOutcome).not.toHaveBeenCalled();
   });
 
-  it("guest battle 자산이 있으면 importedBattleIds에 포함해 계정으로 옮긴다", async () => {
-    const upsertMock = vi.fn().mockResolvedValue({ data: null, error: null });
-    const supabase = {
-      auth: {
-        getUser: vi.fn().mockResolvedValue({
-          data: {
-            user: {
-              id: "user-1",
-            },
-          },
-        }),
-      },
-      from: vi.fn().mockReturnValue({
-        upsert: upsertMock,
-      }),
-    };
-
+  it("guest outcome은 서버에 저장된 데이터만 계정으로 옮긴다", async () => {
+    const supabase = createSupabaseMock();
     vi.mocked(createSupabaseServerClient).mockResolvedValueOnce(supabase as never);
     vi.mocked(getGuestUserId).mockResolvedValue("guest-1");
     listEventsMock.mockResolvedValue([
@@ -183,7 +154,7 @@ describe("POST /api/auth/merge-local", () => {
         userId: "guest-1",
       },
     ]);
-    getSnapshotByBattleIdMock.mockResolvedValue({
+    getSnapshotByBattleIdForUserMock.mockResolvedValue({
       snapshotId: "snapshot-guest",
       userId: "guest-1",
       battleId: "battle-guest",
@@ -213,8 +184,6 @@ describe("POST /api/auth/merge-local", () => {
     });
     getPlayerDecisionSeedMock.mockResolvedValue({
       battleId: "battle-guest",
-      coinId: "bitcoin",
-      coinSymbol: "BTC",
       selectedTeam: "bull",
       timeframe: "24h",
       selectedPrice: 84000,
@@ -242,7 +211,7 @@ describe("POST /api/auth/merge-local", () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({}),
+        body: JSON.stringify({ recentCoins: [] }),
       }),
     );
 
@@ -250,7 +219,8 @@ describe("POST /api/auth/merge-local", () => {
 
     expect(data.ok).toBe(true);
     expect(data.importedBattleIds).toEqual(["battle-guest"]);
-    expect(persistAuthenticatedBattleSnapshot).toHaveBeenCalled();
+    expect(getSnapshotByBattleIdForUserMock).toHaveBeenCalledWith("battle-guest", "guest-1");
     expect(persistAuthenticatedBattleOutcome).toHaveBeenCalledTimes(1);
+    expect(supabase.from).toHaveBeenCalledWith("battle_snapshots");
   });
 });

@@ -16,6 +16,7 @@ interface RateLimitResult {
   remaining: number;
   retryAfterSeconds: number;
   resetAt: number;
+  reason?: "rate_limit_exceeded" | "shared_unavailable";
 }
 
 interface SharedRateLimitInput extends RateLimitInput {
@@ -28,6 +29,16 @@ interface SharedRateLimitInput extends RateLimitInput {
       error: { message: string } | null;
     }>;
   } | null;
+}
+
+function createSharedUnavailableResult(windowMs: number, now: number): RateLimitResult {
+  return {
+    allowed: false,
+    remaining: 0,
+    retryAfterSeconds: Math.max(1, Math.ceil(windowMs / 1000)),
+    resetAt: now + windowMs,
+    reason: "shared_unavailable",
+  };
 }
 
 const windows = new Map<string, RateLimitWindow>();
@@ -90,7 +101,15 @@ export function consumeRequestRateLimit(input: RateLimitInput): RateLimitResult 
 export async function consumeSharedRequestRateLimit(
   input: SharedRateLimitInput,
 ): Promise<RateLimitResult> {
-  if (process.env.NODE_ENV === "test" || !input.supabase || typeof input.supabase.rpc !== "function") {
+  const now = input.now ?? Date.now();
+  const allowLocalFallback =
+    process.env.NODE_ENV === "test" || process.env.NODE_ENV === "development";
+
+  if (!input.supabase || typeof input.supabase.rpc !== "function") {
+    if (!allowLocalFallback) {
+      return createSharedUnavailableResult(input.windowMs, now);
+    }
+
     return consumeRequestRateLimit(input);
   }
 
@@ -102,6 +121,13 @@ export async function consumeSharedRequestRateLimit(
   });
 
   if (response.error) {
+    if (!allowLocalFallback) {
+      console.warn(
+        `[rate-limit:block] bucket=${input.bucket} reason=shared_rate_limit_failed message=${response.error.message}`,
+      );
+      return createSharedUnavailableResult(input.windowMs, now);
+    }
+
     console.warn(
       `[rate-limit:fallback] bucket=${input.bucket} reason=shared_rate_limit_failed message=${response.error.message}`,
     );
@@ -119,6 +145,11 @@ export async function consumeSharedRequestRateLimit(
     | undefined;
 
   if (!parsedRow) {
+    if (!allowLocalFallback) {
+      console.warn(`[rate-limit:block] bucket=${input.bucket} reason=shared_rate_limit_empty`);
+      return createSharedUnavailableResult(input.windowMs, now);
+    }
+
     console.warn(`[rate-limit:fallback] bucket=${input.bucket} reason=shared_rate_limit_empty`);
     return consumeRequestRateLimit(input);
   }

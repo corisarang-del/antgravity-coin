@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   clearRequestRateLimitStore,
   consumeRequestRateLimit,
@@ -9,6 +9,7 @@ import {
 describe("requestRateLimiter", () => {
   beforeEach(() => {
     clearRequestRateLimitStore();
+    vi.unstubAllEnvs();
   });
 
   it("같은 윈도우 안에서는 max를 넘기면 차단한다", () => {
@@ -61,7 +62,7 @@ describe("requestRateLimiter", () => {
     expect(next.remaining).toBe(0);
   });
 
-  it("subject와 ip를 합쳐서 요청 키를 만든다", () => {
+  it("subject와 ip를 조합해서 요청 키를 만든다", () => {
     const request = new Request("http://localhost/api/battle", {
       headers: {
         "x-forwarded-for": "203.0.113.10, 10.0.0.1",
@@ -72,7 +73,10 @@ describe("requestRateLimiter", () => {
       "battle:guest-1:203.0.113.10",
     );
   });
-  it("shared rpc error媛 ?덈굹硫?濡쒖뺄 limiter濡?fallback?쒕떎", async () => {
+
+  it("test 환경에서는 shared rpc 에러가 나면 로컬 limiter로 fallback 한다", async () => {
+    vi.stubEnv("NODE_ENV", "test");
+
     const createBrokenSupabase = () => ({
       rpc: async () => ({
         data: null,
@@ -107,21 +111,38 @@ describe("requestRateLimiter", () => {
     expect(third.allowed).toBe(false);
   });
 
-  it("shared rpc data媛 鍮꾩뼱 ?덉쑝硫?濡쒖뺄 limiter濡?fallback?쒕떎", async () => {
+  it("production 환경에서는 shared rpc 에러가 나면 fail-closed 한다", async () => {
+    vi.stubEnv("NODE_ENV", "production");
+
     const result = await consumeSharedRequestRateLimit({
       bucket: "battle",
-      key: "owner-empty",
-      max: 1,
+      key: "owner-prod",
+      max: 2,
       windowMs: 60_000,
       supabase: {
         rpc: async () => ({
           data: null,
-          error: null,
+          error: { message: "rpc_failed" },
         }),
       },
     });
 
-    expect(result.allowed).toBe(true);
-    expect(result.remaining).toBe(0);
+    expect(result.allowed).toBe(false);
+    expect(result.reason).toBe("shared_unavailable");
+  });
+
+  it("production 환경에서는 shared rpc 자체가 없으면 역시 차단한다", async () => {
+    vi.stubEnv("NODE_ENV", "production");
+
+    const result = await consumeSharedRequestRateLimit({
+      bucket: "battle",
+      key: "owner-prod-missing",
+      max: 1,
+      windowMs: 60_000,
+      supabase: null,
+    });
+
+    expect(result.allowed).toBe(false);
+    expect(result.reason).toBe("shared_unavailable");
   });
 });

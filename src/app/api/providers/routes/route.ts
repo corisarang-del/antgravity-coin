@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { optimizeProviderRoutes } from "@/application/useCases/optimizeProviderRoutes";
+import { getAdminAccess } from "@/infrastructure/auth/adminAccess";
 import {
   listRuntimeCharacterModelRoutes,
   setRuntimeCharacterModelRoute,
@@ -7,12 +8,22 @@ import {
 import { getCharacterModelRoute } from "@/shared/constants/characterModelRoutes";
 
 export async function GET() {
+  const adminAccess = await getAdminAccess();
+  if (!adminAccess.allowed) {
+    return NextResponse.json({ error: "forbidden" }, { status: adminAccess.status });
+  }
+
   return NextResponse.json({
     routes: listRuntimeCharacterModelRoutes(),
   });
 }
 
 export async function POST(request: Request) {
+  const adminAccess = await getAdminAccess();
+  if (!adminAccess.allowed) {
+    return NextResponse.json({ error: "forbidden" }, { status: adminAccess.status });
+  }
+
   const body = (await request.json()) as {
     evaluations?: Array<{
       characterId: string;

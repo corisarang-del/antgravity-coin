@@ -25,7 +25,7 @@ function readJson<T>(key: string) {
 
 export function MergeLocalStateClient() {
   const router = useRouter();
-  const { user, guestUserId, isAuthenticated, isLoading } = useCurrentUser();
+  const { user, isAuthenticated, isLoading } = useCurrentUser();
   const [mergeStatus, setMergeStatus] = useState<MergeStatus>(() => {
     if (typeof window === "undefined") {
       return { state: "idle" };
@@ -51,11 +51,6 @@ export function MergeLocalStateClient() {
     }
 
     const recentCoins = readJson<string[]>(storageKeys.recentCoins) ?? [];
-    const battleSnapshot = readJson(storageKeys.battleSnapshot);
-    const userBattle = readJson(storageKeys.userBattle);
-    const userLevel = guestUserId
-      ? readJson(`${storageKeys.userLevel}:${guestUserId}`)
-      : null;
 
     void fetch("/api/auth/merge-local", {
       method: "POST",
@@ -64,10 +59,7 @@ export function MergeLocalStateClient() {
       },
       credentials: "include",
       body: JSON.stringify({
-        localUserLevel: userLevel,
         recentCoins,
-        userBattle,
-        battleSnapshot,
       }),
     })
       .then(async (response) => {
@@ -95,7 +87,7 @@ export function MergeLocalStateClient() {
           message: "기존 로컬 기록을 계정에 연결하지 못했어. 잠깐 뒤에 다시 새로고침해줘.",
         });
       });
-  }, [guestUserId, isAuthenticated, isLoading, router, user?.userId]);
+  }, [isAuthenticated, isLoading, router, user?.userId]);
 
   if (mergeStatus.state === "idle") {
     return null;

@@ -9,6 +9,9 @@ import {
   getRequestRateLimitKey,
 } from "@/shared/utils/requestRateLimiter";
 
+const MINUTE_WINDOW_MS = 60_000;
+const DAILY_WINDOW_MS = 86_400_000;
+
 function toSseEvent(event: string, payload: unknown) {
   return `event: ${event}\ndata: ${JSON.stringify(payload)}\n\n`;
 }
@@ -76,16 +79,48 @@ export async function POST(request: Request) {
     bucket: "battle-post",
     key: getRequestRateLimitKey(request, "battle-post", ownerId),
     max: 5,
-    windowMs: 60_000,
+    windowMs: MINUTE_WINDOW_MS,
   });
 
   if (!rateLimit.allowed) {
     return NextResponse.json(
-      { error: "rate_limit_exceeded", retryable: true },
       {
-        status: 429,
+        error:
+          rateLimit.reason === "shared_unavailable"
+            ? "rate_limit_unavailable"
+            : "rate_limit_exceeded",
+        retryable: true,
+      },
+      {
+        status: rateLimit.reason === "shared_unavailable" ? 503 : 429,
         headers: {
           "Retry-After": `${rateLimit.retryAfterSeconds}`,
+        },
+      },
+    );
+  }
+
+  const dailyQuota = await consumeSharedRequestRateLimit({
+    supabase,
+    bucket: "battle-post-daily",
+    key: getRequestRateLimitKey(request, "battle-post-daily", ownerId),
+    max: 60,
+    windowMs: DAILY_WINDOW_MS,
+  });
+
+  if (!dailyQuota.allowed) {
+    return NextResponse.json(
+      {
+        error:
+          dailyQuota.reason === "shared_unavailable"
+            ? "rate_limit_unavailable"
+            : "daily_quota_exceeded",
+        retryable: true,
+      },
+      {
+        status: dailyQuota.reason === "shared_unavailable" ? 503 : 429,
+        headers: {
+          "Retry-After": `${dailyQuota.retryAfterSeconds}`,
         },
       },
     );

@@ -449,3 +449,44 @@ AGENTS에서는 제품 사양 기준 문서를 `docs/PRD.md`로 적고 있지만
 3. `/me`와 `/result`는 단순 페이지가 아니라 상태 전환을 연결하는 허브다.
 4. 최근의 큰 미완료 범위는 보안 후속 수정의 운영 반영이다.
 5. 새 작업을 시작할 때는 코드보다 먼저 더러운 워크트리와 산출물 범위를 분리해서 읽어야 한다.
+## 0. 2026-03-27 `memory.md` 재독 업데이트
+
+이번에 `memory.md`를 처음부터 끝까지 다시 읽고 아래 이해를 추가로 확정했다.
+
+- 이 프로젝트의 핵심 문제는 단일 기능 미구현보다 무료 모델 조합의 불안정성을 UX와 운영 로직으로 흡수하는 데 있다.
+- 사용자가 체감하는 속도에서 더 중요한 값은 첫 발언 도착보다 `pick-ready`가 언제 열리는지다.
+- `/battle`은 4라운드 병렬 토론, waiting primer, result pending, 정산 이후 리포트까지 이어지는 상태 전환형 흐름으로 이해해야 한다.
+- `/me`, `/result`도 단순 조회 페이지가 아니라 auth 병합, 요약 대시보드, 정산 대기, 결과 확인을 묶는 허브다.
+- 원격에 이미 반영된 안정화와 local 미커밋 WIP를 섞어 보면 안 된다.
+  - 원격 반영: auth/rate-limit fallback, Vercel read-only fallback, Bybit partial fallback 같은 production 대응
+  - local WIP: `judy`/`shade` timing 로그, parser 보강, 일부 캐릭터의 `qwen` 재배치, rate limit ambiguity migration
+- 지금 local 변경은 성공 확인 전 상태라서 바로 커밋/푸시할 대상이 아니다.
+- 다음 세션 첫 작업은 구현보다 검증이다.
+  - 새 포트로 서버를 띄우고
+  - `/api/providers/routes`에서 현재 모델 배치를 확인하고
+  - `/api/battle`에서 `round=2` 이후 `judy`, `shade`가 실제 hang인지 long wait인지 다시 확인해야 한다.
+- 최근 보안 작업은 문서 정리가 아니라 운영 반영 직전 단계다.
+  - admin guard
+  - shared rate limit
+  - Gemini prompt 분리
+  - security headers
+  - Supabase migration 적용 여부
+  를 항상 같이 봐야 한다.
+## 20. 2026-03-27 보안 수정 이후 상태
+
+이번 보안 수정까지 반영하고 나면, 이 프로젝트의 운영 리스크는 “열린 보안 취약점”보다 “남아 있는 기능/품질 WIP” 쪽으로 무게가 옮겨간다.
+
+- `merge-local`이 더 이상 클라이언트 로컬 상태를 그대로 올리지 않게 바뀌었음
+- `battle/session`도 서버 snapshot과 일치하는 값만 저장하게 바뀌었음
+- guest owner는 서명된 쿠키로 바뀌었음
+- `/api/battle`, `/api/battle/outcome`, `/api/battle/snapshot`, `/api/battle/applications`는 minute + daily quota 관점으로 해석하면 됨
+- shared rate limit RPC는 production에서 fail-open 하지 않으므로, migration 미적용 상태면 우회가 아니라 차단으로 나타난다고 이해해야 함
+- `pnpm audit --json` 기준 dependency advisory는 0건으로 정리됐음
+
+즉 다음 세션에서 보안 쪽으로 가장 먼저 확인할 것은 “새 취약점 탐색”보다 아래 배포 체크다.
+
+1. Supabase rate limit 관련 migration 3개 적용 여부
+2. `GUEST_SESSION_SECRET` 배포 환경 변수 설정 여부
+3. admin 계정 권한 부여 여부
+
+그 이후 우선순위는 다시 battle 품질과 live 안정성으로 넘어가면 된다.
