@@ -127,6 +127,38 @@ interface ParsedDebatePayload {
   stance: "bullish" | "bearish";
 }
 
+function normalizeStance(value: unknown): "bullish" | "bearish" | null {
+  if (typeof value !== "string") {
+    return null;
+  }
+
+  const normalized = value.trim().toLowerCase();
+
+  if (
+    normalized === "bullish" ||
+    normalized === "강세" ||
+    normalized === "상승" ||
+    normalized === "상승 추세" ||
+    normalized === "매수" ||
+    normalized === "bull"
+  ) {
+    return "bullish";
+  }
+
+  if (
+    normalized === "bearish" ||
+    normalized === "약세" ||
+    normalized === "하락" ||
+    normalized === "하락 추세" ||
+    normalized === "매도" ||
+    normalized === "bear"
+  ) {
+    return "bearish";
+  }
+
+  return null;
+}
+
 function replaceKnownMarketTerms(text: string) {
   return text
     .replace(/\bon[\s-]?chain\b/gi, "온체인")
@@ -161,6 +193,7 @@ function tryParseDebateJson(candidate: string): ParsedDebatePayload | null {
     .trim()
     .replace(/[“”]/g, '"')
     .replace(/[‘’]/g, "'")
+    .replace(/([{,]\s*)(summary|detail|indicatorLabel|indicatorValue|stance)\s*:/g, '$1"$2":')
     .replace(/,\s*([}\]])/g, "$1");
 
   try {
@@ -169,8 +202,8 @@ function tryParseDebateJson(candidate: string): ParsedDebatePayload | null {
       typeof parsed.summary !== "string" ||
       typeof parsed.detail !== "string" ||
       typeof parsed.indicatorLabel !== "string" ||
-      typeof parsed.indicatorValue !== "string" ||
-      (parsed.stance !== "bullish" && parsed.stance !== "bearish")
+      (typeof parsed.indicatorValue !== "string" && typeof parsed.indicatorValue !== "number") ||
+      normalizeStance(parsed.stance) == null
     ) {
       return null;
     }
@@ -179,8 +212,8 @@ function tryParseDebateJson(candidate: string): ParsedDebatePayload | null {
       summary: parsed.summary,
       detail: parsed.detail,
       indicatorLabel: parsed.indicatorLabel,
-      indicatorValue: parsed.indicatorValue,
-      stance: parsed.stance,
+      indicatorValue: String(parsed.indicatorValue),
+      stance: normalizeStance(parsed.stance) ?? "bullish",
     };
   } catch {
     return null;
@@ -243,6 +276,7 @@ function parseDebatePayload(rawText: string): ParsedDebatePayload | null {
     ["stance"],
   );
   const stance = extractLabeledValue(normalized, ["stance"], []);
+  const normalizedStance = normalizeStance(stance);
 
   if (!summary || !detail || !indicatorLabel || !indicatorValue) {
     return null;
@@ -253,7 +287,7 @@ function parseDebatePayload(rawText: string): ParsedDebatePayload | null {
     detail,
     indicatorLabel,
     indicatorValue,
-    stance: stance === "bearish" ? "bearish" : "bullish",
+    stance: normalizedStance ?? "bullish",
   };
 }
 
@@ -563,7 +597,7 @@ export async function generateCharacterMessage(
 
         if (!isKoreanDebateContent(sanitizedSummary, sanitizedDetail)) {
           console.warn(
-            `[battle-llm:error] character=${character.id} provider=${aiResult.provider} model=${aiResult.model} reason=non_korean_response fallbackUsed=${aiResult.fallbackUsed}`,
+            `[battle-llm:error] character=${character.id} provider=${aiResult.provider} model=${aiResult.model} reason=non_korean_response fallbackUsed=${aiResult.fallbackUsed} raw=${aiResult.content.slice(0, 240)}`,
           );
           return buildFallbackMessage(marketData, character);
         }
@@ -585,7 +619,7 @@ export async function generateCharacterMessage(
         } satisfies DebateMessage;
       } catch {
         console.warn(
-          `[battle-llm:error] character=${character.id} provider=${aiResult.provider} model=${aiResult.model} reason=message_parse_failed fallbackUsed=${aiResult.fallbackUsed}`,
+          `[battle-llm:error] character=${character.id} provider=${aiResult.provider} model=${aiResult.model} reason=message_parse_failed fallbackUsed=${aiResult.fallbackUsed} raw=${aiResult.content.slice(0, 240)}`,
         );
       }
     }

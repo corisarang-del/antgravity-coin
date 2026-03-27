@@ -108,7 +108,12 @@ export async function POST(request: Request) {
         const debateRounds = buildDebateRounds();
         let pickReadySent = false;
 
-        for (const roundCharacters of debateRounds) {
+        for (const [roundIndex, roundCharacters] of debateRounds.entries()) {
+          console.log(
+            `[battle-stream] round=${roundIndex + 1} characters=${roundCharacters
+              .map((character) => character.id)
+              .join(",")}`,
+          );
           const pendingTasks = roundCharacters.map((character) => ({
             character,
             promise:
@@ -122,7 +127,25 @@ export async function POST(request: Request) {
                   ),
           }));
 
+          for (const task of pendingTasks) {
+            if (task.character.id === "judy" || task.character.id === "shade") {
+              const startedAt = Date.now();
+              const originalPromise = task.promise;
+              task.promise = originalPromise.then((message) => {
+                console.log(
+                  `[battle-stream:timing] character=${task.character.id} elapsedMs=${Date.now() - startedAt} provider=${message.provider} model=${message.model} fallbackUsed=${message.fallbackUsed}`,
+                );
+                return message;
+              });
+            }
+          }
+
           while (pendingTasks.length > 0) {
+            console.log(
+              `[battle-stream] round=${roundIndex + 1} pending=${pendingTasks
+                .map((task) => task.character.id)
+                .join(",")}`,
+            );
             const settled = await Promise.race(
               pendingTasks.map((task) =>
                 task.promise.then((message) => ({
@@ -133,8 +156,16 @@ export async function POST(request: Request) {
             );
 
             pendingTasks.splice(pendingTasks.indexOf(settled.task), 1);
+            console.log(
+              `[battle-stream] round=${roundIndex + 1} settled=${settled.task.character.id} remaining=${pendingTasks
+                .map((task) => task.character.id)
+                .join(",") || "none"}`,
+            );
             messages.push(settled.message);
             await emitMessageLifecycle(controller, encoder, settled.message);
+            console.log(
+              `[battle-stream] round=${roundIndex + 1} emitted=${settled.task.character.id} count=${messages.length}`,
+            );
 
             const pickReadyPayload = getPickReadyPayload(messages);
             if (!pickReadySent && pickReadyPayload.ready) {

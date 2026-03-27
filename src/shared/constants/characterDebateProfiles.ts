@@ -132,7 +132,7 @@ export const characterDebateProfiles: Record<string, CharacterDebateProfile> = {
     modelRoute: {
       tier: "cheap",
       provider: "openrouter",
-      model: "arcee-ai/trinity-large-preview:free",
+      model: "qwen/qwen3.5-9b",
       fallbackProvider: "openrouter",
       fallbackModel: "qwen/qwen3.5-9b",
       timeoutMs: 8000,
@@ -187,7 +187,7 @@ export const characterDebateProfiles: Record<string, CharacterDebateProfile> = {
     modelRoute: {
       tier: "balanced",
       provider: "openrouter",
-      model: "nvidia/nemotron-3-super-120b-a12b:free",
+      model: "qwen/qwen3.5-9b",
       fallbackProvider: "openrouter",
       fallbackModel: "qwen/qwen3.5-9b",
       timeoutMs: 9000,
@@ -297,7 +297,7 @@ export const characterDebateProfiles: Record<string, CharacterDebateProfile> = {
     modelRoute: {
       tier: "balanced",
       provider: "openrouter",
-      model: "google/gemma-3-12b-it",
+      model: "qwen/qwen3.5-9b",
       fallbackProvider: "openrouter",
       fallbackModel: "qwen/qwen3.5-9b",
       timeoutMs: 9000,
@@ -352,7 +352,7 @@ export const characterDebateProfiles: Record<string, CharacterDebateProfile> = {
     modelRoute: {
       tier: "cheap",
       provider: "openrouter",
-      model: "arcee-ai/trinity-large-preview:free",
+      model: "qwen/qwen3.5-9b",
       fallbackProvider: "openrouter",
       fallbackModel: "qwen/qwen3.5-9b",
       timeoutMs: 8000,
@@ -414,7 +414,7 @@ export const characterDebateProfiles: Record<string, CharacterDebateProfile> = {
     modelRoute: {
       tier: "cheap",
       provider: "openrouter",
-      model: "arcee-ai/trinity-large-preview:free",
+      model: "qwen/qwen3.5-9b",
       fallbackProvider: "openrouter",
       fallbackModel: "qwen/qwen3.5-9b",
       timeoutMs: 8000,

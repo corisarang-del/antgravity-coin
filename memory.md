@@ -614,3 +614,79 @@
 3. Supabase 쪽 적용이 필요하면 migration부터 반영
 4. 관리자 계정이 생기면 `is_admin` 또는 `ADMIN_USER_IDS`로 바로 권한 부여
 5. 이후에만 `/admin` 페이지와 admin API를 실사용 검증
+
+## 2026-03-27 14:30 KST 체크포인트
+
+### 이번 구간에서 이미 원격에 반영된 커밋
+
+- `1ec1e61`
+  - `fix: fallback battle auth and rate limit without supabase rpc`
+- `e31aba5`
+  - `fix: allow required pnpm build scripts on vercel`
+- `dfd1c75`
+  - `fix: fallback file stores on read-only deploys`
+- `9ed4c87`
+  - `fix: relax evidence gating for non-chart debaters`
+- `754e016`
+  - `fix: log missing battle evidence sources`
+- `3565deb`
+  - `fix: keep hyperliquid evidence when bybit fails`
+
+### production에서 새로 확인된 사실
+
+- Supabase 공개 env 누락, shared rate limit RPC 문제, Vercel read-only filesystem 문제는 각각 코드 또는 migration 대응까지 진행했음
+- Bybit 403이 production에서 실제로 발생했고, Hyperliquid 파생 데이터는 살리는 partial fallback까지 원격 반영했음
+- `judy`, `ledger`, `clover`, `vela` 쪽은 보조 근거와 모델 품질 문제 때문에 여전히 불안정했고, 그 때문에 local 디버깅이 이어짐
+
+### 현재 local 미커밋 핵심 WIP
+
+- `src/app/api/battle/route.ts`
+  - `round / pending / settled / emitted` 로그
+  - `judy`, `shade` 전용 timing 로그
+- `src/application/useCases/generateBattleDebate.ts`
+  - bare key JSON 허용
+  - 한국어 stance를 `bullish / bearish`로 매핑
+  - parse fail / non-korean raw snippet 로그 추가
+- `src/shared/constants/characterDebateProfiles.ts`
+  - local 기준 `judy`, `clover`, `ledger`, `shade`, `vela` primary를 `qwen/qwen3.5-9b`로 조정한 상태
+- `supabase/migrations/20260325212000_fix_rate_limit_function_ambiguity.sql`
+  - RPC ambiguity 교정 migration
+
+### local 검증에서 확인된 것
+
+- 이 환경에선 `next dev`가 `spawn EPERM`으로 자주 막혀서 실제 검증은 `next start --port 3001~3005`로 진행했음
+- `3005` 기준 `/api/providers/routes`에서 현재 모델 배치 확인
+  - `aira`: `arcee-ai/trinity-mini`
+  - `judy`: `qwen/qwen3.5-9b`
+  - `clover`: `qwen/qwen3.5-9b`
+  - `blaze`: `minimax/minimax-m2.5:free`
+  - `ledger`: `qwen/qwen3.5-9b`
+  - `shade`: `qwen/qwen3.5-9b`
+  - `vela`: `qwen/qwen3.5-9b`
+  - `flip`: `nvidia/nemotron-3-super-120b-a12b:free`
+- `3005` 기준 `/api/battle` 로그에서
+  - `aira` emitted
+  - `ledger` emitted
+  - `round=2 characters=judy,shade`
+  - `round=2 pending=judy,shade`
+  까지는 확인했음
+- 하지만 `round=2` 이후 settle/emitted 완료는 아직 확인 못 했음
+
+### 지금 가장 중요한 판단
+
+- 현재 local 변경은 “성공 확인 전” 상태다
+- 즉 다음 세션 시작 시 이 WIP를 바로 커밋/푸시하면 안 된다
+- 먼저 `judy`, `shade`가 실제로 hang인지 long wait인지 다시 확인해야 한다
+- 성공 확인 뒤에만 parser / model route / debug log / migration 묶음을 체크포인트 커밋으로 올리는 게 맞다
+
+### 다음 세션 시작 직후 순서
+
+1. `git status`로 현재 미커밋 핵심 4개(`battle route`, `generateBattleDebate`, `characterDebateProfiles`, 새 migration)만 다시 분리해서 보기
+2. 최신 빌드 서버를 새 포트로 재기동
+3. `/api/providers/routes`로 모델 배치가 위 상태와 같은지 확인
+4. `/api/battle`를 다시 쳐서
+   - `judy`, `shade` timing log
+   - `round=2 settled/emitted`
+   - 이후 `round=3` 진입
+   를 확인
+5. 여기서 성공이면 그때만 커밋/푸시
