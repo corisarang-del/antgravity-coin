@@ -10,7 +10,7 @@
 - owner 계산은 `auth user id -> guest cookie id`
 - battle outcome 저장은 `battleId` 단위 직렬화
 - `battleId` 조회 API는 현재 owner가 가진 snapshot 기준으로만 접근 가능
-- 일부 고비용 POST route는 in-memory rate limit을 건다
+- 일부 공개/고비용 route는 shared rate limit과 일일 quota를 건다
 
 ## 인증
 
@@ -39,6 +39,10 @@ Supabase 세션을 종료한다.
 ```ts
 { ok: true }
 ```
+
+회귀 테스트:
+
+- `src/app/api/auth/signout/route.test.ts`
 
 ### `POST /api/auth/merge-local`
 
@@ -76,6 +80,13 @@ Supabase 세션을 종료한다.
 ### `GET /api/coins/search?q=...`
 
 CoinGecko 검색 결과 반환.
+
+규칙:
+
+- 빈 검색어는 즉시 `[]` 반환
+- 검색어 길이 64자 초과 시 `400 invalid_query`
+- public + client ip 기준 분당 30회 shared rate limit
+- 초과 시 `429 rate_limit_exceeded`, limiter 사용 불가 시 `503 rate_limit_unavailable`
 
 ### `GET /api/coins/top`
 
@@ -118,6 +129,11 @@ event: error
 data: { code, message, retryable }
 ```
 
+추가 메모:
+
+- 첫 SSE 청크는 placeholder `battle_start`로 먼저 열리고, 실제 `marketData`, `summary`가 준비되면 같은 이벤트로 다시 갱신한다.
+- opening round draft는 더 이상 pre-response 단계에서 만들지 않는다.
+
 응답 헤더:
 
 ```text
@@ -129,14 +145,27 @@ x-battle-prepared-at-age-ms
 rate limit:
 
 - owner + client ip 기준 분당 5회
+- owner + client ip 기준 일일 60회
 - 초과 시 `429 rate_limit_exceeded`, `Retry-After` 헤더 반환
 
 구현 메모:
 
 - 4라운드 병렬 구조
-- `Aira`, `Ledger` prepared first turn 재사용 가능
+- 외부 데이터 timeout
+  - CoinGecko: 4초
+  - Fear & Greed: 3초
+  - Alpha Vantage / GDELT / NewsAPI: 각 4초
+  - Hyperliquid: 4초
+- 캐릭터 메시지는 상위 레벨에서 15초 timeout 뒤 fallback으로 내려간다
 - `battle_pick_ready`는 bull 2개, bear 2개 메시지가 모이면 송신
 - 일부 캐릭터가 fallback을 써도 전체 스트림은 계속 진행
+
+production 검증 메모:
+
+- 2026-03-27 기준 `antgravity-coin.vercel.app`
+  - `BTC` 배틀 진입 성공
+  - `8/8` 발언 완료 확인
+  - `pick -> waiting -> result` 진입 확인
 
 ### `GET /api/battle/snapshot?snapshotId=...`
 
@@ -243,6 +272,7 @@ battleId 기준 기존 outcome, report, seeds 조회.
 rate limit:
 
 - owner + client ip 기준 분당 10회
+- owner + client ip 기준 일일 120회
 - 초과 시 `429 rate_limit_exceeded`, `Retry-After` 헤더 반환
 
 ### `GET /api/battle/events?battleId=...`
@@ -254,6 +284,11 @@ event log 조회.
 { ok: true, events: EventLogEntry[] }
 ```
 
+rate limit:
+
+- owner + client ip 기준 분당 60회
+- 초과 시 `429 rate_limit_exceeded`, limiter 사용 불가 시 `503 rate_limit_unavailable`
+
 ### `GET /api/battle/applications?battleId=...`
 
 현재 owner 기준 결과 적용 여부 확인.
@@ -261,6 +296,10 @@ event log 조회.
 ```ts
 { applied: boolean, userId: string }
 ```
+
+rate limit:
+
+- owner + client ip 기준 분당 60회
 
 ### `POST /api/battle/applications`
 
@@ -272,6 +311,11 @@ event log 조회.
   userId: string;
 }
 ```
+
+rate limit:
+
+- owner + client ip 기준 분당 20회
+- owner + client ip 기준 일일 240회
 
 ## 캐릭터
 

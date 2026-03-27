@@ -1,0 +1,12 @@
+.git
+.next
+.playwright-cli
+backup-worktree
+bootstrap-app
+out
+pptx
+skill-staging
+tmp
+tools/ffmpeg
+supabase/.temp
+error.png

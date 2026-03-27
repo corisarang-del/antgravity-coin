@@ -24,6 +24,7 @@
   - 서버에서 `getInitialCurrentUserSnapshot()` 생성
   - `AppHeader`에 초기 props 주입
   - 이후 클라이언트 store가 실제 세션 상태를 이어받음
+  - 브라우저 탭 파비콘은 현재 `Judy` portrait webp (`/icon.webp`)를 사용
 
 ## `/`
 
@@ -74,6 +75,7 @@
   - 조기 선택 오픈
 - 현재 상태
   - 진입 즉시 `POST /api/battle`
+  - 첫 placeholder `battle_start`를 먼저 열고, 실제 시장 요약은 뒤에서 합류
   - 상단 hero에 headline, 첫 발언 준비 단계, 첫 발언 도착 시간 표시
   - 메시지가 아직 없으면 pre-message loading step 카드 노출
   - pick-ready 전에는 waiting primer 노출
@@ -83,6 +85,7 @@
   - `battle_pick_ready`가 오면 pick CTA 열림
   - `battle_complete` 후 snapshot 서버 저장
   - localStorage snapshot은 메시지마다 갱신
+  - production 실테스트 기준 `BTC`는 `8/8` 완료와 pick CTA 노출까지 확인
 
 ## `/battle/[coinId]/pick`
 
@@ -117,6 +120,7 @@
   - countdown이 0초가 되면 `/result`로 자동 이동
   - 결과 화면 이동 CTA 제공
   - 선택 정보가 없으면 pick 화면으로 복귀 링크 표시
+  - production 실테스트 기준 `결과 화면 열기` 링크로 `/result` 선진입이 동작함
 
 ## `/battle/[coinId]/result`
 
@@ -132,6 +136,7 @@
   - report가 아직 없으면 `리포트 정리 중` 단계 표시
   - report가 준비되면 본문 출력
   - XP는 local applied set으로 1회 반영
+  - pending 상태에서도 `결과 페이지 준비 중`, 단계 카드, `현재까지 저장된 발언: n/8`가 표시됨
 
 ## `/characters`
 
