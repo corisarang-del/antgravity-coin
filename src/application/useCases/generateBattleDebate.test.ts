@@ -250,6 +250,27 @@ describe("generateBattleDebate", () => {
     expect(messages[0]?.fallbackUsed).toBe(true);
   });
 
+  it("llm 호출이 오래 걸리면 상위 timeout 이후 fallback으로 진행한다", async () => {
+    vi.useFakeTimers();
+    vi.mocked(generateCharacterDebateChunk).mockImplementation(
+      () => new Promise(() => undefined),
+    );
+
+    const judy = getCharacterById("judy");
+
+    if (!judy) {
+      throw new Error("missing_judy");
+    }
+
+    const messagePromise = generateCharacterMessage(marketData, judy, []);
+    await vi.advanceTimersByTimeAsync(15_000);
+    const message = await messagePromise;
+
+    expect(message.fallbackUsed).toBe(true);
+    expect(message.model).toBe("character-fallback");
+    vi.useRealTimers();
+  });
+
   it("이전 발언은 직전 1개, 반대팀 핵심 1개, 공통 요약 1개로 압축한다", async () => {
     vi.mocked(generateCharacterDebateChunk).mockResolvedValueOnce({
       content:

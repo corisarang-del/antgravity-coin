@@ -15,6 +15,7 @@ const fallbackTemplates: Record<
 > = Object.fromEntries(
   Object.values(characterDebateProfiles).map((profile) => [profile.characterId, profile.fallback]),
 );
+const CHARACTER_MESSAGE_TIMEOUT_MS = 15_000;
 
 const characterVoiceGuide: Record<
   string,
@@ -526,6 +527,52 @@ function buildFallbackMessage(
   };
 }
 
+async function getCharacterAiResultWithTimeout(input: {
+  marketData: MarketData;
+  character: (typeof characters)[number];
+  marketSummary: string;
+  roleEvidenceItems: string[];
+  reusableDebateContext: {
+    recentBattleLessons: string[];
+    characterLessonsById: Record<string, string[]>;
+  };
+  compressedPreviousMessages: DebateMessage[];
+}) {
+  const aiPromise = generateCharacterDebateChunk({
+    coinId: input.marketData.coinId,
+    characterId: input.character.id,
+    llmInput: {
+      characterId: input.character.id,
+      characterName: input.character.name,
+      role: input.character.role,
+      team: input.character.team,
+      specialty: input.character.specialty,
+      personality: input.character.personality,
+      selectionReason: input.character.selectionReason,
+      coinSymbol: input.marketData.symbol,
+      focusSummary: input.marketSummary,
+      evidence: input.roleEvidenceItems,
+      recentBattleLessons: input.reusableDebateContext.recentBattleLessons,
+      characterLessons: input.reusableDebateContext.characterLessonsById[input.character.id] ?? [],
+      previousMessages: input.compressedPreviousMessages,
+    },
+  });
+
+  const timeoutPromise = new Promise<null>((resolve) => {
+    setTimeout(() => resolve(null), CHARACTER_MESSAGE_TIMEOUT_MS);
+  });
+
+  const result = await Promise.race([aiPromise, timeoutPromise]);
+
+  if (result === null) {
+    console.warn(
+      `[battle-llm:error] character=${input.character.id} reason=character_message_timeout timeoutMs=${CHARACTER_MESSAGE_TIMEOUT_MS}`,
+    );
+  }
+
+  return result;
+}
+
 export async function generateBattleDebate(marketData: MarketData) {
   const messages: DebateMessage[] = [];
 
@@ -565,24 +612,13 @@ export async function generateCharacterMessage(
   }
 
   try {
-    const aiResult = await generateCharacterDebateChunk({
-      coinId: marketData.coinId,
-      characterId: character.id,
-      llmInput: {
-        characterId: character.id,
-        characterName: character.name,
-        role: character.role,
-        team: character.team,
-        specialty: character.specialty,
-        personality: character.personality,
-        selectionReason: character.selectionReason,
-        coinSymbol: marketData.symbol,
-        focusSummary: marketSummary,
-        evidence: roleEvidence.items,
-        recentBattleLessons: reusableDebateContext.recentBattleLessons,
-        characterLessons: reusableDebateContext.characterLessonsById[character.id] ?? [],
-        previousMessages: compressedPreviousMessages,
-      },
+    const aiResult = await getCharacterAiResultWithTimeout({
+      marketData,
+      character,
+      marketSummary,
+      roleEvidenceItems: roleEvidence.items,
+      reusableDebateContext,
+      compressedPreviousMessages,
     });
 
     if (aiResult?.content) {
