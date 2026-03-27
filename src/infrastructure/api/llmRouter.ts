@@ -8,6 +8,7 @@ import {
 import { getRuntimeCharacterModelRoute } from "@/infrastructure/config/providerRuntimeConfig";
 import { geminiProvider } from "@/infrastructure/api/geminiProvider";
 import { openRouterProvider } from "@/infrastructure/api/openRouterProvider";
+import { debugBattleLog } from "@/shared/utils/debugBattleLogs";
 
 const providers: Record<string, LlmProvider> = {
   openrouter: openRouterProvider,
@@ -112,7 +113,7 @@ export async function generateCharacterDebateChunk(input: {
     break;
   }
 
-  console.log(
+  debugBattleLog(
     `[battle-llm] character=${input.characterId} provider=${result.provider} model=${result.model} fallbackUsed=${result.fallbackUsed}`,
   );
 

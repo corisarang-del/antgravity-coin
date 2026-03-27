@@ -8,6 +8,7 @@ import {
   consumeSharedRequestRateLimit,
   getRequestRateLimitKey,
 } from "@/shared/utils/requestRateLimiter";
+import { debugBattleLog } from "@/shared/utils/debugBattleLogs";
 
 const MINUTE_WINDOW_MS = 60_000;
 const DAILY_WINDOW_MS = 86_400_000;
@@ -144,7 +145,7 @@ export async function POST(request: Request) {
         let pickReadySent = false;
 
         for (const [roundIndex, roundCharacters] of debateRounds.entries()) {
-          console.log(
+          debugBattleLog(
             `[battle-stream] round=${roundIndex + 1} characters=${roundCharacters
               .map((character) => character.id)
               .join(",")}`,
@@ -167,7 +168,7 @@ export async function POST(request: Request) {
               const startedAt = Date.now();
               const originalPromise = task.promise;
               task.promise = originalPromise.then((message) => {
-                console.log(
+                debugBattleLog(
                   `[battle-stream:timing] character=${task.character.id} elapsedMs=${Date.now() - startedAt} provider=${message.provider} model=${message.model} fallbackUsed=${message.fallbackUsed}`,
                 );
                 return message;
@@ -176,7 +177,7 @@ export async function POST(request: Request) {
           }
 
           while (pendingTasks.length > 0) {
-            console.log(
+            debugBattleLog(
               `[battle-stream] round=${roundIndex + 1} pending=${pendingTasks
                 .map((task) => task.character.id)
                 .join(",")}`,
@@ -191,14 +192,14 @@ export async function POST(request: Request) {
             );
 
             pendingTasks.splice(pendingTasks.indexOf(settled.task), 1);
-            console.log(
+            debugBattleLog(
               `[battle-stream] round=${roundIndex + 1} settled=${settled.task.character.id} remaining=${pendingTasks
                 .map((task) => task.character.id)
                 .join(",") || "none"}`,
             );
             messages.push(settled.message);
             await emitMessageLifecycle(controller, encoder, settled.message);
-            console.log(
+            debugBattleLog(
               `[battle-stream] round=${roundIndex + 1} emitted=${settled.task.character.id} count=${messages.length}`,
             );
 

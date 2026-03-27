@@ -1,11 +1,14 @@
 import {
-  buildLessonSynthesisPrompt,
-  buildSynthesisPrompt,
+  buildLessonSynthesisSystemInstruction,
+  buildLessonSynthesisUserPrompt,
+  buildSynthesisSystemInstruction,
+  buildSynthesisUserPrompt,
 } from "@/application/prompts/synthesisPrompt";
 import type { BattleOutcomeSeed } from "@/domain/models/BattleOutcomeSeed";
 import type { CharacterMemorySeed } from "@/domain/models/CharacterMemorySeed";
 import type { PlayerDecisionSeed } from "@/domain/models/PlayerDecisionSeed";
 import { envConfig } from "@/shared/constants/envConfig";
+import { debugBattleLog } from "@/shared/utils/debugBattleLogs";
 
 interface GeminiResponse {
   candidates?: Array<{
@@ -30,7 +33,10 @@ export interface GeminiBattleLessons {
   }>;
 }
 
-async function requestGemini(prompt: string) {
+async function requestGemini(input: {
+  systemInstruction: string;
+  userPrompt: string;
+}) {
   if (!envConfig.geminiApiKey) {
     return null;
   }
@@ -49,9 +55,17 @@ async function requestGemini(prompt: string) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          systemInstruction: {
+            parts: [
+              {
+                text: input.systemInstruction,
+              },
+            ],
+          },
           contents: [
             {
-              parts: [{ text: prompt }],
+              role: "user",
+              parts: [{ text: input.userPrompt }],
             },
           ],
           generationConfig: {
@@ -94,9 +108,12 @@ export async function synthesizeBattleReportWithGemini(input: {
   characterMemorySeeds: CharacterMemorySeed[];
   playerDecisionSeed: PlayerDecisionSeed;
 }) {
-  const text = await requestGemini(buildSynthesisPrompt(input));
+  const text = await requestGemini({
+    systemInstruction: buildSynthesisSystemInstruction(),
+    userPrompt: buildSynthesisUserPrompt(input),
+  });
   if (text) {
-    console.log(
+    debugBattleLog(
       `[battle-report] source=gemini battleId=${input.battleOutcomeSeed.battleId} model=gemini-2.5-pro`,
     );
   }
@@ -109,7 +126,10 @@ export async function synthesizeBattleLessonsWithGemini(input: {
   playerDecisionSeed: PlayerDecisionSeed;
   report: string;
 }): Promise<GeminiBattleLessons | null> {
-  const text = await requestGemini(buildLessonSynthesisPrompt(input));
+  const text = await requestGemini({
+    systemInstruction: buildLessonSynthesisSystemInstruction(),
+    userPrompt: buildLessonSynthesisUserPrompt(input),
+  });
   if (!text) {
     return null;
   }

@@ -597,7 +597,7 @@ export async function generateCharacterMessage(
 
         if (!isKoreanDebateContent(sanitizedSummary, sanitizedDetail)) {
           console.warn(
-            `[battle-llm:error] character=${character.id} provider=${aiResult.provider} model=${aiResult.model} reason=non_korean_response fallbackUsed=${aiResult.fallbackUsed} raw=${aiResult.content.slice(0, 240)}`,
+            `[battle-llm:error] character=${character.id} provider=${aiResult.provider} model=${aiResult.model} reason=non_korean_response fallbackUsed=${aiResult.fallbackUsed}`,
           );
           return buildFallbackMessage(marketData, character);
         }
@@ -619,7 +619,7 @@ export async function generateCharacterMessage(
         } satisfies DebateMessage;
       } catch {
         console.warn(
-          `[battle-llm:error] character=${character.id} provider=${aiResult.provider} model=${aiResult.model} reason=message_parse_failed fallbackUsed=${aiResult.fallbackUsed} raw=${aiResult.content.slice(0, 240)}`,
+          `[battle-llm:error] character=${character.id} provider=${aiResult.provider} model=${aiResult.model} reason=message_parse_failed fallbackUsed=${aiResult.fallbackUsed}`,
         );
       }
     }

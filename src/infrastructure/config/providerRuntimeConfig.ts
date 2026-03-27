@@ -11,6 +11,10 @@ export function setRuntimeCharacterModelRoute(route: CharacterModelRoute) {
   runtimeRouteOverrides.set(route.characterId, route);
 }
 
+export function clearRuntimeCharacterModelRouteOverrides() {
+  runtimeRouteOverrides.clear();
+}
+
 export function listRuntimeCharacterModelRoutes() {
   return Object.keys(characterModelRoutes).map((characterId) =>
     getRuntimeCharacterModelRoute(characterId),

@@ -67,7 +67,6 @@ export const openRouterProvider: LlmProvider = {
       return null;
     }
 
-    let responseBody = "";
     try {
       const controller = new AbortController();
       const timeoutHandle = setTimeout(() => controller.abort(), timeoutMs);
@@ -99,18 +98,18 @@ export const openRouterProvider: LlmProvider = {
       clearTimeout(timeoutHandle);
 
       if (!response.ok) {
-        responseBody = await response.text();
+        await response.text();
         const cooldownMs = getCooldownMsForStatus(response.status);
         if (cooldownMs > 0) {
           markModelUnavailable(model, cooldownMs);
         }
         console.warn(
-          `[battle-llm:error] character=${input.characterId} provider=openrouter model=${model} reason=http_status status=${response.status} body=${responseBody.slice(0, 240)}`,
+          `[battle-llm:error] character=${input.characterId} provider=openrouter model=${model} reason=http_status status=${response.status}`,
         );
         return null;
       }
 
-      responseBody = await response.text();
+      const responseBody = await response.text();
       clearModelUnavailable(model);
 
       let data: OpenRouterResponse;
@@ -118,7 +117,7 @@ export const openRouterProvider: LlmProvider = {
         data = JSON.parse(responseBody) as OpenRouterResponse;
       } catch {
         console.warn(
-          `[battle-llm:error] character=${input.characterId} provider=openrouter model=${model} reason=parse_failed body=${responseBody.slice(0, 240)}`,
+          `[battle-llm:error] character=${input.characterId} provider=openrouter model=${model} reason=parse_failed`,
         );
         return null;
       }
@@ -126,7 +125,7 @@ export const openRouterProvider: LlmProvider = {
       const content = data.choices?.[0]?.message?.content ?? null;
       if (!content) {
         console.warn(
-          `[battle-llm:error] character=${input.characterId} provider=openrouter model=${model} reason=empty_content body=${responseBody.slice(0, 240)}`,
+          `[battle-llm:error] character=${input.characterId} provider=openrouter model=${model} reason=empty_content`,
         );
       }
       return content;
