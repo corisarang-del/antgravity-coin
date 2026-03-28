@@ -7,6 +7,7 @@ import { AppHeader } from "@/presentation/components/AppHeader";
 import { MergeLocalStateClient } from "@/app/me/MergeLocalStateClient";
 import type { DebateMessage } from "@/domain/models/DebateMessage";
 import { createSupabaseServerClient } from "@/infrastructure/auth/supabaseServerClient";
+import { normalizeUserLevel } from "@/infrastructure/mappers/levelMapper";
 import { getBattleTimeframeMeta } from "@/shared/constants/battleTimeframes";
 
 interface MePageProps {
@@ -151,11 +152,12 @@ export default async function MePage({ searchParams }: MePageProps) {
   const selectedMessages = Array.isArray(selectedSnapshot?.messages_json)
     ? (selectedSnapshot.messages_json as DebateMessage[])
     : [];
-  const level = progress?.level ?? 1;
-  const xp = progress?.xp ?? 0;
-  const wins = progress?.wins ?? 0;
-  const losses = progress?.losses ?? 0;
-  const title = progress?.title ?? "개미";
+  const normalizedProgress = normalizeUserLevel(progress);
+  const level = normalizedProgress.level;
+  const xp = normalizedProgress.xp;
+  const wins = normalizedProgress.wins;
+  const losses = normalizedProgress.losses;
+  const title = normalizedProgress.title;
   const totalBattles = wins + losses;
   const providerLabel =
     providerHints.length > 0 ? providerHints.map(getProviderLabel).join(" · ") : "email";
