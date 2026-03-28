@@ -2,15 +2,16 @@
 
 import { create } from "zustand";
 import type { UserLevel } from "@/domain/models/UserLevel";
+import { normalizeUserLevel } from "@/infrastructure/mappers/levelMapper";
 import { storageKeys } from "@/shared/constants/storageKeys";
 
-const defaultUserLevel: UserLevel = {
+const defaultUserLevel: UserLevel = normalizeUserLevel({
   level: 1,
   title: "개미",
   xp: 0,
   wins: 0,
   losses: 0,
-};
+});
 
 interface UserLevelStore {
   userLevel: UserLevel;
@@ -35,7 +36,7 @@ function readStoredLevelByUserId(userId: string) {
   }
 
   try {
-    return JSON.parse(rawValue) as UserLevel;
+    return normalizeUserLevel(JSON.parse(rawValue) as UserLevel);
   } catch {
     return defaultUserLevel;
   }
@@ -53,10 +54,15 @@ export const useUserLevelStore = create<UserLevelStore>((set) => ({
     });
   },
   setUserLevel: (userId, userLevel) => {
+    const normalizedUserLevel = normalizeUserLevel(userLevel);
+
     if (typeof window !== "undefined") {
-      window.localStorage.setItem(getUserLevelStorageKey(userId), JSON.stringify(userLevel));
+      window.localStorage.setItem(
+        getUserLevelStorageKey(userId),
+        JSON.stringify(normalizedUserLevel),
+      );
     }
 
-    set({ userLevel });
+    set({ userLevel: normalizedUserLevel });
   },
 }));

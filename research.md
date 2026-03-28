@@ -575,3 +575,50 @@ Google 로그인 후 `/me` 페이지에서 프로필 이미지가 `https://lh3.g
 2. Google Cloud와 Supabase의 origin / redirect 설정이 실제 dev 포트와 맞는지 확인
 3. Google 로그인 후 `/me`의 avatar 렌더링이 계속 정상인지 확인
 4. 이후에만 battle live 품질과 round 2 검증으로 다시 돌아가기
+
+## 23. 2026-03-28 memory.md 이해 반영 업데이트
+
+- 작성시각: 2026-03-28 KST
+- 기준 문서: `memory.md`
+- 목적: 최근 세션 메모를 다시 처음부터 읽고, 지금 프로젝트를 이해할 때 절대 놓치면 안 되는 판단만 깨끗하게 재정리
+
+### 이번에 다시 확인한 핵심
+
+- 이 프로젝트의 중심 문제는 단순 기능 미구현보다 무료 OpenRouter 모델 조합의 불안정성과 그 불안정을 UX와 운영 로직으로 얼마나 흡수하느냐다.
+- 체감 속도 최적화의 핵심 지표는 `첫 발언 도착`만이 아니라 `pick-ready`를 얼마나 빨리 여느냐다.
+- `/me`, `/result`는 단순 조회 화면이 아니라 상태 전환을 이어주는 허브로 이해해야 한다.
+- 최근 보안 작업은 코드 수정 단계보다 운영 반영 확인 단계에 더 가깝다.
+- 현재 로컬 워크트리엔 런타임 산출물과 미검증 WIP가 섞여 있어서, 다음 작업 전 반드시 범위를 분리해서 봐야 한다.
+
+### battle / 모델 구조 이해
+
+- battle은 8명 완전 직렬이 아니라 4라운드 병렬 구조로 바뀌었다.
+- `Aira + Ledger` prewarm과 `battle_pick_ready` 조기 오픈이 현재 UX 개선의 핵심 축이다.
+- 지금 병목은 프롬프트 자체보다 모델 availability, `429`, `404`, `non_korean_response`, `message_parse_failed` 쪽이다.
+- opening round 분산으로 `aira`, `ledger` 동시 장애 리스크는 줄였지만, 여전히 live 편차 검증이 필요하다.
+- `judy`, `shade`의 round 2 진행이 실제 hang인지 long wait인지 아직 성공 확인 전 상태다.
+
+### 보안 / 운영 이해
+
+- admin 보호, signed guest cookie, snapshot 검증, minute + daily quota, shared rate limit, security header까지 주요 보안 축은 이미 코드 반영이 진행됐다.
+- 다음 단계는 새 기능 추가보다 Supabase migration 적용 여부, `GUEST_SESSION_SECRET`, admin 권한 부여 여부를 운영 환경에서 확인하는 쪽이다.
+- production에서는 shared limiter가 fail-open이 아니라 fail-close에 가깝게 동작하므로 migration 누락을 가볍게 보면 안 된다.
+
+### 환경 / 의존성 이해
+
+- 최근 dev/build 불안정의 직접 원인은 코드보다 `node_modules`와 pnpm store 손상 쪽이었다.
+- `.npmrc`의 `store-dir=.pnpm-store-clean`은 단순 설정이 아니라 재발 방지용 핵심 복구 흔적이다.
+- 다음 세션에서 `pnpm run dev`가 또 꼬이면 코드보다 install/store 상태부터 의심하는 게 맞다.
+
+### 다음 세션에서 바로 해야 할 순서
+
+1. `git status`로 코드 변경, 문서 변경, 런타임 산출물을 먼저 분리한다.
+2. dev/build 이상 시 install/store 상태부터 확인한다.
+3. `/api/providers/routes`로 현재 모델 배치를 재확인한다.
+4. `/api/battle` 재실측으로 `judy`, `shade` round 2 진행 여부와 `pickReadyAt` 체감을 다시 확인한다.
+5. 운영 반영 전 Supabase migration, `GUEST_SESSION_SECRET`, admin 권한 상태를 점검한다.
+
+### 지금 기준 최종 판단
+
+- 이 프로젝트는 이미 "기능을 만들 단계"를 많이 지난 상태고, 지금 더 중요한 건 불안정한 외부 모델 환경을 견디는 battle UX와 운영 안정화다.
+- 따라서 다음 작업의 우선순위는 새 기능 추가보다 `실측 검증`, `미검증 WIP 분리`, `운영 반영 체크`가 맞다.

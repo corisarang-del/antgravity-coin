@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/infrastructure/auth/supabaseServerClient";
+import { normalizeUserLevel } from "@/infrastructure/mappers/levelMapper";
 
 export async function GET() {
   const supabase = await createSupabaseServerClient();
@@ -35,13 +36,6 @@ export async function GET() {
         (Array.isArray(user.app_metadata?.providers) && user.app_metadata.providers) ||
         (user.app_metadata?.provider ? [user.app_metadata.provider] : []),
     },
-    progress:
-      progress ?? {
-        level: 1,
-        title: "개미",
-        xp: 0,
-        wins: 0,
-        losses: 0,
-      },
+    progress: normalizeUserLevel(progress),
   });
 }
