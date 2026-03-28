@@ -16,6 +16,7 @@ const contentSecurityPolicy = [
 ].join("; ");
 
 const nextConfig: NextConfig = {
+  allowedDevOrigins: ["172.25.224.1"],
   images: {
     localPatterns: [
       {
