@@ -45,6 +45,12 @@ export function CharacterCard({
           </div>
         </div>
         <p className="ag-body-copy ag-body-copy-strong mt-4">{character.specialty}</p>
+        <div className="mt-4 rounded-[18px] border border-border/80 bg-[hsl(var(--surface-2))] px-4 py-3">
+          <p className="text-xs font-semibold text-muted-foreground">초보용 한줄 해설</p>
+          <p className="ag-body-copy ag-body-copy-strong mt-2 text-sm">
+            {character.beginnerSummary}
+          </p>
+        </div>
       </div>
     </button>
   );

@@ -12,6 +12,9 @@ describe("character api schema", () => {
     expect(parsed.characters).toHaveLength(8);
     expect(parsed.characters[0]).toHaveProperty("selectionReason");
     expect(parsed.characters[0]).toHaveProperty("imageSrc");
+    expect(parsed.characters[0]).toHaveProperty("beginnerSummary");
+    expect(parsed.characters[0]).toHaveProperty("beginnerGuide");
+    expect(parsed.characters[0]?.beginnerGuide[0]).toHaveProperty("whyItMatters");
     expect(parsed.characters[0].imageSrc).toContain("?v=");
   });
 });

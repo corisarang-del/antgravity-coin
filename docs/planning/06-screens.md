@@ -258,4 +258,4 @@
 ### `/characters`
 
 - 캐릭터도감 상단 소개와 `sourceNotice`는 확대된 설명문 규칙을 적용받는다.
-- 카드에서는 `specialty`, 상세 모달에서는 `specialty`, `personality`, `selectionReason`이 같은 규칙을 적용받는다.
+- 카드에서는 `specialty`, 상세 모달에서는 `specialty`, `personality`, 초보용 해설이 같은 규칙을 적용받는다.
