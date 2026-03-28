@@ -4,7 +4,7 @@ import { AppHeaderAuthControls } from "@/presentation/components/AppHeaderAuthCo
 import { cn } from "@/shared/lib/cn";
 
 const navItems = [
-  { href: "/home", label: "홈" },
+  { href: "/", label: "홈" },
   { href: "/characters", label: "캐릭터도감" },
 ] as const;
 
@@ -19,7 +19,7 @@ export function AppHeader({ currentPath, initialCurrentUserSnapshot }: AppHeader
       <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3 px-4 py-4">
         <Link
           className="transition-opacity hover:opacity-80 focus-visible:rounded-xl focus-visible:ring-2 focus-visible:ring-primary/30"
-          href="/home"
+          href="/"
         >
           <div>
             <p className="font-display text-lg font-bold tracking-[-0.04em]">Ant Gravity</p>
