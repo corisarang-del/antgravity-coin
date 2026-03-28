@@ -7,6 +7,20 @@ export const characterCatalog: CharacterCatalogEntry[] = [
     role: "기술분석가",
     team: "bull",
     specialty: "RSI, 추세선, 거래량 패턴 해석",
+    beginnerSummary:
+      "차트 숫자를 복잡하게 보지 않고, 지금 힘이 붙는지 쉬는지 먼저 읽어주는 타입이야.",
+    beginnerGuide: [
+      {
+        term: "RSI",
+        easyMeaning: "지금 너무 달렸는지, 잠깐 쉬는 중인지 보여주는 속도계 같은 지표야.",
+        whyItMatters: "과열 구간인지 먼저 감이 오면 뒤늦게 추격할지 잠깐 기다릴지 판단하기 쉬워져.",
+      },
+      {
+        term: "추세선",
+        easyMeaning: "가격이 올라가는 길인지, 내려가는 길인지 큰 방향을 그어보는 선이야.",
+        whyItMatters: "지금 움직임이 우연한 흔들림인지, 계속 이어질 흐름인지 구분하는 데 도움이 돼.",
+      },
+    ],
     emoji: "AI",
     imageFileName: "aira.webp",
     sourceImageName:
@@ -23,6 +37,20 @@ export const characterCatalog: CharacterCatalogEntry[] = [
     role: "뉴스 스카우터",
     team: "bull",
     specialty: "공시, 일정, 정책 변화 해석",
+    beginnerSummary:
+      "가격표보다 먼저 뉴스 재료를 읽고, 왜 갑자기 분위기가 달라졌는지 설명해주는 캐릭터야.",
+    beginnerGuide: [
+      {
+        term: "공시",
+        easyMeaning: "회사나 프로젝트가 공식적으로 알리는 중요한 발표야.",
+        whyItMatters: "소문이 아니라 확인된 정보라서 시장이 크게 반응할 만한 재료인지 판단하기 좋아.",
+      },
+      {
+        term: "일정",
+        easyMeaning: "업데이트, 심사, 회의처럼 미리 예정된 이벤트 날짜야.",
+        whyItMatters: "시장은 결과가 나오기 전부터 기대나 불안으로 먼저 움직여서, 타이밍을 읽는 데 중요해.",
+      },
+    ],
     emoji: "JD",
     imageFileName: "judy.webp",
     sourceImageName: "ant_character_2d_2.png",
@@ -38,6 +66,20 @@ export const characterCatalog: CharacterCatalogEntry[] = [
     role: "심리 센티먼트 분석가",
     team: "bull",
     specialty: "공포탐욕지수와 커뮤니티 온도 감지",
+    beginnerSummary:
+      "사람들이 지금 겁먹었는지 들떴는지를 읽어서, 분위기가 과열인지 식는 중인지 알려줘.",
+    beginnerGuide: [
+      {
+        term: "공포탐욕지수",
+        easyMeaning: "시장이 지금 겁이 큰지, 욕심이 큰지 숫자로 보여주는 분위기 점수야.",
+        whyItMatters: "너무 들떠 있으면 쉬어갈 가능성을, 너무 겁먹고 있으면 반등 여지를 생각해볼 수 있어.",
+      },
+      {
+        term: "커뮤니티 온도",
+        easyMeaning: "SNS나 커뮤니티에서 사람들이 얼마나 뜨겁게 반응하는지 보는 거야.",
+        whyItMatters: "가격보다 먼저 기대감이나 피로감이 드러나는 경우가 많아서 흐름 변화를 빨리 눈치챌 수 있어.",
+      },
+    ],
     emoji: "CL",
     imageFileName: "clover.webp",
     sourceImageName:
@@ -54,6 +96,20 @@ export const characterCatalog: CharacterCatalogEntry[] = [
     role: "모멘텀 트레이더",
     team: "bull",
     specialty: "돌파 구간, 속도감 있는 추세 포착",
+    beginnerSummary:
+      "가격이 갑자기 힘을 받을 때 그 순간을 잡아내는 타입이라, '지금 달리는 장인지'를 빨리 알려줘.",
+    beginnerGuide: [
+      {
+        term: "돌파",
+        easyMeaning: "가격이 계속 막히던 구간을 뚫고 위나 아래로 강하게 나가는 장면이야.",
+        whyItMatters: "막힌 벽을 넘는 순간엔 흐름이 더 세게 이어질 수 있어서 진입 타이밍 후보가 돼.",
+      },
+      {
+        term: "모멘텀",
+        easyMeaning: "지금 시장에 붙어 있는 추진력이나 가속도라고 보면 돼.",
+        whyItMatters: "힘이 살아 있을 땐 추세가 생각보다 오래 이어질 수 있어서, 흐름을 거스를지 탈지 판단하게 해줘.",
+      },
+    ],
     emoji: "BZ",
     imageFileName: "blaze.webp",
     sourceImageName:
@@ -70,6 +126,20 @@ export const characterCatalog: CharacterCatalogEntry[] = [
     role: "온체인 분석가",
     team: "bear",
     specialty: "지갑 이동, 거래소 입출금, 대형 자금 추적",
+    beginnerSummary:
+      "겉으로 보이는 가격보다, 뒤에서 돈이 어디로 움직이는지 보고 시장 속마음을 읽는 캐릭터야.",
+    beginnerGuide: [
+      {
+        term: "온체인",
+        easyMeaning: "블록체인 위에 실제로 남는 거래 기록을 직접 보는 분석이야.",
+        whyItMatters: "말이 아니라 실제 이동 데이터를 보기 때문에 큰손이 움직였는지 확인하기 좋아.",
+      },
+      {
+        term: "거래소 입출금",
+        easyMeaning: "코인이 거래소 안으로 들어오거나 밖으로 빠져나가는 흐름이야.",
+        whyItMatters: "거래소로 많이 들어오면 매도 압력, 밖으로 많이 나가면 보관 의도가 커졌다고 해석할 수 있어.",
+      },
+    ],
     emoji: "LD",
     imageFileName: "ledger.webp",
     sourceImageName:
@@ -86,6 +156,20 @@ export const characterCatalog: CharacterCatalogEntry[] = [
     role: "리스크 매니저",
     team: "bear",
     specialty: "손절 시나리오, 변동성 경고, 방어 전략",
+    beginnerSummary:
+      "얼마나 벌 수 있냐보다 먼저 얼마나 크게 다칠 수 있는지 계산해서, 무리한 진입을 막아주는 역할이야.",
+    beginnerGuide: [
+      {
+        term: "손절",
+        easyMeaning: "틀렸을 때 손실이 더 커지기 전에 미리 정해둔 선에서 정리하는 거야.",
+        whyItMatters: "한 번 크게 무너지면 다음 기회를 잡기 어려워서, 오래 살아남으려면 손실 제한이 중요해.",
+      },
+      {
+        term: "변동성",
+        easyMeaning: "가격이 얼마나 빠르고 크게 흔들리는지를 뜻해.",
+        whyItMatters: "변동성이 크면 기회도 커지지만, 반대로 잘못 잡으면 손실도 순식간에 커질 수 있어.",
+      },
+    ],
     emoji: "SD",
     imageFileName: "shade.webp",
     sourceImageName:
@@ -102,6 +186,20 @@ export const characterCatalog: CharacterCatalogEntry[] = [
     role: "고래 추적자",
     team: "bear",
     specialty: "대형 자금 이동, 숨은 신호 감시",
+    beginnerSummary:
+      "눈에 잘 안 보이는 큰 자금의 방향을 읽어서, 겉보기와 다른 진짜 흐름이 있는지 체크해줘.",
+    beginnerGuide: [
+      {
+        term: "고래 자금",
+        easyMeaning: "시장에 큰 영향을 줄 수 있는 큰손들의 돈이야.",
+        whyItMatters: "이런 자금은 움직이기만 해도 가격과 심리를 크게 흔들 수 있어서 방향 힌트가 되곤 해.",
+      },
+      {
+        term: "자금 이동",
+        easyMeaning: "돈이나 코인이 어느 지갑, 어느 거래소 쪽으로 흘러가는지 보는 거야.",
+        whyItMatters: "보이는 뉴스가 조용해도 자금이 먼저 움직이면 곧 시장 반응이 따라올 수 있어.",
+      },
+    ],
     emoji: "VE",
     imageFileName: "vela.webp",
     sourceImageName:
@@ -118,6 +216,20 @@ export const characterCatalog: CharacterCatalogEntry[] = [
     role: "역발상 전략가",
     team: "bear",
     specialty: "과열 구간 반전 신호 포착",
+    beginnerSummary:
+      "사람들이 한쪽으로 너무 몰릴 때 반대로 생각해서, 지금 너무 뜨거운 건 아닌지 점검해주는 캐릭터야.",
+    beginnerGuide: [
+      {
+        term: "과열",
+        easyMeaning: "기대감이 너무 커져서 가격이 빠르게 달려버린 상태야.",
+        whyItMatters: "다들 같은 방향만 볼 때는 작은 악재에도 크게 흔들릴 수 있어서 조심해야 해.",
+      },
+      {
+        term: "반전 신호",
+        easyMeaning: "지금까지 흐르던 방향이 꺾일 수 있다고 알려주는 징후야.",
+        whyItMatters: "추세가 영원히 가지는 않아서, 꺾이는 순간을 먼저 보면 늦은 추격을 피할 수 있어.",
+      },
+    ],
     emoji: "FP",
     imageFileName: "flip.webp",
     sourceImageName:

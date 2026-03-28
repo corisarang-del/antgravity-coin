@@ -86,8 +86,21 @@ export function CharacterDetailModal({ character, onClose }: CharacterDetailModa
               <p className="ag-body-copy ag-body-copy-strong mt-2">{character.personality}</p>
             </div>
             <div>
-              <p className="text-sm font-semibold">고른 이유</p>
-              <p className="ag-body-copy ag-body-copy-strong mt-2">{character.selectionReason}</p>
+              <p className="text-sm font-semibold">어려운 부분만 쉽게 보기</p>
+              <div className="mt-3 grid gap-3">
+                {character.beginnerGuide.map((item) => (
+                  <div
+                    key={`${character.id}-${item.term}`}
+                    className="rounded-[18px] border border-border/80 bg-[hsl(var(--surface-2))] px-4 py-4"
+                  >
+                    <p className="text-sm font-semibold text-foreground">{item.term}</p>
+                    <p className="ag-body-copy ag-body-copy-strong mt-2">{item.easyMeaning}</p>
+                    <p className="ag-body-copy mt-2 text-muted-foreground">
+                      왜 중요해? {item.whyItMatters}
+                    </p>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>

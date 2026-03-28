@@ -7,6 +7,14 @@ export const CharacterApiItemSchema = z.object({
   role: z.string(),
   team: z.enum(["bull", "bear"]),
   specialty: z.string(),
+  beginnerSummary: z.string(),
+  beginnerGuide: z.array(
+    z.object({
+      term: z.string(),
+      easyMeaning: z.string(),
+      whyItMatters: z.string(),
+    }),
+  ),
   personality: z.string(),
   selectionReason: z.string(),
   imageSrc: z.string(),
@@ -27,6 +35,8 @@ export function toCharacterApiItem(character: Character): CharacterApiItem {
     role: character.role,
     team: character.team,
     specialty: character.specialty,
+    beginnerSummary: character.beginnerSummary,
+    beginnerGuide: character.beginnerGuide,
     personality: character.personality,
     selectionReason: character.selectionReason,
     imageSrc: character.imageSrc,
