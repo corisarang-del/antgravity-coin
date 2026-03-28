@@ -148,3 +148,46 @@
 - 로그인 화면 headline은 현재 `바로시작` 한 줄 카피를 기준으로 운영된다.
 - Google / Kakao 버튼은 보조 설명을 줄여 버튼 선택 자체가 먼저 보이게 정리됐다.
 - 상단 설명문, 에러 안내, 하단 보조 카피는 확대된 설명문 규칙을 적용받는다.
+
+## 2026-03-27 인증 보안/회귀 테스트 메모
+
+- `GET /auth/callback`
+  - 외부 `next`는 계속 내부 경로로 강제됨
+  - `code` 교환 실패 시 `oauth_callback_failed`로 로그인 화면 복귀
+  - 회귀 테스트 파일: `src/app/auth/callback/route.test.ts`
+- `POST /api/auth/signout`
+  - 서버 `signOut()` 호출 유지
+  - 회귀 테스트 파일: `src/app/api/auth/signout/route.test.ts`
+- 현재 auth 관련 보안 흐름은 callback 경로 강제, 서버 세션 종료, guest 병합 시 서버 상태 우선 규칙까지 포함해서 다시 확인된 상태다.
+
+## 2026-03-28 Google 로그인 설정 / 아바타 렌더 메모
+
+### 현재 구현 상태
+
+- Google 로그인 버튼과 callback 교환 흐름은 이미 코드에 들어가 있음
+  - `src/app/login/LoginPageClient.tsx`
+  - `src/app/auth/callback/route.ts`
+- 따라서 새 과제는 “구현”보다 아래 설정 연결로 봐야 함
+  - Google Cloud OAuth client 생성
+  - Supabase Dashboard `Authentication -> Providers -> Google`
+  - Supabase `URL Configuration`
+
+### 설정 시 반드시 맞춰야 할 값
+
+- Google Cloud `Authorized JavaScript origins`
+  - `http://localhost:3000`
+  - 필요하면 `http://localhost:3001`
+- Google Cloud `Authorized redirect URIs`
+  - Supabase callback URL 그대로
+  - 보통 `https://<project-ref>.supabase.co/auth/v1/callback`
+- Supabase `Site URL`
+  - 로컬 개발 기준 `http://localhost:3000`
+- Supabase `Additional Redirect URLs`
+  - `http://localhost:3000/**`
+  - 필요하면 `http://localhost:3001/**`
+
+### 런타임 후속 이슈
+
+- Google 로그인 후 `/me` 페이지에서 프로필 이미지가 `lh3.googleusercontent.com`으로 내려오며 `next/image`가 런타임 에러를 냈음
+- 이를 해결하려고 `next.config.ts`의 `images.remotePatterns`에 아래 호스트를 추가했음
+  - `https://lh3.googleusercontent.com/**`

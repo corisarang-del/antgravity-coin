@@ -769,3 +769,73 @@
 - `pnpm-lock.yaml`
 - `SECURITY_AUDIT.md`
 - `research.md`
+
+## 2026-03-28 의존성 복구 / Google 로그인 후속 체크포인트
+
+### 이번 세션에서 실제로 확인한 근본 원인
+
+- `next dev`가 반복해서 깨진 직접 원인은 코드보다 `node_modules`와 pnpm store 손상이었음
+- 처음엔 `react`, `react-dom` 누락처럼 보였지만, 실제로는 아래 패키지들이 부분적으로 깨진 상태였음
+  - `react`
+  - `react-dom`
+  - `scheduler`
+  - `zod`
+  - `@supabase/ssr`
+- 같은 손상 패키지를 기존 store에서 계속 재사용하면서 오류가 반복됐음
+- 중간에 보였던 대표 증상
+  - `Cannot find module ... react/index.js`
+  - `Module not found: Can't resolve '@supabase/ssr'`
+  - `Module not found: Can't resolve 'zod'`
+  - `Module not found: Can't resolve 'scheduler'`
+  - `spawn EPERM`
+  - `.next/dev/lock` 충돌
+
+### 최종 복구 방식
+
+- 기존 store 재사용을 버리고 새 로컬 store `.pnpm-store-clean`로 강제 재설치함
+- sandbox 안에서는 postinstall 단계에서 `spawn EPERM`이 나서 설치가 끝까지 안 갔고, sandbox 밖 실행으로 마무리했음
+- 이후 새 세션에서도 같은 store를 쓰게 하려고 `.npmrc`에 `store-dir=.pnpm-store-clean`을 추가했음
+- 최종적으로 아래 의존성 resolve가 정상으로 돌아온 걸 확인함
+  - `react`
+  - `react-dom`
+  - `scheduler`
+  - `zod`
+  - `@supabase/ssr`
+- 현재 의존성 핵심 버전
+  - `react`: `19.2.4`
+  - `react-dom`: `19.2.4`
+  - `scheduler`: `0.27.0`
+  - `zod`: `4.3.6`
+  - `@supabase/ssr`: `0.9.0`
+
+### 이번 세션 검증 결과
+
+- `pnpm build` 통과 확인
+- `next dev` 로그에서 `Ready in 805ms` 확인
+- 즉 현재 기준으로는 새 세션에서 먼저 의심할 건 코드보다 다시 깨진 store / install 상태인지 여부임
+
+### Google 로그인 구현 상태 판단
+
+- 코드 기준으로 Google 로그인 흐름 자체는 이미 구현돼 있음
+  - `/login`의 `Google로 시작` 버튼
+  - `signInWithOAuth({ provider: "google" })`
+  - `/auth/callback`에서 `exchangeCodeForSession(code)`
+  - `/me`로 리디렉션
+- 따라서 새로 구현할 핵심은 버튼 추가가 아니라 아래 설정 연결 쪽이었음
+  - Google Cloud OAuth client
+  - Supabase Provider 설정
+  - Supabase URL Configuration
+
+### Google 로그인 후 실제로 추가한 코드 수정
+
+- `/me`에서 Google 프로필 이미지 URL이 `lh3.googleusercontent.com`으로 내려와 `next/image` 런타임 에러가 발생했음
+- `next.config.ts`에 아래 remote host 허용을 추가함
+  - `https://lh3.googleusercontent.com/**`
+- 이 수정 덕분에 Google 로그인 후 프로필 아바타 렌더 에러 원인은 해소된 상태로 봐도 됨
+
+### 새 세션에서 바로 이어갈 때 주의할 것
+
+1. `pnpm run dev`가 또 이상하면 코드보다 먼저 install/store 상태를 의심
+2. 로컬 dev 포트가 `3000`이 아닐 수 있으니 Google Cloud / Supabase redirect 허용 URL에 `3001`도 필요할 수 있음
+3. Google 로그인이 성공해도 `/me`에서 아바타 관련 에러가 다시 나면 `next.config.ts` remotePatterns가 유지되는지 먼저 확인
+4. 새로 `pnpm add`나 `pnpm install`을 할 일이 생기면 store mismatch가 다시 나오지 않는지 같이 확인

@@ -490,3 +490,88 @@ AGENTS에서는 제품 사양 기준 문서를 `docs/PRD.md`로 적고 있지만
 3. admin 계정 권한 부여 여부
 
 그 이후 우선순위는 다시 battle 품질과 live 안정성으로 넘어가면 된다.
+
+## 21. 2026-03-28 `memory.md` 재이해 업데이트
+
+이번 세션에서 `memory.md`를 다시 읽으면서 아래 운영 규칙을 더 분명하게 확정했다.
+
+- `memory.md`는 단순 회고가 아니라 다음 세션의 실행 순서를 정하는 운영 매뉴얼에 가깝다.
+- 문서 기준은 `docs/PRD.md`, `spec/*.md`를 먼저 보되, 실제 최신 구현 맥락은 `docs/planning/*`에도 많이 반영돼 있어서 둘을 분리해서 읽으면 안 된다.
+- 응답 규칙, 기록 규칙, 더러운 워크트리 주의는 부가 메모가 아니라 항상 먼저 지켜야 하는 전제다.
+  - 반말 한글
+  - 이모티콘 금지
+  - `docs/prompt`, `docs/개발일지` 기록 유지
+  - 무관한 사용자 변경 절대 롤백 금지
+
+이번 세션의 `git status`로도 이 전제가 다시 확인됐다.
+
+- 런타임 산출물, 이미지, 로그, `database/data/*.json`, `tmp/*`, `out/*` 변경이 많이 섞여 있다.
+- 따라서 다음 작업도 구현 전에 반드시 “커밋 대상 코드 / 문서”와 “런타임 산출물”을 먼저 분리해서 읽어야 한다.
+
+기술적으로 지금 가장 중요한 이해도 다시 좁혀졌다.
+
+1. 지금 당장 더 중요한 건 새 기능 추가보다 `judy`, `shade`의 round 2 진행 확인과 live 재검증이다.
+2. local WIP는 아직 성공 확인 전이라 바로 커밋하거나 푸시하면 안 된다.
+3. 운영 반영 전 체크는 계속 보안 migration, `GUEST_SESSION_SECRET`, admin 권한 부여가 우선이다.
+4. 그 다음에야 모델 배치 재조정, parser 보강, `pickReadyAt` 계측 같은 battle 품질 작업을 이어가는 게 맞다.
+
+즉 현재 프로젝트를 이해하는 가장 안전한 요약은 아래다.
+
+- battle UX는 이미 많이 빨라졌지만 free 모델 편차 때문에 live 안정성 검증이 계속 필요하다.
+- 보안은 코드 수정 단계보다 배포 반영 확인 단계로 넘어와 있다.
+- 새 세션에서 실수하기 쉬운 지점은 구현 부족보다 “더러운 워크트리와 미검증 WIP를 섞어서 판단하는 것”이다.
+
+## 22. 2026-03-28 의존성 복구와 Google 로그인 후속
+
+이번 세션에서 가장 중요한 새 사실은, 최근 dev/build 불안정이 애플리케이션 코드보다 pnpm install 결과물 손상에 더 가까웠다는 점이다.
+
+- 반복 증상
+  - `react`, `react-dom` 누락
+  - `zod`, `scheduler`, `@supabase/ssr` 누락
+  - `spawn EPERM`
+  - `.next/dev/lock` 충돌
+- 근본 원인 판단
+  - 기존 pnpm store에서 부분 손상된 패키지를 반복 재사용하면서 같은 오류가 연쇄적으로 다시 발생
+
+복구는 아래 흐름으로 진행됐다.
+
+1. `react`, `react-dom`을 `19.2.4`로 상향
+2. 새 로컬 store `.pnpm-store-clean`로 강제 재설치
+3. sandbox 밖 설치로 postinstall `spawn EPERM` 우회
+4. `.npmrc`에 `store-dir=.pnpm-store-clean` 추가
+5. `react`, `react-dom`, `scheduler`, `zod`, `@supabase/ssr` resolve 정상 확인
+6. `pnpm build` 통과 확인
+7. `next dev` 로그에서 `Ready in 805ms` 확인
+
+즉 다음 세션에서 dev/build가 다시 비슷하게 깨지면, 코드를 의심하기 전에 install/store 상태부터 확인하는 게 맞다.
+
+### Google 로그인 구현 상태
+
+이 프로젝트에서 Google 로그인은 “이제 구현할 기능”보다는 “이미 코드가 있고 설정을 마무리해야 하는 기능”에 더 가깝다.
+
+- 현재 코드에 이미 있는 것
+  - `/login`의 Google OAuth 버튼
+  - `signInWithOAuth({ provider: "google" })`
+  - `/auth/callback`의 `exchangeCodeForSession(code)`
+  - `/me` 진입 흐름
+- 실제 남은 일
+  - Google Cloud OAuth client 설정
+  - Supabase Google provider 설정
+  - Supabase URL Configuration 정합성 확인
+
+### Google 로그인 후 실제로 생긴 런타임 이슈
+
+Google 로그인 후 `/me` 페이지에서 프로필 이미지가 `https://lh3.googleusercontent.com/...`로 내려오면서 `next/image`가 런타임 에러를 냈다.
+
+이를 해결하려고 [next.config.ts](C:/Users/khc/Desktop/fastcampus/ant_gravity_coin/next.config.ts)에 아래 remote host를 추가했다.
+
+- `lh3.googleusercontent.com`
+
+이 수정은 단순 UI 오류 대응이 아니라 OAuth provider별 외부 이미지 호스트 허용 정책의 일부로 이해하는 게 맞다.
+
+### 새 세션 우선순위에 추가된 것
+
+1. `pnpm` 관련 새 작업 전에 현재 install/store 상태가 정상인지 먼저 확인
+2. Google Cloud와 Supabase의 origin / redirect 설정이 실제 dev 포트와 맞는지 확인
+3. Google 로그인 후 `/me`의 avatar 렌더링이 계속 정상인지 확인
+4. 이후에만 battle live 품질과 round 2 검증으로 다시 돌아가기

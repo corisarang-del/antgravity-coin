@@ -2,8 +2,11 @@
 !.env*.example
 node_modules/
 .next/
+.pnpm-store-clean/
 bootstrap-app/
 backup-worktree/
 skill-staging/
 pptx/
 *.tsbuildinfo
+
+.vercel

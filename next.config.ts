@@ -22,6 +22,13 @@ const nextConfig: NextConfig = {
         pathname: "/characters/**",
       },
     ],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "lh3.googleusercontent.com",
+        pathname: "/**",
+      },
+    ],
   },
   async headers() {
     return [

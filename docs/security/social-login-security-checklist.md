@@ -10,9 +10,12 @@
   - 기준 파일: `src/app/auth/callback/route.ts`
 - [x] 로그아웃 시 서버 `signOut()`을 호출한다
   - 기준 파일: `src/app/api/auth/signout/route.ts`
+  - 회귀 테스트: `src/app/api/auth/signout/route.test.ts`
 - [x] 만료/무효 세션은 서버에서 `auth.getUser()`로 재검증한다
   - 기준 파일: `src/infrastructure/auth/updateSession.ts`
   - 기준 파일: `src/app/api/auth/session/route.ts`
+- [x] callback redirect 방어와 실패 처리 회귀 테스트가 있다
+  - 기준 파일: `src/app/auth/callback/route.test.ts`
 
 ## 대시보드에서 수동 확인할 것
 
@@ -20,6 +23,9 @@
   - 예: `https://your-domain.com/auth/callback`
   - 로컬 개발 URL도 필요한 것만 등록
 - [ ] Google OAuth redirect URI가 Supabase callback URL과 정확히 일치하는지 확인
+- [ ] Google OAuth JavaScript origin에 실제 dev 포트가 포함돼 있는지 확인
+  - `http://localhost:3000`
+  - 필요하면 `http://localhost:3001`
 - [ ] Kakao OAuth redirect URI가 Supabase callback URL과 정확히 일치하는지 확인
 - [ ] 허용되지 않은 preview/임시 도메인이 OAuth redirect allowlist에 남아있지 않은지 확인
 
@@ -47,13 +53,26 @@
 
 - [ ] callback 실패 원인을 서버 로그에서 구분 가능하게 남길지 결정
 - [ ] OAuth provider별 허용 이메일 도메인/관리자 계정 정책이 필요한지 결정
-- [ ] 인증 관련 route에 보안 회귀 테스트를 CI에 포함
+- [x] Google 프로필 이미지 호스트를 `next/image` 허용 목록에 포함
+  - 기준 파일: `next.config.ts`
+  - 허용 호스트: `lh3.googleusercontent.com`
+- [x] 인증 관련 route에 보안 회귀 테스트를 CI 대상에 포함
 ## 2026-03-27 추가 메모
 
 - 현재 코드 기준으로 social login 자체의 핵심 흐름은 계속 유효
   - `next`는 내부 경로만 허용
   - callback 실패 시 로그인 에러 화면으로 보냄
   - signout은 서버 `signOut()` 호출
+- 현재 회귀 테스트도 아래까지 추가된 상태
+  - `src/app/auth/callback/route.test.ts`
+  - `src/app/api/auth/signout/route.test.ts`
 - 이번 보안 수정과 직접 연결되는 추가 체크포인트는 아래 두 가지임
   - 로그인 후 guest 상태를 계정으로 병합할 때도 클라이언트 로컬 진행도를 신뢰하지 않게 바뀌었는지 유지 확인
   - 배포 환경에 `GUEST_SESSION_SECRET`가 실제로 설정돼 있는지 확인
+
+## 2026-03-28 추가 메모
+
+- 이번 세션에서 OAuth 코드보다 install/store 손상이 더 큰 장애 원인이었음
+- Google 로그인 후 실제로 마주친 사용자 노출 에러는 아래였음
+  - `/me` 페이지 `next/image`가 `lh3.googleusercontent.com`을 허용하지 않아 런타임 에러 발생
+- 따라서 social login 점검 범위는 이제 redirect / callback뿐 아니라 provider 이미지 호스트 허용 여부까지 포함해서 보는 게 맞다
