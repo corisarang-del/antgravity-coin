@@ -1,5 +1,6 @@
 "use client";
 
+import { useSearchParams } from "next/navigation";
 import { useRef, useState } from "react";
 import { characters } from "@/shared/constants/characters";
 
@@ -8,6 +9,8 @@ function getPreviewVideoSrc(characterId: string) {
 }
 
 export function LandingEnterOverlay() {
+  const searchParams = useSearchParams();
+  const skipOverlay = searchParams.get("entered") === "1";
   const unlockVideoRef = useRef<HTMLVideoElement | null>(null);
   const [isEntered, setIsEntered] = useState(false);
 
@@ -37,7 +40,7 @@ export function LandingEnterOverlay() {
     setIsEntered(true);
   };
 
-  if (isEntered) {
+  if (skipOverlay || isEntered) {
     return null;
   }
 
