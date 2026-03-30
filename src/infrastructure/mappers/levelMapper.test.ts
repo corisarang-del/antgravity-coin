@@ -8,7 +8,7 @@ describe("levelMapper", () => {
     expect(mapXpToUserLevel(400, 0, 0).title).toBe("전설개미");
   });
 
-  it("깨진 등급명을 level 기준 canonical title로 교정한다", () => {
+  it("저장된 title이 깨졌거나 달라도 level 기준 canonical title로 교정한다", () => {
     expect(
       normalizeUserLevel({
         level: 1,
@@ -23,6 +23,21 @@ describe("levelMapper", () => {
       xp: 12,
       wins: 1,
       losses: 0,
+    });
+    expect(
+      normalizeUserLevel({
+        level: 2,
+        title: "아무말",
+        xp: 120,
+        wins: 3,
+        losses: 1,
+      }),
+    ).toEqual({
+      level: 2,
+      title: "새싹개미",
+      xp: 120,
+      wins: 3,
+      losses: 1,
     });
   });
 
