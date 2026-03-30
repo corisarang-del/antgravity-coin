@@ -35,6 +35,12 @@ interface OutcomeResponsePayload {
 }
 
 type ResolveStage = "idle" | "checking" | "settling" | "report";
+type ProgressStep = {
+  label: string;
+  status: string;
+  progressPercent: number;
+  active?: boolean;
+};
 
 function readAppliedBattleResults() {
   if (typeof window === "undefined") {
@@ -81,6 +87,35 @@ function getRemainingSeconds(settlementAt: string) {
   return Math.max(0, Math.ceil((Date.parse(settlementAt) - Date.now()) / 1000));
 }
 
+function getTimeProgress(selectedAt: string, settlementAt: string, now = Date.now()) {
+  const selectedAtMs = Date.parse(selectedAt);
+  const settlementAtMs = Date.parse(settlementAt);
+
+  if (!Number.isFinite(selectedAtMs) || !Number.isFinite(settlementAtMs) || settlementAtMs <= selectedAtMs) {
+    return {
+      totalDurationMs: 0,
+      elapsedMs: 0,
+      remainingMs: 0,
+      progressRatio: 0,
+      progressPercent: 0,
+    };
+  }
+
+  const totalDurationMs = settlementAtMs - selectedAtMs;
+  const elapsedMs = Math.min(Math.max(0, now - selectedAtMs), totalDurationMs);
+  const remainingMs = Math.max(0, settlementAtMs - now);
+  const progressRatio = Math.min(1, Math.max(0, elapsedMs / totalDurationMs));
+  const progressPercent = Math.round(progressRatio * 100);
+
+  return {
+    totalDurationMs,
+    elapsedMs,
+    remainingMs,
+    progressRatio,
+    progressPercent,
+  };
+}
+
 function getStageCopy(resolveStage: ResolveStage) {
   switch (resolveStage) {
     case "checking":
@@ -106,6 +141,63 @@ function getStageCopy(resolveStage: ResolveStage) {
   }
 }
 
+function ResultProgressBar({
+  label,
+  progressPercent,
+  helperText,
+}: {
+  label: string;
+  progressPercent: number;
+  helperText: string;
+}) {
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center justify-between gap-3 text-xs font-semibold">
+        <span className="text-muted-foreground">{label}</span>
+        <span className="text-foreground">{progressPercent}%</span>
+      </div>
+      <div className="h-3 overflow-hidden rounded-full bg-[hsl(var(--surface-2))]">
+        <div
+          aria-label={label}
+          aria-valuemax={100}
+          aria-valuemin={0}
+          aria-valuenow={progressPercent}
+          className="h-full rounded-full bg-primary transition-all duration-500"
+          role="progressbar"
+          style={{ width: `${progressPercent}%` }}
+        />
+      </div>
+      <p className="text-xs text-muted-foreground">{helperText}</p>
+    </div>
+  );
+}
+
+function ResultProgressStepCard({ step }: { step: ProgressStep }) {
+  return (
+    <div
+      className={`rounded-[16px] border px-3 py-3 text-xs transition-colors ${
+        step.active
+          ? "border-primary/25 bg-primary/5"
+          : "border-border/80 bg-[hsl(var(--surface-2))]"
+      }`}
+    >
+      <p className="font-semibold text-foreground">{step.label}</p>
+      <p className="mt-1 text-muted-foreground">{step.status}</p>
+      <div className="mt-3 h-2 overflow-hidden rounded-full bg-background/70">
+        <div
+          aria-label={`${step.label} 진행도`}
+          aria-valuemax={100}
+          aria-valuemin={0}
+          aria-valuenow={step.progressPercent}
+          className="h-full rounded-full bg-primary transition-all duration-500"
+          role="progressbar"
+          style={{ width: `${step.progressPercent}%` }}
+        />
+      </div>
+    </div>
+  );
+}
+
 export function ResultPageClient({ coinId }: ResultPageClientProps) {
   const { userBattle } = useUserBattle(coinId);
   const snapshot = useBattleSnapshot(coinId);
@@ -124,6 +216,9 @@ export function ResultPageClient({ coinId }: ResultPageClientProps) {
 
   const battleId = userBattle?.battleId ?? null;
   const settlementPending = userBattle ? remainingSeconds > 0 : false;
+  const timeProgress = userBattle
+    ? getTimeProgress(userBattle.selectedAt, userBattle.settlementAt)
+    : getTimeProgress("", "");
   const battleResult = useMemo(
     () => (battleOutcomeSeed ? toBattleResult(battleOutcomeSeed) : null),
     [battleOutcomeSeed],
@@ -313,6 +408,50 @@ export function ResultPageClient({ coinId }: ResultPageClientProps) {
   }
 
   const timeframeMeta = getBattleTimeframeMeta(userBattle.timeframe);
+  const pendingSteps: ProgressStep[] = [
+    {
+      label: "차트 마감 대기",
+      status: `실시간 정산까지 ${remainingSeconds}s`,
+      progressPercent: timeProgress.progressPercent,
+      active: true,
+    },
+    {
+      label: "승패와 XP 계산",
+      status: "곧 시작",
+      progressPercent: 0,
+    },
+    {
+      label: "리포트와 요약 정리",
+      status: "곧 시작",
+      progressPercent: 0,
+    },
+  ];
+  const resolveStageSteps: ProgressStep[] = [
+    {
+      label: "기존 결과 확인",
+      status: resolveStage === "idle" ? "곧 확인" : "확인 중",
+      progressPercent: resolveStage === "idle" ? 0 : 100,
+      active: resolveStage === "checking",
+    },
+    {
+      label: "실캔들 조회와 승패 계산",
+      status:
+        resolveStage === "settling"
+          ? "계산 중"
+          : resolveStage === "report"
+            ? "계산 완료"
+            : "곧 시작",
+      progressPercent:
+        resolveStage === "settling" ? 70 : resolveStage === "report" ? 100 : 0,
+      active: resolveStage === "settling",
+    },
+    {
+      label: "리포트 정리",
+      status: resolveStage === "report" ? "정리 중" : "곧 시작",
+      progressPercent: resolveStage === "report" ? 70 : 0,
+      active: resolveStage === "report",
+    },
+  ];
 
   if (settlementPending) {
     return (
@@ -337,15 +476,16 @@ export function ResultPageClient({ coinId }: ResultPageClientProps) {
               정산 시각 전에는 카운트다운과 준비 상태를 먼저 보여주고, 시간이 되면 같은 화면에서 결과 카드가
               채워져.
             </p>
+            <div className="mt-4">
+              <ResultProgressBar
+                helperText={`약 ${remainingSeconds}초 남음`}
+                label="준비 진행도"
+                progressPercent={timeProgress.progressPercent}
+              />
+            </div>
             <div className="mt-4 grid gap-2 sm:grid-cols-3">
-              {["차트 마감 대기", "승패와 XP 계산", "리포트와 요약 정리"].map((item) => (
-                <div
-                  key={item}
-                  className="rounded-[16px] border border-border/80 bg-[hsl(var(--surface-2))] px-3 py-3 text-xs"
-                >
-                  <p className="font-semibold text-foreground">{item}</p>
-                  <p className="mt-1 text-muted-foreground">{remainingSeconds > 0 ? "대기 중" : "곧 시작"}</p>
-                </div>
+              {pendingSteps.map((step) => (
+                <ResultProgressStepCard key={step.label} step={step} />
               ))}
             </div>
             <p className="ag-body-copy mt-4 text-muted-foreground">
@@ -367,31 +507,30 @@ export function ResultPageClient({ coinId }: ResultPageClientProps) {
           <section className="rounded-[28px] border border-border bg-card p-5 shadow-[0_18px_40px_rgba(17,29,61,0.08)]">
             <h1 className="font-display text-3xl font-bold tracking-[-0.05em]">{stageCopy.title}</h1>
             <p className="ag-body-copy mt-3 text-muted-foreground">{stageCopy.description}</p>
+            <div className="mt-4">
+              <ResultProgressBar
+                helperText={
+                  resolveStage === "checking"
+                    ? "기존 결과를 먼저 확인하고 있어."
+                    : resolveStage === "settling"
+                      ? "실캔들을 읽고 승패와 XP를 계산 중이야."
+                      : "결과는 먼저 보여주고 리포트를 뒤에서 붙이고 있어."
+                }
+                label="정산 진행도"
+                progressPercent={
+                  resolveStage === "checking"
+                    ? 33
+                    : resolveStage === "settling"
+                      ? 67
+                      : resolveStage === "report"
+                        ? 90
+                        : 0
+                }
+              />
+            </div>
             <div className="mt-4 grid gap-2 sm:grid-cols-3">
-              {[
-                {
-                  label: "기존 결과 확인",
-                  done: resolveStage !== "idle",
-                },
-                {
-                  label: "실캔들 조회와 승패 계산",
-                  done: resolveStage === "settling" || resolveStage === "report",
-                },
-                {
-                  label: "리포트 정리",
-                  done: resolveStage === "report",
-                },
-              ].map((step) => (
-                <div
-                  key={step.label}
-                  className={`rounded-[16px] border px-3 py-3 text-xs ${
-                    step.done
-                      ? "border-primary/25 bg-primary/5 text-foreground"
-                      : "border-border/80 bg-[hsl(var(--surface-2))] text-muted-foreground"
-                  }`}
-                >
-                  <p className="font-semibold">{step.label}</p>
-                </div>
+              {resolveStageSteps.map((step) => (
+                <ResultProgressStepCard key={step.label} step={step} />
               ))}
             </div>
           </section>
