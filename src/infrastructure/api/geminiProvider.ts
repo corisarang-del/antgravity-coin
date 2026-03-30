@@ -27,7 +27,7 @@ export const geminiProvider: LlmProvider = {
 
     const baseUrl =
       envConfig.geminiApiUrl || "https://generativelanguage.googleapis.com/v1beta/models";
-    const url = `${baseUrl}/${model}:generateContent?key=${envConfig.geminiApiKey}`;
+    const url = `${baseUrl}/${model}:generateContent`;
 
     try {
       const controller = new AbortController();
@@ -36,6 +36,7 @@ export const geminiProvider: LlmProvider = {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "x-goog-api-key": envConfig.geminiApiKey,
         },
         body: JSON.stringify({
           systemInstruction: {

@@ -37,7 +37,7 @@ async function requestGemini(prompt: string) {
 
   const baseUrl =
     envConfig.geminiApiUrl || "https://generativelanguage.googleapis.com/v1beta/models";
-  const url = `${baseUrl}/gemini-2.5-pro:generateContent?key=${envConfig.geminiApiKey}`;
+  const url = `${baseUrl}/gemini-2.5-pro:generateContent`;
 
   try {
     const controller = new AbortController();
@@ -47,6 +47,7 @@ async function requestGemini(prompt: string) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "x-goog-api-key": envConfig.geminiApiKey,
         },
         body: JSON.stringify({
           contents: [

@@ -105,7 +105,7 @@ export const openRouterProvider: LlmProvider = {
           markModelUnavailable(model, cooldownMs);
         }
         console.warn(
-          `[battle-llm:error] character=${input.characterId} provider=openrouter model=${model} reason=http_status status=${response.status} body=${responseBody.slice(0, 240)}`,
+          `[battle-llm:error] character=${input.characterId} provider=openrouter model=${model} reason=http_status status=${response.status} responseBodyLength=${responseBody.length}`,
         );
         return null;
       }
@@ -118,7 +118,7 @@ export const openRouterProvider: LlmProvider = {
         data = JSON.parse(responseBody) as OpenRouterResponse;
       } catch {
         console.warn(
-          `[battle-llm:error] character=${input.characterId} provider=openrouter model=${model} reason=parse_failed body=${responseBody.slice(0, 240)}`,
+          `[battle-llm:error] character=${input.characterId} provider=openrouter model=${model} reason=parse_failed responseBodyLength=${responseBody.length}`,
         );
         return null;
       }
@@ -126,7 +126,7 @@ export const openRouterProvider: LlmProvider = {
       const content = data.choices?.[0]?.message?.content ?? null;
       if (!content) {
         console.warn(
-          `[battle-llm:error] character=${input.characterId} provider=openrouter model=${model} reason=empty_content body=${responseBody.slice(0, 240)}`,
+          `[battle-llm:error] character=${input.characterId} provider=openrouter model=${model} reason=empty_content responseBodyLength=${responseBody.length}`,
         );
       }
       return content;

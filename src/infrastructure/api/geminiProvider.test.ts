@@ -94,6 +94,13 @@ describe("geminiProvider", () => {
     expect(body.systemInstruction?.parts?.[0]?.text).toContain("Judy");
     expect(body.contents?.[0]?.role).toBe("user");
     expect(body.contents?.[0]?.parts?.[0]?.text).toContain("summary");
+    expect(fetchMock.mock.calls[0]?.[0]).toBe(
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent",
+    );
+    expect(requestInit?.headers).toMatchObject({
+      "Content-Type": "application/json",
+      "x-goog-api-key": "key",
+    });
     vi.unstubAllGlobals();
   });
 });
