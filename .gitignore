@@ -1,6 +1,8 @@
 .env*
 !.env*.example
 node_modules/
+.pnpm-store-clean/
+.vercel/
 .next/
 bootstrap-app/
 backup-worktree/

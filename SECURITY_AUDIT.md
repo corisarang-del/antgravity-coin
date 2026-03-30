@@ -73,3 +73,22 @@
   - `GUEST_SESSION_SECRET` 설정
   - admin 권한 부여
 - 그 이후에는 보안보다 battle live 품질과 기존 `llmRouter.test.ts` 실패 정리가 우선이다.
+
+## 2026-03-31 추가 메모
+
+- dirty worktree에서 production 미반영 의미 있는 코드가 남았는지 다시 점검한 결과, 사실상 Gemini/OpenRouter 보안 후속만 별도 반영 대상이었다
+- 아래 보안 후속은 clean production worktree에서 따로 반영했고 현재 `master`까지 올렸음
+  - Gemini API 키를 URL 쿼리스트링 대신 `x-goog-api-key` 헤더로 전송
+  - OpenRouter 실패 로그에서 raw response body 제거
+  - 관련 테스트 3개 추가/보강
+- 관련 커밋
+  - `dc86c3e`
+  - `fix: harden gemini and openrouter logging`
+- 검증
+  - `pnpm.cmd typecheck` 통과
+  - `pnpm.cmd build` 통과
+  - Gemini/OpenRouter 관련 Vitest 통과
+- 운영 메모
+  - Git 기반 production 반영은 실제로 정상 동작
+  - `vercel deploy --prod --yes` 수동 실행은 마지막 단계에서 `Unexpected error. Please try again later. ()`가 반복됨
+  - 따라서 현재는 수동 CLI 배포보다 Git 기반 production 반영을 우선하는 게 안전함

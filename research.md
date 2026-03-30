@@ -490,3 +490,35 @@ AGENTS에서는 제품 사양 기준 문서를 `docs/PRD.md`로 적고 있지만
 3. admin 계정 권한 부여 여부
 
 그 이후 우선순위는 다시 battle 품질과 live 안정성으로 넘어가면 된다.
+
+## 21. 2026-03-31 production sync / dirty cleanup 정리
+
+- 현재 기준 production에서 직접 확인한 사용자 기능
+  - `/characters` 초보용 한줄 해설
+  - `/battle/[coinId]/result` 준비 진행 바
+  - 홈 / 로고 본문 랜딩 이동
+  - `/me` 현재 등급 `개미`
+- 즉 최근 사용자 체감 기능은 production 기준으로 반영 완료라고 봐도 됨
+
+### 지금 기준 production 미반영 코드 판단
+
+- 메인 dirty worktree에 남아 있던 의미 있는 미반영 코드는 Gemini/OpenRouter 보안 후속뿐이었음
+- 그 보안 후속도 clean production worktree에서 별도 반영 후 `master`까지 올렸음
+- 따라서 지금 메인 dirty 대상으로 남아 있던 것들은 대부분 아래 성격이었다
+  - runtime 산출물
+  - tmp / logs
+  - preview / automation 실험 파일
+  - 미추적 prompt / 개발일지 기록
+
+### cleanup 결과
+
+- 메인 workspace의 tracked dirty 변경은 되돌림
+- untracked 파일은 삭제 대신 아래 backup 폴더로 이동
+  - `C:\Users\Public\Documents\ESTsoft\CreatorTemp\ant_gravity_coin_dirty_backup_20260331_001`
+- 다음 세션은 사실상 `master` 기준 clean 상태에서 시작하면 됨
+
+### 운영 메모
+
+- Git push를 통한 production 반영은 실제로 확인됐음
+- 반면 `vercel deploy --prod --yes` 수동 실행은 여러 번 `Unexpected error`로 실패했음
+- 즉 현재 운영 원칙은 “CLI 직접 배포보다 Git 기반 production 반영 우선”이다

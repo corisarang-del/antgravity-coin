@@ -769,3 +769,77 @@
 - `pnpm-lock.yaml`
 - `SECURITY_AUDIT.md`
 - `research.md`
+
+## 2026-03-31 production sync / cleanup 메모
+
+### production 기준으로 실제 확인한 것
+
+- production에서 아래 사용자 기능은 직접 확인 완료
+  - `/characters` 초보용 한줄 해설
+  - `/battle/[coinId]/result` 준비 진행 바
+  - 헤더 홈 / 로고가 본문 랜딩으로 이동
+  - `/me` 현재 등급이 `개미`로 정상 표시
+- current `master` 기준 최신 커밋은 `dc86c3e`
+  - `fix: harden gemini and openrouter logging`
+
+### production-minimal 브랜치로 한 일
+
+- clean release 브랜치 `codex/production-minimal-20260330`를 따로 만들어 최소 커밋만 cherry-pick 했음
+- 사용자 기능 최소 반영 커밋
+  - `cd04662` `/me` 등급 복구
+  - `25e9a9e` 헤더 랜딩 이동
+  - `95a4040` 캐릭터 도감 초보 설명
+  - `9785043` 결과 페이지 준비 진행 바
+  - `74823f4` 본문 랜딩 바로 진입
+  - `69127e0` level 기준 canonical title 강제
+- 그 브랜치에서
+  - `pnpm.cmd typecheck`
+  - `pnpm.cmd build`
+  - 핵심 Vitest
+  를 다시 돌려 확인했음
+
+### 보안 후속 반영 상태
+
+- dirty worktree에 남아 있던 의미 있는 미반영 코드는 Gemini/OpenRouter 보안 후속뿐이었음
+- 아래 3개 코드와 테스트 3개를 clean production worktree에서 따로 반영 후 `master`까지 올렸음
+  - `src/infrastructure/api/geminiProvider.ts`
+  - `src/infrastructure/api/geminiSynthesisClient.ts`
+  - `src/infrastructure/api/openRouterProvider.ts`
+- 관련 커밋
+  - `dc86c3e`
+  - `fix: harden gemini and openrouter logging`
+
+### Vercel 운영 메모
+
+- Git push를 통한 production 반영은 실제로 동작했음
+- 반면 `vercel deploy --prod --yes` 수동 실행은 마지막 단계에서 계속 아래 에러가 남았음
+  - `Unexpected error. Please try again later. ()`
+- 즉 현재 운영 판단은
+  - Git 기반 production 반영을 우선
+  - 수동 Vercel CLI production deploy는 별도 조사 대상으로 본다
+
+### dirty worktree cleanup 상태
+
+- tracked dirty 변경은 현재 브랜치 기준으로 되돌렸음
+- untracked 파일은 삭제 대신 외부 backup 폴더로 이동했음
+  - `C:\Users\Public\Documents\ESTsoft\CreatorTemp\ant_gravity_coin_dirty_backup_20260331_001`
+- backup 안에는 주로 아래가 들어 있음
+  - `tmp/*`
+  - `out/*`
+  - `.playwright-cli/*`
+  - `supabase/.temp/*`
+  - 실험용 테스트 / 스크립트
+  - 미추적 `docs/prompt/*`, `docs/개발일지/*`
+- 현재 메인 workspace는 `master` 기준으로 이어가면 됨
+- `.pnpm-store-clean/`, `.vercel/`은 `.gitignore`에 추가해서 다음 세션 noise를 줄였음
+
+### 다음 세션에서 바로 이어서 할 것
+
+1. `master`에서 시작
+2. backup 폴더 안 실험물 중 정말 살릴 것만 선별
+3. 수동 Vercel CLI production deploy 실패 원인을 따로 볼지 결정
+4. 그다음 다시 원래 제품 우선순위로 복귀
+   - battle live 품질
+   - 모델 안정성
+   - prewarm wall-clock
+   - 문서 인코딩 / 정리
